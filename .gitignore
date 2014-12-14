@@ -1,4 +1,10 @@
+bin/
 target/
+generated/
+generated-sources/
+src-gen/
+xtend-gen/
+.DS_Store
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup

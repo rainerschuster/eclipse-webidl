@@ -1,0 +1,470 @@
+grammar com.rainerschuster.webidl.WebIDL /*with org.eclipse.xtext.common.Terminals hidden(WHITESPACE_WEBIDL)*/ hidden(WS, ML_COMMENT, SL_COMMENT)
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+generate webIDL "http://www.mydsl.webidl/WebIDL"
+
+Definitions:
+	definitions+=ExtendedDefinition*
+;
+
+ExtendedDefinition:
+	eal=ExtendedAttributeList? def=Definition
+;
+
+Definition:
+	Callback
+	| Interface
+	| Partial
+	| Dictionary
+	| Enum
+	| Typedef
+	| ImplementsStatement
+;
+
+Callback:
+	'callback' CallbackRestOrInterface
+;
+
+CallbackRestOrInterface:
+	CallbackRest
+	| Interface
+;
+
+Interface:
+	'interface' name=IDENTIFIER_WEBIDL (':' inherits=[Interface|IDENTIFIER_WEBIDL])? '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
+;
+
+Partial:
+	'partial' PartialDefinition
+;
+
+PartialDefinition:
+	PartialInterface
+	| PartialDictionary
+;
+
+PartialInterface:
+	'interface' interfaceName=[Interface|IDENTIFIER_WEBIDL] '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
+;
+
+ExtendedInterfaceMember:
+	eal=ExtendedAttributeList? interfaceMember=InterfaceMember
+;
+
+InterfaceMember:
+	Const
+	| Operation
+	| Serializer
+	| Stringifier
+	| StaticMember
+	| Iterable_
+	| Attribute
+	| Maplike
+	| Setlike
+;
+
+Dictionary:
+	'dictionary' name=IDENTIFIER_WEBIDL (':' inherits=[Dictionary|IDENTIFIER_WEBIDL])? '{' dictionaryMembers+=ExtendedDictionaryMember* '}' ';'
+;
+
+ExtendedDictionaryMember:
+	eal=ExtendedAttributeList? dictionaryMember=DictionaryMember
+;
+
+DictionaryMember:
+	required?='required'? type=Type name=IDENTIFIER_WEBIDL defaultValue=Default? ';'
+;
+
+PartialDictionary:
+	'dictionary' dictionaryName=[Dictionary|IDENTIFIER_WEBIDL] '{' dictionaryMembers+=ExtendedDictionaryMember* '}' ';'
+;
+
+Default:{Default}
+	'=' defaultValue=DefaultValue
+;
+
+DefaultValue:
+	value=ConstValue
+	| value=STRING
+	| {DefaultValue} '[' ']'
+;
+
+Enum:
+	'enum' name=IDENTIFIER_WEBIDL '{' values+=STRING (',' values+=STRING)* '}' ';'
+;
+
+// TODO Rename to CallbackFunction?
+CallbackRest:
+	name=IDENTIFIER_WEBIDL '=' type=ReturnType '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
+;
+
+Typedef:
+	'typedef' type=Type name=IDENTIFIER_WEBIDL ';'
+;
+
+ImplementsStatement:
+	ifaceA=[Interface|IDENTIFIER_WEBIDL] 'implements' ifaceB=[Interface|IDENTIFIER_WEBIDL] ';'
+;
+
+Const:
+	'const' type=ConstType name=IDENTIFIER_WEBIDL '=' constValue=ConstValue ';'
+;
+
+ConstValue:
+	BooleanLiteral
+	| FloatLiteral
+	| INTEGER_WEBIDL
+	| 'null'
+;
+
+BooleanLiteral returns ecore::EBoolean:
+	'true'
+	| 'false'
+;
+
+FloatLiteral returns ecore::EFloat:
+	FLOAT_WEBIDL
+	| '-Infinity'
+	| 'Infinity'
+	| 'NaN'
+;
+
+Serializer
+	: 'serializer' operation=Operation
+	| 'serializer' '=' pattern=SerializationPattern ';' // TODO the semicolon is not specified!
+;
+
+SerializationPattern
+	: {SerializationPattern}'{' patternMap=SerializationPatternMap? '}' 
+	| {SerializationPattern}'[' patternList=SerializationPatternList? ']' 
+	| {SerializationPattern}identifiers+=IDENTIFIER_WEBIDL
+;
+
+SerializationPatternMap
+	: getter?='getter' 
+	| inherit?='inherit' (',' identifiers+=IDENTIFIER_WEBIDL)*
+	| identifiers+=IDENTIFIER_WEBIDL (',' identifiers+=IDENTIFIER_WEBIDL)*
+;
+
+SerializationPatternList
+	: getter?='getter' 
+	| identifiers+=IDENTIFIER_WEBIDL (',' identifiers+=IDENTIFIER_WEBIDL)*
+;
+
+Stringifier
+	: 'stringifier' StringifierRest
+;
+
+StringifierRest
+	: Attribute
+	| Operation
+	| {EmptyStringifier}';'
+;
+
+StaticMember
+	: 'static' StaticMemberRest
+;
+
+StaticMemberRest
+	: Attribute
+	| Operation
+;
+
+Attribute
+	: inherit?='inherit'? readOnly?='readonly'? 'attribute' type=Type name=AttributeName ';'
+;
+
+AttributeName:
+	AttributeNameKeyword
+	| IDENTIFIER_WEBIDL
+;
+
+AttributeNameKeyword:
+	'required'
+;
+
+Operation
+	: specials+=Special* type=ReturnType name=IDENTIFIER_WEBIDL? '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
+;
+
+enum Special:
+	GETTER='getter'
+	| SETTER='setter'
+	| CREATOR='creator'
+	| DELETER='deleter'
+	| LEGACYCALLER='legacycaller'
+//	| STRINGIFIER='stringifier'
+//	| SERIALIZER='serializer'
+;
+
+//OperationRest:
+//	type=ReturnType name=IDENTIFIER_WEBIDL? '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
+//;
+
+Argument:
+	eal=ExtendedAttributeList?
+		(optional?="optional" type=Type name=ArgumentName defaultValue=Default? 
+		| type=Type ellipsis?='...'? name=ArgumentName)
+;
+
+ArgumentName:
+	ArgumentNameKeyword
+	| IDENTIFIER_WEBIDL
+;
+
+Iterable_
+	: 'iterable' '<' types+=Type (',' types+=Type)? '>' ';'
+	| legacy?='legacyiterable' '<' types+=Type '>' ';'
+;
+
+Maplike
+	: readOnly?='readonly'? 'maplike' '<' keyType=Type ',' valueType=Type '>' ';'
+;
+
+Setlike
+	: readOnly?='readonly'? 'setlike' '<' type=Type '>' ';'
+;
+
+ExtendedAttributeList:
+	'[' extendedAttributes+=ExtendedAttribute (',' extendedAttributes+=ExtendedAttribute)* ']';
+
+ExtendedAttribute:{ExtendedAttribute} (
+	'(' extendedAttributeInner=ExtendedAttributeInner? ')' extendedAttributeRest=ExtendedAttributeRest?
+	| '[' extendedAttributeInner=ExtendedAttributeInner? ']' extendedAttributeRest=ExtendedAttributeRest?
+	| '{' extendedAttributeInner=ExtendedAttributeInner? '}' extendedAttributeRest=ExtendedAttributeRest?
+	| other=Other extendedAttributeRest=ExtendedAttributeRest?);
+
+ExtendedAttributeRest:
+	ExtendedAttribute;
+
+ExtendedAttributeInner:{ExtendedAttributeInner} (
+	'(' extendedAttributeInner=ExtendedAttributeInner? ')' extendedAttributeInner2=ExtendedAttributeInner?
+	| '[' extendedAttributeInner=ExtendedAttributeInner? ']' extendedAttributeInner2=ExtendedAttributeInner?
+	| '{' extendedAttributeInner=ExtendedAttributeInner? '}' extendedAttributeInner2=ExtendedAttributeInner?
+	| other=OtherOrComma extendedAttributeInner2=ExtendedAttributeInner?);
+
+Other:
+	INTEGER_WEBIDL
+	| FLOAT_WEBIDL
+	| IDENTIFIER_WEBIDL
+	| STRING
+	| OTHER_WEBIDL
+	| '-'
+	| '-Infinity'
+	| '.'
+	| '...'
+	| ':'
+	| ';'
+	| '<'
+	| '='
+	| '>'
+	| '?'
+	| 'ByteString'
+	| 'Date'
+	| 'DOMString'
+	| 'Infinity'
+	| 'NaN'
+	| 'RegExp'
+	| 'USVString'
+	| 'any'
+	| 'boolean'
+	| 'byte'
+	| 'double'
+	| 'false'
+	| 'float'
+	| 'long'
+	| 'null'
+	| 'object'
+	| 'octet'
+	| 'or'
+	| 'optional'
+	| 'sequence'
+	| 'short'
+	| 'true'
+	| 'unsigned'
+	| 'void'
+	| ArgumentNameKeyword
+	| BufferRelatedType
+;
+
+ArgumentNameKeyword:
+	'attribute' 
+	| 'callback' 
+	| 'const' 
+	| 'creator' 
+	| 'deleter' 
+	| 'dictionary' 
+	| 'enum' 
+	| 'getter' 
+	| 'implements' 
+	| 'inherit' 
+	| 'interface' 
+	| 'iterable'
+	| 'legacycaller'
+	| 'legacyiterable'
+	| 'maplike'
+	| 'partial' 
+	| 'required'
+	| 'serializer'
+	| 'setlike'
+	| 'setter' 
+	| 'static' 
+	| 'stringifier' 
+	| 'typedef' 
+	| 'unrestricted'
+;
+
+OtherOrComma:
+	Other
+	| ','
+;
+
+Type:
+	SingleType
+	| UnionType typeSuffix+=TypeSuffix*
+;
+
+SingleType:
+	NonAnyType
+	| {AnyType} 'any' typeSuffix+=TypeSuffix* // TODO Must start with Array!
+;
+
+UnionType:
+	'(' unionMemberTypes+=Type ('or' unionMemberTypes+=Type)+ ')'
+;
+
+NonAnyType:
+	/*type=*/PrimitiveType typeSuffix+=TypeSuffix*
+	| {PromiseType} 'Promise' '<' type=ReturnType '>' typeSuffix+=NullableTypeSuffix? // nullable?=Nullable?
+	| {ByteStringType} 'ByteString' typeSuffix+=TypeSuffix*
+	| {DOMStringType} 'DOMString' typeSuffix+=TypeSuffix*
+	| {USVStringType} 'USVString' typeSuffix+=TypeSuffix*
+	| typeRef=[Definition|IDENTIFIER_WEBIDL] typeSuffix+=TypeSuffix*
+	| {SequenceType} 'sequence' '<' type=Type '>' typeSuffix+=NullableTypeSuffix? // nullable?=Nullable?
+	| {ObjectType} 'object' typeSuffix+=TypeSuffix*
+	| {DateType} 'Date' typeSuffix+=TypeSuffix*
+	| {RegExpType} 'RegExp' typeSuffix+=TypeSuffix*
+	| {ErrorType} 'Error' typeSuffix+=TypeSuffix*
+	| {DOMExceptionType} 'DOMException' typeSuffix+=TypeSuffix*
+	| /*type=*/BufferRelatedType typeSuffix+=TypeSuffix*
+;
+
+BufferRelatedType
+	: {ArrayBufferType}'ArrayBuffer'
+	| {DataViewType}'DataView'
+	| {Int8ArrayType}'Int8Array'
+	| {Int16ArrayType}'Int16Array'
+	| {Int32ArrayType}'Int32Array'
+	| {Uint8ArrayType}'Uint8Array'
+	| {Uint16ArrayType}'Uint16Array'
+	| {Uint32ArrayType}'Uint32Array'
+	| {Uint8ClampedArrayType}'Uint8ClampedArray'
+	| {Float32ArrayType}'Float32Array'
+	| {Float64ArrayType}'Float64Array'
+;
+
+// TODO Get rid of ConstType (replace by NonAnyType?)
+ConstType:
+	type=PrimitiveType typeSuffix+=NullableTypeSuffix? // nullable?=Nullable?
+	| typeRef=[Definition|IDENTIFIER_WEBIDL] typeSuffix+=NullableTypeSuffix? // nullable?=Nullable?
+;
+
+PrimitiveType:
+	UnsignedIntegerType
+	| UnrestrictedFloatType
+	| {BooleanType} 'boolean'
+	| {ByteType} 'byte'
+	| {OctetType} 'octet'
+;
+
+UnrestrictedFloatType:
+	unrestricted?='unrestricted'? floatType=AbstractFloatType
+;
+
+AbstractFloatType:
+	{FloatType} 'float'
+	| {DoubleType} 'double'
+;
+
+UnsignedIntegerType:
+	unsigned?='unsigned'? integerType=AbstractIntegerType
+;
+
+AbstractIntegerType:
+	{ShortType} 'short'
+	| {LongType} 'long'
+	| {LongLongType} 'long' 'long'
+;
+
+//PromiseType:
+//	'Promise' '<' type=ReturnType '>'
+//;
+
+TypeSuffix:
+	ArrayTypeSuffix
+	| NullableTypeSuffix
+;
+
+ArrayTypeSuffix:
+	{ArrayTypeSuffix} '[' ']' //typeSuffix=TypeSuffix?
+;
+// TODO After NullableTypeSuffix only an ArrayTypeSuffix is allowed!
+NullableTypeSuffix:
+	{NullableTypeSuffix} '?' //typeSuffix=ArrayTypeSuffix?
+;
+
+ReturnType:
+	Type
+	| {VoidType} 'void'
+;
+
+
+
+
+// TODO name might not be correct for ExtendedAttributes (e.g., use attribute=...)
+
+ExtendedAttributeNoArg:
+	name=IDENTIFIER_WEBIDL;
+
+ExtendedAttributeArgList:
+	name=IDENTIFIER_WEBIDL '(' (arguments+=Argument (',' arguments+=Argument)*)? ')';
+
+ExtendedAttributeIdent:
+	nameA=IDENTIFIER_WEBIDL '=' nameB=IDENTIFIER_WEBIDL;
+
+//ExtendedAttributeScopedName:
+//	IDENTIFIER_WEBIDL '=' ScopedName;
+
+ExtendedAttributeNamedArgList:
+	nameA=IDENTIFIER_WEBIDL '=' nameB=IDENTIFIER_WEBIDL '(' (arguments+=Argument (',' arguments+=Argument)*)? ')';
+
+
+terminal INTEGER_WEBIDL returns ecore::EInt:
+	'-'? ('0' (('0'..'7')* | ('X' | 'x') ('0'..'9' | 'A'..'F' | 'a'..'f')+) | ('1'..'9') ('0'..'9')*);
+terminal FLOAT_WEBIDL returns ecore::EFloat:
+	'-'? ((('0'..'9')+ '.' ('0'..'9')* | /*('0'..'9')**/ '.' ('0'..'9')+) (('E' | 'e') ('+' | '-')? ('0'..'9')+)? | ('0'..'9')+ ('E' | 'e') ('+' | '-')? ('0'..'9')+);
+terminal IDENTIFIER_WEBIDL returns ecore::EString:
+	('A'..'Z' | '_' | 'a'..'z') ('0'..'9' | 'A'..'Z' | '_' | 'a'..'z')*;
+terminal STRING:
+	'"'->'"';
+terminal ML_COMMENT:
+	'/*' -> '*/';
+terminal SL_COMMENT:
+	'//' !('\n'|'\r')* ('\r'? '\n')?;
+terminal WS:
+	(' '|'\t'|'\r'|'\n')+;
+//terminal STRING_WEBIDL:
+//	'"'->'"';
+//terminal WHITESPACE_WEBIDL:
+//	('\t' | '\n' | '\r' | ' ')+ | ('\t' | '\n' | '\r' | ' ')* (('//' /*.**//* INSERT BEGIN */ (!('\n'|'\r')* '\r'? '\n') /* INSERT END */ | '/*' -> '*/') ('\t' | '\n' | '\r' | ' ')*)+
+//	; // TODO '?' ???
+terminal OTHER_WEBIDL:
+	!('\t' | '\n' | '\r' | ' ' | '0'..'9' | 'A'..'Z' | '_' | 'a'..'z');
+
+
+/*terminal FLOAT:
+	'-'? INT? '.' INT (('E' | 'e') '-'? INT)?; // TODO Check this!
+terminal OTHER_TERMINAL: // [^\t\n\r 0-9A-Z_a-z]
+	'-'? INT? '.' INT (('E' | 'e') '-'? INT)?; // TODO Check this!
+*/

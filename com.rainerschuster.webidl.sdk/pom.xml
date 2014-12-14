@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <relativePath>../com.rainerschuster.webidl.releng/pom.xml</relativePath>
+    <groupId>com.rainerschuster.webidl</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>com.rainerschuster.webidl.sdk</artifactId>
+  <packaging>eclipse-feature</packaging>
+
+  <name>Web IDL Language Feature</name>
+</project>
