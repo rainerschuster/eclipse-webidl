@@ -3,11 +3,271 @@
 */
 package com.rainerschuster.webidl.ui.outline
 
+import com.rainerschuster.webidl.webIDL.AnyType
+import com.rainerschuster.webidl.webIDL.ArrayBufferType
+import com.rainerschuster.webidl.webIDL.ArrayTypeSuffix
+import com.rainerschuster.webidl.webIDL.Attribute
+import com.rainerschuster.webidl.webIDL.BooleanType
+import com.rainerschuster.webidl.webIDL.ByteStringType
+import com.rainerschuster.webidl.webIDL.ByteType
+import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.Const
+import com.rainerschuster.webidl.webIDL.ConstType
+import com.rainerschuster.webidl.webIDL.DOMExceptionType
+import com.rainerschuster.webidl.webIDL.DOMStringType
+import com.rainerschuster.webidl.webIDL.DataViewType
+import com.rainerschuster.webidl.webIDL.DateType
+import com.rainerschuster.webidl.webIDL.Definition
+import com.rainerschuster.webidl.webIDL.Definitions
+import com.rainerschuster.webidl.webIDL.Dictionary
+import com.rainerschuster.webidl.webIDL.DictionaryMember
+import com.rainerschuster.webidl.webIDL.DoubleType
+import com.rainerschuster.webidl.webIDL.Enum
+import com.rainerschuster.webidl.webIDL.Float32ArrayType
+import com.rainerschuster.webidl.webIDL.Float64ArrayType
+import com.rainerschuster.webidl.webIDL.FloatType
+import com.rainerschuster.webidl.webIDL.ImplementsStatement
+import com.rainerschuster.webidl.webIDL.Int16ArrayType
+import com.rainerschuster.webidl.webIDL.Int32ArrayType
+import com.rainerschuster.webidl.webIDL.Int8ArrayType
+import com.rainerschuster.webidl.webIDL.Interface
+import com.rainerschuster.webidl.webIDL.Iterable_
+import com.rainerschuster.webidl.webIDL.LongLongType
+import com.rainerschuster.webidl.webIDL.LongType
+import com.rainerschuster.webidl.webIDL.Maplike
+import com.rainerschuster.webidl.webIDL.NonAnyType
+import com.rainerschuster.webidl.webIDL.NullableTypeSuffix
+import com.rainerschuster.webidl.webIDL.ObjectType
+import com.rainerschuster.webidl.webIDL.OctetType
+import com.rainerschuster.webidl.webIDL.Operation
+import com.rainerschuster.webidl.webIDL.PartialDictionary
+import com.rainerschuster.webidl.webIDL.PartialInterface
+import com.rainerschuster.webidl.webIDL.PromiseType
+import com.rainerschuster.webidl.webIDL.RegExpType
+import com.rainerschuster.webidl.webIDL.ReturnType
+import com.rainerschuster.webidl.webIDL.SequenceType
+import com.rainerschuster.webidl.webIDL.Setlike
+import com.rainerschuster.webidl.webIDL.ShortType
+import com.rainerschuster.webidl.webIDL.Type
+import com.rainerschuster.webidl.webIDL.Typedef
+import com.rainerschuster.webidl.webIDL.USVStringType
+import com.rainerschuster.webidl.webIDL.Uint16ArrayType
+import com.rainerschuster.webidl.webIDL.Uint32ArrayType
+import com.rainerschuster.webidl.webIDL.Uint8ArrayType
+import com.rainerschuster.webidl.webIDL.Uint8ClampedArrayType
+import com.rainerschuster.webidl.webIDL.UnionType
+import com.rainerschuster.webidl.webIDL.UnrestrictedFloatType
+import com.rainerschuster.webidl.webIDL.UnsignedIntegerType
+import com.rainerschuster.webidl.webIDL.VoidType
+import org.eclipse.xtext.ui.editor.outline.IOutlineNode
+import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider
+import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode
+
 /**
  * Customization of the default outline structure.
  *
  * see http://www.eclipse.org/Xtext/documentation.html#outline
  */
-class WebIDLOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider {
+class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	
+	// ExtendedDefinition
+
+	def _createChildren(DocumentRootNode parentNode, Definitions definitions) {
+		definitions.definitions.forEach[
+			createNode(parentNode, it.def);
+		];
+	}
+
+	// ExtendedInterfaceMember
+
+	def _createChildren(IOutlineNode parentNode, Interface iface) {
+		// name
+		// inherits
+		iface.interfaceMembers.forEach[
+			createNode(parentNode, it.interfaceMember);
+		];
+	}
+
+	def _createChildren(IOutlineNode parentNode, PartialInterface iface) {
+		// interfaceName (reference)
+		iface.interfaceMembers.forEach[
+			createNode(parentNode, it.interfaceMember);
+		];
+	}
+
+	// ExtendedDictionaryMember
+
+	def _createChildren(IOutlineNode parentNode, Dictionary dictionary) {
+		// name
+		// inherits
+		dictionary.dictionaryMembers.forEach[
+			createNode(parentNode, it.dictionaryMember);
+		];
+	}
+
+	def _createChildren(IOutlineNode parentNode, PartialDictionary dictionary) {
+		// dictionaryName (reference)
+		dictionary.dictionaryMembers.forEach[
+			createNode(parentNode, it.dictionaryMember);
+		];
+	}
+
+
+	def _isLeaf(Const const) {
+		true
+	}
+
+	def _isLeaf(Attribute attribute) {
+		true
+	}
+
+	def _isLeaf(Operation operation) {
+		true
+	}
+
+	def _isLeaf(Iterable_ maplike) {
+		true
+	}
+
+	def _isLeaf(Maplike maplike) {
+		true
+	}
+
+	def _isLeaf(Setlike setlike) {
+		true
+	}
+
+	def _isLeaf(CallbackRest callbackRest) {
+		true
+	}
+
+	def _isLeaf(DictionaryMember dictionaryMember) {
+		true
+	}
+
+	def _isLeaf(Typedef typedef) {
+		true
+	}
+
+	// TODO Argument ?
+
+	def _text(Typedef typedef) {
+		typedef.name + ' : ' + typeName(typedef.type)
+	}
+
+	def _text(ImplementsStatement implementsStatement) {
+		implementsStatement.ifaceA?.name + ' implements ' + implementsStatement.ifaceB?.name
+	}
+
+	def _text(CallbackRest callbackRest) {
+		callbackRest.name + ' : ' + (typeName(callbackRest.type)?:callbackRest.type)
+	}
+
+	def _text(Const const) {
+		const.name + ' : ' + (typeName(const.type)?:const.type)
+	}
+
+	// TODO Attributes etc.
+	def _text(Operation operation) {
+		operation.name + ' : ' + (typeName(operation.type)?:operation.type)
+	}
+
+	// TODO required, default etc.
+	def _text(DictionaryMember dictionaryMember) {
+		dictionaryMember.name + ' : ' + (typeName(dictionaryMember.type)?:dictionaryMember.type)
+	}
+
+	// TODO inherit, readonly etc.
+	def _text(Attribute attribute) {
+		attribute.name + ' : ' + (typeName(attribute.type)?:attribute.type)
+	}
+
+	def String typeName(ReturnType type) {
+		switch (type) {
+			VoidType: 'Void' // TODO void does not have a typeName!
+			Type: typeName(type)
+			default: null
+		}
+	}
+
+	def String typeName(Definition type) {
+		switch (type) {
+			 Interface: type.name
+			 Dictionary: type.name
+			 Enum: type.name
+			 CallbackRest: type.name
+			 Typedef: type.name // TODO This may not be specified!
+			 default: null
+		}
+	}
+
+	def String typeName(Type type) {
+		typeNameWithoutSuffix(type) + type.typeSuffix.map[
+			switch (it) {
+				NullableTypeSuffix: 'OrNull'
+				ArrayTypeSuffix: 'Array'
+			}
+		].join
+	}
+
+	def String typeName(ConstType type) {
+		typeNameWithoutSuffix(type) + type.typeSuffix.map[
+			switch (it) {
+				NullableTypeSuffix: 'OrNull'
+				ArrayTypeSuffix: 'Array'
+			}
+		].join
+	}
+
+	def String typeNameWithoutSuffix(ConstType type) {
+		if (type.type != null) {
+			typeName(type.type)
+		} else {
+			typeName(type.typeRef)
+		}
+	}
+
+	private def String typeNameWithoutSuffix(Type type) {
+		switch (type) {
+			AnyType: 'Any'
+			BooleanType: 'Boolean'
+			ByteType: 'Byte'
+			OctetType: 'Octet'
+			UnsignedIntegerType: switch (type.integerType) {
+				ShortType: {if (type.unsigned) 'UnsignedShort' else 'Short'}
+				LongType: {if (type.unsigned) 'UnsignedLong' else 'Long'}
+				LongLongType: {if (type.unsigned) 'UnsignedLongLong' else 'LongLong'}
+			}
+			UnrestrictedFloatType: switch (type.floatType) {
+				FloatType: {if (type.unrestricted) 'UnrestrictedFloat' else 'Float'}
+				DoubleType: {if (type.unrestricted) 'UnrestrictedDouble' else 'Double'}
+			}
+			DOMStringType: 'String'
+			ByteStringType: 'ByteString'
+			USVStringType: 'USVString'
+			ObjectType: 'Object'
+			SequenceType: typeName(type.type as Type) + 'Sequence'
+			PromiseType: typeName(type.type as ReturnType) + 'Promise'
+			UnionType: type.unionMemberTypes.map[typeName(it)].join('Or')
+			DateType: 'Date'
+			RegExpType: 'RegExp'
+			DOMExceptionType: 'DOMException'
+			ArrayBufferType : 'ArrayBuffer'
+			DataViewType : 'DataView'
+			Int8ArrayType : 'Int8Array'
+			Int16ArrayType : 'Int16Array'
+			Int32ArrayType : 'Int32Array'
+			Uint8ArrayType : 'Uint8Array'
+			Uint16ArrayType : 'Uint16Array'
+			Uint32ArrayType : 'Uint32Array'
+			Uint8ClampedArrayType : 'Uint8ClampedArray'
+			Float32ArrayType : 'Float32Array'
+			Float64ArrayType : 'Float64Array'
+
+			// Reference type
+			NonAnyType: typeName(type.typeRef)
+
+			default: null
+		}
+	}
 }
