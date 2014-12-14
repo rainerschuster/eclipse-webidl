@@ -4,25 +4,141 @@
 package com.rainerschuster.webidl.ui.labeling
 
 import com.google.inject.Inject
+import com.rainerschuster.webidl.webIDL.Attribute
+import com.rainerschuster.webidl.webIDL.Callback
+import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.Const
+import com.rainerschuster.webidl.webIDL.Dictionary
+import com.rainerschuster.webidl.webIDL.DictionaryMember
+import com.rainerschuster.webidl.webIDL.Enum
+import com.rainerschuster.webidl.webIDL.ImplementsStatement
+import com.rainerschuster.webidl.webIDL.Interface
+import com.rainerschuster.webidl.webIDL.Iterable_
+import com.rainerschuster.webidl.webIDL.Maplike
+import com.rainerschuster.webidl.webIDL.Operation
+import com.rainerschuster.webidl.webIDL.PartialDictionary
+import com.rainerschuster.webidl.webIDL.PartialInterface
+import com.rainerschuster.webidl.webIDL.Serializer
+import com.rainerschuster.webidl.webIDL.Setlike
+import com.rainerschuster.webidl.webIDL.Stringifier
+import com.rainerschuster.webidl.webIDL.Typedef
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider
+import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider
 
 /**
  * Provides labels for a EObjects.
  * 
  * see http://www.eclipse.org/Xtext/documentation.html#labelProvider
  */
-class WebIDLLabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider {
+class WebIDLLabelProvider extends DefaultEObjectLabelProvider {
 
 	@Inject
-	new(org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider delegate) {
+	new(AdapterFactoryLabelProvider delegate) {
 		super(delegate);
 	}
 
-	// Labels and icons can be computed like this:
-	
-//	def text(Greeting ele) {
-//		'A greeting to ' + ele.name
+//	def text(EObject ele) {
+//		ele.class.simpleName
+//	}
+
+	def text(PartialInterface ele) {
+		ele.interfaceName?.name
+	}
+
+	def text(PartialDictionary ele) {
+		ele.dictionaryName?.name
+	}
+
+//	def image(Interface ele) {
+//		'int_obj.gif'
 //	}
 //
+//	def image(com.rainerschuster.webidl.webIDL.Enum ele) {
+//		'enum_obj.gif'
+//	}
+
+	def image(Interface ele) {
+		'interface.png'
+	}
+
+	def image(Callback ele) {
+		'callback.png'
+	}
+
+	def image(Dictionary ele) {
+		'dictionary.png'
+	}
+
+	def image(PartialInterface ele) {
+		'partialInterface.png'
+	}
+
+	def image(PartialDictionary ele) {
+		'partialDictionary.png'
+	}
+
+	def image(Enum ele) {
+		'enum.png'
+	}
+
+	def image(Typedef ele) {
+		'typedef.png'
+	}
+
+	def image(ImplementsStatement ele) {
+		'implementsStatement.png'
+	}
+
+//	def image(Operation ele) {
+//		'methpub_obj.gif'
+//	}
+
+
+	def image(Const ele) {
+		'const.png'
+	}
+
+	def image(Operation ele) {
+		'operation.png'
+	}
+
+	def image(Serializer ele) {
+		'operation.png'
+	}
+
+	def image(Stringifier ele) {
+		'operation.png'
+	}
+
+	def image(Iterable_ ele) {
+		'iterable.png'
+	}
+
+	def image(Attribute ele) {
+		'attribute.png'
+	}
+
+	def image(Maplike ele) {
+		'maplike.png'
+	}
+
+	def image(Setlike ele) {
+		'setlike.png'
+	}
+
+	def image(CallbackRest ele) {
+		'callbackFunction.png'
+	}
+
+	def image(DictionaryMember ele) {
+		'dictionaryMember.png'
+	}
+
+
+
+
+	// Labels and icons can be computed like this:
+
 //	def image(Greeting ele) {
 //		'Greeting.gif'
 //	}
