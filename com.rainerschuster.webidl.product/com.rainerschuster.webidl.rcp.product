@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="com.rainerschuster.webidl.rcp" uid="WebIDL Language" id="com.rainerschuster.webidl.rcp.product" application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <programArgs>-clearPersistedState
+      </programArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
+      </vmArgsMac>
+   </launcherArgs>
+
+   <windowImages/>
+
+   <launcher>
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="com.rainerschuster.webidl.sdk" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.egit" version="3.4.1.201406201815-r"/>
+      <feature id="org.eclipse.e4.rcp" version="1.3.100.v20140909-1633"/>
+      <feature id="org.eclipse.platform" version="4.4.0.v20140925-0400"/>
+   </features>
+
+   <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.p2.reconciler.dropins" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
+   </configurations>
+
+   <repositories>
+      <repository location="http://rainerschuster.github.io/webidl-eclipse/updatesite/repository/" enabled="true" />
+   </repositories>
+
+</product>
