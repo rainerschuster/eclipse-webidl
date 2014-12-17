@@ -6,6 +6,9 @@ package com.rainerschuster.webidl.generator
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.IGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess
+import com.rainerschuster.webidl.webIDL.Interface
+import com.google.inject.Inject
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 
 /**
  * Generates code from your model files on save.
@@ -13,12 +16,23 @@ import org.eclipse.xtext.generator.IFileSystemAccess
  * see http://www.eclipse.org/Xtext/documentation.html#TutorialCodeGeneration
  */
 class WebIDLGenerator implements IGenerator {
+ 
+	@Inject extension IQualifiedNameProvider
 	
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(typeof(Greeting))
-//				.map[name]
-//				.join(', '))
+		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
+			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.compile);
+		};
 	}
+
+	def compile(Interface e) ''' 
+		«IF e.eContainer.fullyQualifiedName != null»
+			package «e.eContainer.fullyQualifiedName»;
+		«ENDIF»
+		
+		public class «e.name» «IF e.inherits != null»extends «e.inherits.fullyQualifiedName» «ENDIF»{
+		
+		}
+	'''
+
 }
