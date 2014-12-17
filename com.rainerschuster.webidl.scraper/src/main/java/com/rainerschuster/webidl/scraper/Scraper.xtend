@@ -33,9 +33,8 @@ class Scraper {
 		}
 	}
 
+	// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
 	def scrapeUrl(String urlString) {
-
-		// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
 		try {
 			val URL url = new URL(urlString);
 			val TagNode tagNode = new HtmlCleaner().clean(url);
@@ -94,7 +93,7 @@ class Scraper {
 			val List<String> innerListText = innerList.map[it.textContent.replace("&lt;", "<").replace("&gt;", ">")];
 
 			if (isEnum) {
-				out.println(innerListText.map["\"" + it  + "\""].join(','));
+				out.println(innerListText.map["\"" + it  + "\""].join(", "));
 			} else if (isCallback) {
 				out.println("(" + innerListText.join(", ") + ")");
 			} else {
