@@ -18,56 +18,64 @@ import org.htmlcleaner.TagNode
 import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
+import javax.xml.xpath.XPathExpression
 
-// TODO precompile xpath expressions for performance
+// TODO precompile inner xpath expressions for performance
 class Scraper {
+
+	XPathFactory xPathFactory = XPathFactory.newInstance();
 
 	def static void main(String[] args) {
 		if (args.length == 1) {
-			(new Scraper()).mymain(args.get(0));
+			(new Scraper()).scrapeUrl(args.get(0));
 		} else {
 			System.out.println("Usage: Scraper <idlurl>");
 		}
 	}
 
-	def mymain(String urlString) {
-			// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
-			try {
-				val URL url = new URL(urlString);
-				val TagNode tagNode = new HtmlCleaner().clean(url);
+	def scrapeUrl(String urlString) {
 
-				val Document doc = new DomSerializer(new CleanerProperties()).createDOM(tagNode);
+		// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
+		try {
+			val URL url = new URL(urlString);
+			val TagNode tagNode = new HtmlCleaner().clean(url);
 
-				// "//pre[@class='idl']"
-				// "//pre[contains(@class, 'idl')]"
-				printNodeContent(System.out, doc, "//pre[contains(@class, 'idl')]");
-				printNodeContentSpecial(System.out, doc, "//dl[contains(@class, 'idl')]");
-//				printNodeContent(System.out, doc, "//spec-idl[contains(@class, 'idl')]");
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (XPathExpressionException e) {
-				e.printStackTrace();
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			val Document doc = new DomSerializer(new CleanerProperties()).createDOM(tagNode);
+
+			// Note: [@class='idl'] vs. [contains(@class, 'idl')]
+			val XPath xpathPreIdl = xPathFactory.newXPath();
+			val XPathExpression xpathExpressionPreIdl = xpathPreIdl.compile("//pre[contains(@class, 'idl')]");
+			val XPath xpathDlIdl = xPathFactory.newXPath();
+			val XPathExpression xpathExpressionDlIdl = xpathDlIdl.compile("//dl[contains(@class, 'idl')]");
+//			val XPath xpathSpecIdlIdl = xPathFactory.newXPath();
+//			val XPathExpression xpathExpressionSpecIdlIdl = xpathSpecIdlIdl.compile("//spec-idl[contains(@class, 'idl')]");
+
+			printNodeContent(System.out, doc, xpathExpressionPreIdl);
+			printNodeContentSpecial(System.out, doc, xpathExpressionDlIdl);
+//			printNodeContent(System.out, doc, xpathExpressionSpecIdlIdl);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (XPathExpressionException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	private def int printNodeContent(PrintStream out, Document doc, String xpathExpression) throws XPathExpressionException {
-		val XPath xpath = XPathFactory.newInstance().newXPath();
-		val NodeList nodeList = xpath.evaluate(xpathExpression, doc, XPathConstants.NODESET) as NodeList;
-		for (var int i = 0; i < nodeList.getLength(); i++) {
-			val Node node = nodeList.item(i);
+	private def int printNodeContent(PrintStream out, Document doc, XPathExpression xpathExpression) throws XPathExpressionException {
+		val NodeList nodeList = xpathExpression.evaluate(doc, XPathConstants.NODESET) as NodeList;
+		val List<Node> list = nodeListToList(nodeList);
+		for (Node node : list) {
 			out.println(node.getTextContent());
 			out.println();
 		}
 		return nodeList.getLength();
 	}
 
-	private def int printNodeContentSpecial(PrintStream out, Document doc, String xpathExpression) throws XPathExpressionException {
-		val XPath xpath = XPathFactory.newInstance().newXPath();
-		val NodeList nodeList = xpath.evaluate(xpathExpression, doc, XPathConstants.NODESET) as NodeList;
+	private def int printNodeContentSpecial(PrintStream out, Document doc, XPathExpression xpathExpression) throws XPathExpressionException {
+		val NodeList nodeList = xpathExpression.evaluate(doc, XPathConstants.NODESET) as NodeList;
 		val List<Node> list = nodeListToList(nodeList);
 		for (Node node : list) {
 			val String title = node.getAttributes().getNamedItem("title").getTextContent();
@@ -79,7 +87,7 @@ class Scraper {
 			} else {
 				out.println();
 			}
-			val XPath xpathInner = XPathFactory.newInstance().newXPath();
+			val XPath xpathInner = xPathFactory.newXPath();
 			val NodeList nodeListInner = xpathInner.evaluate("./dt", node, XPathConstants.NODESET) as NodeList;
 			val List<Node> innerList = nodeListToList(nodeListInner);
 			// TODO more html replacement!
