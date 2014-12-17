@@ -23,11 +23,10 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 	@Inject extension WebIDLGrammarAccess
 
 	override protected void configureFormatting(FormattingConfig c) {
-//		val WebIDLGrammarAccess f = getGrammarAccess() as WebIDLGrammarAccess;
-
+		// Default linewrap is 80
 		c.setAutoLinewrap(120);
 
-		// find common keywords an specify formatting for them
+		// Find common keywords an specify formatting for them
 		for (Pair<Keyword, Keyword> pair : findKeywordPairs("(", ")")) {
 			c.setNoSpace().after(pair.first);
 			c.setNoSpace().before(pair.second);
@@ -39,8 +38,6 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		for (Keyword comma : findKeywords(",")) {
 			c.setNoSpace().before(comma);
 		}
-
-
 
 		// Interface
 		c.setIndentation(interfaceAccess.leftCurlyBracketKeyword_3, interfaceAccess.rightCurlyBracketKeyword_5);
@@ -80,33 +77,9 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap(2).after(implementsStatementAccess.semicolonKeyword_3);
 		c.setNoSpace().before(implementsStatementAccess.semicolonKeyword_3);
 
-//    // formatting for grammar rule Line
-//    c.setLinewrap(2).after(f.getLineAccess().getSemicolonKeyword_1());
-//    c.setNoSpace().before(f.getLineAccess().getSemicolonKeyword_1());
-//    
-//    // formatting for grammar rule TestIndentation
-//    c.setIndentationIncrement().after(
-//        f.getTestIndentationAccess().getLeftCurlyBracketKeyword_1());
-//    c.setIndentationDecrement().before(
-//        f.getTestIndentationAccess().getRightCurlyBracketKeyword_3());
-//    c.setLinewrap().after(
-//        f.getTestIndentationAccess().getLeftCurlyBracketKeyword_1());
-//    c.setLinewrap().after(
-//        f.getTestIndentationAccess().getRightCurlyBracketKeyword_3());
-//    
-//    // formatting for grammar rule Param
-//    c.setNoLinewrap().around(f.getParamAccess().getColonKeyword_1());
-//    c.setNoSpace().around(f.getParamAccess().getColonKeyword_1());
-
-		// formatting for comments 
+		// Comments 
 		c.setLinewrap(0, 1, 2).before(SL_COMMENTRule);
 		c.setLinewrap(0, 1, 2).before(ML_COMMENTRule);
 		c.setLinewrap(0, 1, 1).after(ML_COMMENTRule);
-
-// It's usually a good idea to activate the following three statements.
-// They will add and preserve newlines around comments
-//		c.setLinewrap(0, 1, 2).before(SL_COMMENTRule)
-//		c.setLinewrap(0, 1, 2).before(ML_COMMENTRule)
-//		c.setLinewrap(0, 1, 1).after(ML_COMMENTRule)
 	}
 }
