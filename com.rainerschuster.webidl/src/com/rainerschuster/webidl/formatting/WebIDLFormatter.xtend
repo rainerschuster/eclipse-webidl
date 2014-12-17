@@ -5,8 +5,10 @@ package com.rainerschuster.webidl.formatting
 
 import org.eclipse.xtext.formatting.impl.AbstractDeclarativeFormatter
 import org.eclipse.xtext.formatting.impl.FormattingConfig
-// import com.google.inject.Inject;
-// import com.rainerschuster.webidl.services.WebIDLGrammarAccess
+import com.google.inject.Inject;
+import com.rainerschuster.webidl.services.WebIDLGrammarAccess
+import org.eclipse.xtext.Keyword
+import org.eclipse.xtext.util.Pair
 
 /**
  * This class contains custom formatting description.
@@ -18,9 +20,90 @@ import org.eclipse.xtext.formatting.impl.FormattingConfig
  */
 class WebIDLFormatter extends AbstractDeclarativeFormatter {
 
-//	@Inject extension WebIDLGrammarAccess
-	
+	@Inject extension WebIDLGrammarAccess
+
 	override protected void configureFormatting(FormattingConfig c) {
+//		val WebIDLGrammarAccess f = getGrammarAccess() as WebIDLGrammarAccess;
+
+		c.setAutoLinewrap(120);
+
+		// find common keywords an specify formatting for them
+		for (Pair<Keyword, Keyword> pair : findKeywordPairs("(", ")")) {
+			c.setNoSpace().after(pair.first);
+			c.setNoSpace().before(pair.second);
+		}
+		for (Pair<Keyword, Keyword> pair : findKeywordPairs("<", ">")) {
+			c.setNoSpace().after(pair.first);
+			c.setNoSpace().before(pair.second);
+		}
+		for (Keyword comma : findKeywords(",")) {
+			c.setNoSpace().before(comma);
+		}
+
+
+
+		// Interface
+		c.setIndentation(interfaceAccess.leftCurlyBracketKeyword_3, interfaceAccess.rightCurlyBracketKeyword_5);
+		c.setLinewrap().after(interfaceAccess.leftCurlyBracketKeyword_3);
+		c.setNoSpace.between(interfaceAccess.rightCurlyBracketKeyword_5, interfaceAccess.semicolonKeyword_6);
+		c.setLinewrap().after(interfaceAccess.semicolonKeyword_6);
+
+		// Dictionary
+		c.setIndentation(dictionaryAccess.leftCurlyBracketKeyword_3, dictionaryAccess.rightCurlyBracketKeyword_5);
+		c.setLinewrap().after(dictionaryAccess.leftCurlyBracketKeyword_3);
+		c.setNoSpace.between(dictionaryAccess.rightCurlyBracketKeyword_5, dictionaryAccess.semicolonKeyword_6);
+		c.setLinewrap().after(dictionaryAccess.semicolonKeyword_6);
+
+		// Partial Interface
+		c.setIndentation(partialInterfaceAccess.leftCurlyBracketKeyword_2, partialInterfaceAccess.rightCurlyBracketKeyword_4);
+		c.setLinewrap().after(partialInterfaceAccess.leftCurlyBracketKeyword_2);
+		c.setNoSpace.between(partialInterfaceAccess.rightCurlyBracketKeyword_4, partialInterfaceAccess.semicolonKeyword_5);
+		c.setLinewrap().after(partialInterfaceAccess.semicolonKeyword_5);
+
+		// Partial Dictionary
+		c.setIndentation(partialDictionaryAccess.leftCurlyBracketKeyword_2, partialDictionaryAccess.rightCurlyBracketKeyword_4);
+		c.setLinewrap().after(partialDictionaryAccess.leftCurlyBracketKeyword_2);
+		c.setNoSpace.between(partialDictionaryAccess.rightCurlyBracketKeyword_4, partialDictionaryAccess.semicolonKeyword_5);
+		c.setLinewrap().after(partialDictionaryAccess.semicolonKeyword_5);
+
+		// Enum
+		c.setIndentation(enumAccess.leftCurlyBracketKeyword_2, dictionaryAccess.rightCurlyBracketKeyword_5);
+		c.setLinewrap().after(enumAccess.leftCurlyBracketKeyword_2);
+		c.setNoSpace.between(enumAccess.rightCurlyBracketKeyword_5, dictionaryAccess.semicolonKeyword_6);
+		c.setLinewrap().after(enumAccess.semicolonKeyword_6);
+
+		// Typedef
+		c.setLinewrap(2).after(typedefAccess.semicolonKeyword_3);
+		c.setNoSpace().before(typedefAccess.semicolonKeyword_3);
+
+		// ImplementsStatement
+		c.setLinewrap(2).after(implementsStatementAccess.semicolonKeyword_3);
+		c.setNoSpace().before(implementsStatementAccess.semicolonKeyword_3);
+
+
+//    // formatting for grammar rule Line
+//    c.setLinewrap(2).after(f.getLineAccess().getSemicolonKeyword_1());
+//    c.setNoSpace().before(f.getLineAccess().getSemicolonKeyword_1());
+//    
+//    // formatting for grammar rule TestIndentation
+//    c.setIndentationIncrement().after(
+//        f.getTestIndentationAccess().getLeftCurlyBracketKeyword_1());
+//    c.setIndentationDecrement().before(
+//        f.getTestIndentationAccess().getRightCurlyBracketKeyword_3());
+//    c.setLinewrap().after(
+//        f.getTestIndentationAccess().getLeftCurlyBracketKeyword_1());
+//    c.setLinewrap().after(
+//        f.getTestIndentationAccess().getRightCurlyBracketKeyword_3());
+//    
+//    // formatting for grammar rule Param
+//    c.setNoLinewrap().around(f.getParamAccess().getColonKeyword_1());
+//    c.setNoSpace().around(f.getParamAccess().getColonKeyword_1());
+
+		// formatting for comments 
+		c.setLinewrap(0, 1, 2).before(SL_COMMENTRule);
+		c.setLinewrap(0, 1, 2).before(ML_COMMENTRule);
+		c.setLinewrap(0, 1, 1).after(ML_COMMENTRule);
+
 // It's usually a good idea to activate the following three statements.
 // They will add and preserve newlines around comments
 //		c.setLinewrap(0, 1, 2).before(SL_COMMENTRule)
