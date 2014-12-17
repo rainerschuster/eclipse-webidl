@@ -67,9 +67,9 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap().after(partialDictionaryAccess.semicolonKeyword_5);
 
 		// Enum
-		c.setIndentation(enumAccess.leftCurlyBracketKeyword_2, dictionaryAccess.rightCurlyBracketKeyword_5);
+		c.setIndentation(enumAccess.leftCurlyBracketKeyword_2, enumAccess.rightCurlyBracketKeyword_5);
 		c.setLinewrap().after(enumAccess.leftCurlyBracketKeyword_2);
-		c.setNoSpace.between(enumAccess.rightCurlyBracketKeyword_5, dictionaryAccess.semicolonKeyword_6);
+		c.setNoSpace.between(enumAccess.rightCurlyBracketKeyword_5, enumAccess.semicolonKeyword_6);
 		c.setLinewrap().after(enumAccess.semicolonKeyword_6);
 
 		// Typedef
@@ -79,7 +79,6 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		// ImplementsStatement
 		c.setLinewrap(2).after(implementsStatementAccess.semicolonKeyword_3);
 		c.setNoSpace().before(implementsStatementAccess.semicolonKeyword_3);
-
 
 //    // formatting for grammar rule Line
 //    c.setLinewrap(2).after(f.getLineAccess().getSemicolonKeyword_1());
