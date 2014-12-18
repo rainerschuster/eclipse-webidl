@@ -333,21 +333,21 @@ SingleType:
 UnionType:
 	'(' unionMemberTypes+=Type ('or' unionMemberTypes+=Type)+ ')'
 ;
-
+// FIXME for PromiseType and SequenceType the typeSuffix should be NullableTypeSuffix
 NonAnyType:
-	/*type=*/PrimitiveType typeSuffix+=TypeSuffix*
-	| {PromiseType} 'Promise' '<' type=ReturnType '>' typeSuffix+=NullableTypeSuffix? // nullable?=Nullable?
+	PrimitiveType typeSuffix+=TypeSuffix*
+	| {PromiseType} 'Promise' '<' type=ReturnType '>' typeSuffix+=TypeSuffix? // nullable?=Nullable?
 	| {ByteStringType} 'ByteString' typeSuffix+=TypeSuffix*
 	| {DOMStringType} 'DOMString' typeSuffix+=TypeSuffix*
 	| {USVStringType} 'USVString' typeSuffix+=TypeSuffix*
-	| typeRef=[Definition|IDENTIFIER_WEBIDL] typeSuffix+=TypeSuffix*
-	| {SequenceType} 'sequence' '<' type=Type '>' typeSuffix+=NullableTypeSuffix? // nullable?=Nullable?
+	| {ReferenceType} typeRef=[Definition|IDENTIFIER_WEBIDL] typeSuffix+=TypeSuffix*
+	| {SequenceType} 'sequence' '<' type=Type '>' typeSuffix+=TypeSuffix? // nullable?=Nullable?
 	| {ObjectType} 'object' typeSuffix+=TypeSuffix*
 	| {DateType} 'Date' typeSuffix+=TypeSuffix*
 	| {RegExpType} 'RegExp' typeSuffix+=TypeSuffix*
 	| {ErrorType} 'Error' typeSuffix+=TypeSuffix*
 	| {DOMExceptionType} 'DOMException' typeSuffix+=TypeSuffix*
-	| /*type=*/BufferRelatedType typeSuffix+=TypeSuffix*
+	| BufferRelatedType typeSuffix+=TypeSuffix*
 ;
 
 BufferRelatedType
@@ -365,9 +365,9 @@ BufferRelatedType
 ;
 
 // TODO Get rid of ConstType (replace by NonAnyType?)
-ConstType:
-	type=PrimitiveType typeSuffix+=NullableTypeSuffix? // nullable?=Nullable?
-	| typeRef=[Definition|IDENTIFIER_WEBIDL] typeSuffix+=NullableTypeSuffix? // nullable?=Nullable?
+ConstType returns NonAnyType:
+	PrimitiveType typeSuffix+=TypeSuffix? // nullable?=Nullable?
+	| {ReferenceType} typeRef=[Definition|IDENTIFIER_WEBIDL] typeSuffix+=TypeSuffix? // nullable?=Nullable?
 ;
 
 PrimitiveType:

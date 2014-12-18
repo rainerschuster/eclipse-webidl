@@ -12,7 +12,6 @@ import com.rainerschuster.webidl.webIDL.ByteStringType
 import com.rainerschuster.webidl.webIDL.ByteType
 import com.rainerschuster.webidl.webIDL.CallbackRest
 import com.rainerschuster.webidl.webIDL.Const
-import com.rainerschuster.webidl.webIDL.ConstType
 import com.rainerschuster.webidl.webIDL.DOMExceptionType
 import com.rainerschuster.webidl.webIDL.DOMStringType
 import com.rainerschuster.webidl.webIDL.DataViewType
@@ -35,7 +34,6 @@ import com.rainerschuster.webidl.webIDL.Iterable_
 import com.rainerschuster.webidl.webIDL.LongLongType
 import com.rainerschuster.webidl.webIDL.LongType
 import com.rainerschuster.webidl.webIDL.Maplike
-import com.rainerschuster.webidl.webIDL.NonAnyType
 import com.rainerschuster.webidl.webIDL.NullableTypeSuffix
 import com.rainerschuster.webidl.webIDL.ObjectType
 import com.rainerschuster.webidl.webIDL.OctetType
@@ -44,7 +42,6 @@ import com.rainerschuster.webidl.webIDL.PartialDictionary
 import com.rainerschuster.webidl.webIDL.PartialInterface
 import com.rainerschuster.webidl.webIDL.PromiseType
 import com.rainerschuster.webidl.webIDL.RegExpType
-import com.rainerschuster.webidl.webIDL.ReturnType
 import com.rainerschuster.webidl.webIDL.SequenceType
 import com.rainerschuster.webidl.webIDL.Setlike
 import com.rainerschuster.webidl.webIDL.ShortType
@@ -62,6 +59,8 @@ import com.rainerschuster.webidl.webIDL.VoidType
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode
 import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider
 import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode
+import com.rainerschuster.webidl.webIDL.ReturnType
+import com.rainerschuster.webidl.webIDL.ReferenceType
 
 /**
  * Customization of the default outline structure.
@@ -210,22 +209,25 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		].join
 	}
 
-	def String typeName(ConstType type) {
-		typeNameWithoutSuffix(type) + type.typeSuffix.map[
-			switch (it) {
-				NullableTypeSuffix: 'OrNull'
-				ArrayTypeSuffix: 'Array'
-			}
-		].join
-	}
+//	def String typeName(ConstType type) {
+//		typeNameWithoutSuffix(type) + type.typeSuffix.map[
+//			switch (it) {
+//				NullableTypeSuffix: 'OrNull'
+//				ArrayTypeSuffix: 'Array'
+//			}
+//		].join
+//	}
 
-	def String typeNameWithoutSuffix(ConstType type) {
-		if (type.type != null) {
-			typeName(type.type)
-		} else {
-			typeName(type.typeRef)
-		}
-	}
+//	def String typeNameWithoutSuffix(ConstType type) {
+//		switch (type) {
+////			PrimitiveType: typeNameWithoutSuffix(type as PrimitiveType)
+//			// Reference type
+////			NonAnyType: typeName(type.typeRef)
+//			ReferenceType: typeName(type.typeRef)
+//
+//			default: null
+//		}
+//	}
 
 	private def String typeNameWithoutSuffix(Type type) {
 		switch (type) {
@@ -247,7 +249,7 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 			USVStringType: 'USVString'
 			ObjectType: 'Object'
 			SequenceType: typeName(type.type as Type) + 'Sequence'
-			PromiseType: typeName(type.type as ReturnType) + 'Promise'
+			PromiseType: typeName(type.type as /*Return*/Type) + 'Promise'
 			UnionType: type.unionMemberTypes.map[typeName(it)].join('Or')
 			DateType: 'Date'
 			RegExpType: 'RegExp'
@@ -265,7 +267,8 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 			Float64ArrayType : 'Float64Array'
 
 			// Reference type
-			NonAnyType: typeName(type.typeRef)
+//			NonAnyType: typeName(type.typeRef)
+			ReferenceType: typeName(type.typeRef)
 
 			default: null
 		}
