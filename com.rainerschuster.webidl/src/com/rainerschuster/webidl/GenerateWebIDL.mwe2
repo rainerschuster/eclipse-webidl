@@ -149,6 +149,13 @@ Workflow {
     
     		// provides a compare view
     		fragment = compare.CompareFragment auto-inject {}
+
+//			// See http://jevopisdeveloperblog.blogspot.co.at/2011/02/extract-xtext-project-wizard.html
+//    		// project wizard (optional)
+//			fragment = projectWizard.SimpleProjectWizardFragment {
+//				generatorProjectName = "${projectName}.generator"
+//				fileExtension = fileExtensions
+//			}
     	}
     }
 }
