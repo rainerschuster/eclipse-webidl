@@ -53,8 +53,6 @@ import com.rainerschuster.webidl.webIDL.Uint32ArrayType
 import com.rainerschuster.webidl.webIDL.Uint8ArrayType
 import com.rainerschuster.webidl.webIDL.Uint8ClampedArrayType
 import com.rainerschuster.webidl.webIDL.UnionType
-import com.rainerschuster.webidl.webIDL.UnrestrictedFloatType
-import com.rainerschuster.webidl.webIDL.UnsignedIntegerType
 import com.rainerschuster.webidl.webIDL.VoidType
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode
 import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider
@@ -235,15 +233,11 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 			BooleanType: 'Boolean'
 			ByteType: 'Byte'
 			OctetType: 'Octet'
-			UnsignedIntegerType: switch (type.integerType) {
-				ShortType: {if (type.unsigned) 'UnsignedShort' else 'Short'}
-				LongType: {if (type.unsigned) 'UnsignedLong' else 'Long'}
-				LongLongType: {if (type.unsigned) 'UnsignedLongLong' else 'LongLong'}
-			}
-			UnrestrictedFloatType: switch (type.floatType) {
-				FloatType: {if (type.unrestricted) 'UnrestrictedFloat' else 'Float'}
-				DoubleType: {if (type.unrestricted) 'UnrestrictedDouble' else 'Double'}
-			}
+			ShortType: {if (type.unsigned) 'UnsignedShort' else 'Short'}
+			LongType: {if (type.unsigned) 'UnsignedLong' else 'Long'}
+			LongLongType: {if (type.unsigned) 'UnsignedLongLong' else 'LongLong'}
+			FloatType: {if (type.unrestricted) 'UnrestrictedFloat' else 'Float'}
+			DoubleType: {if (type.unrestricted) 'UnrestrictedDouble' else 'Double'}
 			DOMStringType: 'String'
 			ByteStringType: 'ByteString'
 			USVStringType: 'USVString'

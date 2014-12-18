@@ -371,30 +371,30 @@ ConstType returns NonAnyType:
 ;
 
 PrimitiveType:
-	UnsignedIntegerType
-	| UnrestrictedFloatType
+	AbstractIntegerType
+	| AbstractFloatType
 	| {BooleanType} 'boolean'
 	| {ByteType} 'byte'
 	| {OctetType} 'octet'
 ;
 
-UnrestrictedFloatType:
-	unrestricted?='unrestricted'? floatType=AbstractFloatType
-;
+//UnrestrictedFloatType:
+//	unrestricted?='unrestricted'? floatType=AbstractFloatType
+//;
 
 AbstractFloatType:
-	{FloatType} 'float'
-	| {DoubleType} 'double'
+	{FloatType} unrestricted?='unrestricted'? 'float'
+	| {DoubleType} unrestricted?='unrestricted'? 'double'
 ;
 
-UnsignedIntegerType:
-	unsigned?='unsigned'? integerType=AbstractIntegerType
-;
+//UnsignedIntegerType:
+//	unsigned?='unsigned'? integerType=AbstractIntegerType
+//;
 
 AbstractIntegerType:
-	{ShortType} 'short'
-	| {LongType} 'long'
-	| {LongLongType} 'long' 'long'
+	{ShortType} unsigned?='unsigned'? 'short'
+	| {LongType} unsigned?='unsigned'? 'long'
+	| {LongLongType} unsigned?='unsigned'? 'long' 'long'
 ;
 
 //PromiseType:

@@ -52,10 +52,6 @@ import com.rainerschuster.webidl.webIDL.Definition
 import com.rainerschuster.webidl.webIDL.CallbackRest
 import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.ReturnType
-import com.rainerschuster.webidl.webIDL.UnsignedIntegerType
-import com.rainerschuster.webidl.webIDL.UnrestrictedFloatType
-import com.rainerschuster.webidl.webIDL.AbstractIntegerType
-import com.rainerschuster.webidl.webIDL.AbstractFloatType
 import com.rainerschuster.webidl.webIDL.Typedef
 import com.rainerschuster.webidl.webIDL.Special
 
@@ -86,7 +82,7 @@ class WebIDLGenerator implements IGenerator {
 
 		«ENDIF»
 
-		public interface «iface.name» «IF iface.inherits != null»extends«iface.inherits.fullyQualifiedName»«ELSE» «ENDIF» {
+		public interface «iface.name»«IF iface.inherits != null» extends «iface.inherits.fullyQualifiedName»«ENDIF» {
 		«FOR i : iface.interfaceMembers SEPARATOR '\n'»
 			«binding(i)»
 		«ENDFOR»
@@ -277,29 +273,9 @@ class WebIDLGenerator implements IGenerator {
 			Uint8ClampedArrayType : return "java.lang.Object"
 			Float32ArrayType : return "java.lang.Object"
 			Float64ArrayType : return "java.lang.Object"
-			UnsignedIntegerType : return toJavaType(type.integerType)
-			UnrestrictedFloatType : return toJavaType(type.floatType)
 			default : {/*logger.warn("Unknown type {}!", type);*/ return null}
 		}
 	}
 
-	def static String toJavaType(AbstractIntegerType type) {
-		switch type {
-			ShortType : return "short"
-//			UnsignedShortType : return "short"
-			LongType : return "int"
-//			UnsignedLongType : return "int"
-			LongLongType : return "long"
-		}
-	}
-
-	def static String toJavaType(AbstractFloatType type) {
-		switch type {
-			FloatType : return "float"
-//			UnrestrictedFloatType : return "float"
-			DoubleType : return "double"
-//			UnrestrictedDoubleType : return "double"
-		}
-	}
 
 }
