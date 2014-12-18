@@ -110,7 +110,7 @@ class WebIDLGenerator implements IGenerator {
 
 	/* TODO NON-SPEC: Added "public static final " */
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, Const constant) '''
-		«constant.type.toJavaType» «constant.name» = «constant.constValue»;
+		«constant.type.toJavaType» «NameUtil.getEscapedJavaName(constant.name)» = «constant.constValue»;
 
 	'''
 
@@ -120,18 +120,18 @@ class WebIDLGenerator implements IGenerator {
 			«attribute.type.toJavaType» get«attribute.name.toFirstUpper»();
 		«ENDIF»
 		«IF !attribute.readOnly»
-			void set«attribute.name.toFirstUpper»(«attribute.type.toJavaType» «attribute.name»);
+			void set«attribute.name.toFirstUpper»(«attribute.type.toJavaType» «NameUtil.getEscapedJavaName(attribute.name)»);
 		«ENDIF»
 
 	'''
 
 	// FIXME What if more than one specials occur, e.g.: setter creator void (unsigned long index, HTMLOptionElement? option);
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, Operation operation) '''
-		«operation.type.toJavaType» «IF operation.name.nullOrEmpty»«IF operation.specials.contains(Special.GETTER)»_get«ELSEIF operation.specials.contains(Special.SETTER)»_set«ELSEIF operation.specials.contains(Special.CREATOR)»_create«ELSEIF operation.specials.contains(Special.DELETER)»_delete«ELSEIF operation.specials.contains(Special.LEGACYCALLER)»_call«ENDIF»«ELSE»«operation.name»«ENDIF»(«FOR i : operation.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»);
+		«operation.type.toJavaType» «IF operation.name.nullOrEmpty»«IF operation.specials.contains(Special.GETTER)»_get«ELSEIF operation.specials.contains(Special.SETTER)»_set«ELSEIF operation.specials.contains(Special.CREATOR)»_create«ELSEIF operation.specials.contains(Special.DELETER)»_delete«ELSEIF operation.specials.contains(Special.LEGACYCALLER)»_call«ENDIF»«ELSE»«NameUtil.getEscapedJavaName(operation.name)»«ENDIF»(«FOR i : operation.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»);
 	'''
 
 	def binding(Argument parameter) '''
-		«parameter.type.toJavaType»«IF parameter.ellipsis»...«ENDIF» «parameter.name»'''
+		«parameter.type.toJavaType»«IF parameter.ellipsis»...«ENDIF» «NameUtil.getEscapedJavaName(parameter.name)»'''
 
 
 
