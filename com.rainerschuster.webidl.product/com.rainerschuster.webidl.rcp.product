@@ -3,7 +3,6 @@
 
 <product name="com.rainerschuster.webidl.rcp" uid="WebIDL Language" id="com.rainerschuster.webidl.rcp.product" application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
 
-
    <configIni use="default">
    </configIni>
 
@@ -16,18 +15,23 @@
 
    <windowImages/>
 
-
    <launcher name="webidl">
       <solaris/>
-      <win useIco="false">
-         <bmp/>
+      <win useIco="true">
+         <ico path="/icons/logo.ico"/>
+         <bmp
+            winSmallHigh="/icons/logo-16x16-32bit.bmp"
+            winSmallLow="/icons/logo-16x16-8bit.bmp"
+            winMediumHigh="/icons/logo-32x32-32bit.bmp"
+            winMediumLow="/icons/logo-32x32-8bit.bmp"
+            winLargeHigh="/icons/logo-48x48-32bit.bmp"
+            winLargeLow="/icons/logo-48x48-8bit.bmp"
+            winExtraLargeHigh="/icons/logo-256x256-32bit.bmp"/>
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
    </plugins>
