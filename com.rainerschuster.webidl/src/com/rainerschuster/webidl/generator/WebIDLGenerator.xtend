@@ -54,6 +54,7 @@ import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.ReturnType
 import com.rainerschuster.webidl.webIDL.Typedef
 import com.rainerschuster.webidl.webIDL.Special
+import com.rainerschuster.webidl.util.NameUtil
 
 /**
  * Generates code from your model files on save.

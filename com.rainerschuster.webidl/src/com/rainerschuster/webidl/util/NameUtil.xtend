@@ -1,4 +1,4 @@
-package com.rainerschuster.webidl.generator
+package com.rainerschuster.webidl.util
 
 class NameUtil {
 

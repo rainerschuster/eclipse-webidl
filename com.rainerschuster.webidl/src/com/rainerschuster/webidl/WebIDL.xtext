@@ -229,64 +229,73 @@ Setlike
 ExtendedAttributeList:
 	'[' extendedAttributes+=ExtendedAttribute (',' extendedAttributes+=ExtendedAttribute)* ']';
 
-ExtendedAttribute:{ExtendedAttribute} (
-	'(' extendedAttributeInner=ExtendedAttributeInner? ')' extendedAttributeRest=ExtendedAttributeRest?
-	| '[' extendedAttributeInner=ExtendedAttributeInner? ']' extendedAttributeRest=ExtendedAttributeRest?
-	| '{' extendedAttributeInner=ExtendedAttributeInner? '}' extendedAttributeRest=ExtendedAttributeRest?
-	| other=Other extendedAttributeRest=ExtendedAttributeRest?);
-
-ExtendedAttributeRest:
-	ExtendedAttribute;
-
-ExtendedAttributeInner:{ExtendedAttributeInner} (
-	'(' extendedAttributeInner=ExtendedAttributeInner? ')' extendedAttributeInner2=ExtendedAttributeInner?
-	| '[' extendedAttributeInner=ExtendedAttributeInner? ']' extendedAttributeInner2=ExtendedAttributeInner?
-	| '{' extendedAttributeInner=ExtendedAttributeInner? '}' extendedAttributeInner2=ExtendedAttributeInner?
-	| other=OtherOrComma extendedAttributeInner2=ExtendedAttributeInner?);
-
-Other:
-	INTEGER_WEBIDL
-	| FLOAT_WEBIDL
-	| IDENTIFIER_WEBIDL
-	| STRING
-	| OTHER_WEBIDL
-	| '-'
-	| '-Infinity'
-	| '.'
-	| '...'
-	| ':'
-	| ';'
-	| '<'
-	| '='
-	| '>'
-	| '?'
-	| 'ByteString'
-	| 'Date'
-	| 'DOMString'
-	| 'Infinity'
-	| 'NaN'
-	| 'RegExp'
-	| 'USVString'
-	| 'any'
-	| 'boolean'
-	| 'byte'
-	| 'double'
-	| 'false'
-	| 'float'
-	| 'long'
-	| 'null'
-	| 'object'
-	| 'octet'
-	| 'or'
-	| 'optional'
-	| 'sequence'
-	| 'short'
-	| 'true'
-	| 'unsigned'
-	| 'void'
-	| ArgumentNameKeyword
-	| BufferRelatedType
+ExtendedAttribute:
+	ExtendedAttributeNoArgs
+	| ExtendedAttributeArgList
+	| ExtendedAttributeNamedArgList
+	| ExtendedAttributeIdent
+	| ExtendedAttributeIdentList
 ;
+
+
+//ExtendedAttribute:{ExtendedAttribute} (
+//	'(' extendedAttributeInner=ExtendedAttributeInner? ')' extendedAttributeRest=ExtendedAttributeRest?
+//	| '[' extendedAttributeInner=ExtendedAttributeInner? ']' extendedAttributeRest=ExtendedAttributeRest?
+//	| '{' extendedAttributeInner=ExtendedAttributeInner? '}' extendedAttributeRest=ExtendedAttributeRest?
+//	| other=Other extendedAttributeRest=ExtendedAttributeRest?);
+//
+//ExtendedAttributeRest:
+//	ExtendedAttribute;
+//
+//ExtendedAttributeInner:{ExtendedAttributeInner} (
+//	'(' extendedAttributeInner=ExtendedAttributeInner? ')' extendedAttributeInner2=ExtendedAttributeInner?
+//	| '[' extendedAttributeInner=ExtendedAttributeInner? ']' extendedAttributeInner2=ExtendedAttributeInner?
+//	| '{' extendedAttributeInner=ExtendedAttributeInner? '}' extendedAttributeInner2=ExtendedAttributeInner?
+//	| other=OtherOrComma extendedAttributeInner2=ExtendedAttributeInner?);
+//
+//Other:
+//	INTEGER_WEBIDL
+//	| FLOAT_WEBIDL
+//	| IDENTIFIER_WEBIDL
+//	| STRING
+//	| OTHER_WEBIDL
+//	| '-'
+//	| '-Infinity'
+//	| '.'
+//	| '...'
+//	| ':'
+//	| ';'
+//	| '<'
+//	| '='
+//	| '>'
+//	| '?'
+//	| 'ByteString'
+//	| 'Date'
+//	| 'DOMString'
+//	| 'Infinity'
+//	| 'NaN'
+//	| 'RegExp'
+//	| 'USVString'
+//	| 'any'
+//	| 'boolean'
+//	| 'byte'
+//	| 'double'
+//	| 'false'
+//	| 'float'
+//	| 'long'
+//	| 'null'
+//	| 'object'
+//	| 'octet'
+//	| 'or'
+//	| 'optional'
+//	| 'sequence'
+//	| 'short'
+//	| 'true'
+//	| 'unsigned'
+//	| 'void'
+//	| ArgumentNameKeyword
+//	| BufferRelatedType
+//;
 
 ArgumentNameKeyword:
 	'attribute' 
@@ -315,10 +324,10 @@ ArgumentNameKeyword:
 	| 'unrestricted'
 ;
 
-OtherOrComma:
-	Other
-	| ','
-;
+//OtherOrComma:
+//	Other
+//	| ','
+//;
 
 Type:
 	SingleType
@@ -424,20 +433,20 @@ ReturnType:
 
 // TODO name might not be correct for ExtendedAttributes (e.g., use attribute=...)
 
-ExtendedAttributeNoArg:
-	name=IDENTIFIER_WEBIDL;
+ExtendedAttributeNoArgs:
+	nameRef=IDENTIFIER_WEBIDL;
 
 ExtendedAttributeArgList:
-	name=IDENTIFIER_WEBIDL '(' (arguments+=Argument (',' arguments+=Argument)*)? ')';
+	nameRef=IDENTIFIER_WEBIDL '(' (arguments+=Argument (',' arguments+=Argument)*)? ')';
 
 ExtendedAttributeIdent:
-	nameA=IDENTIFIER_WEBIDL '=' nameB=IDENTIFIER_WEBIDL;
+	nameRef=IDENTIFIER_WEBIDL '=' nameRefB=IDENTIFIER_WEBIDL;
 
-//ExtendedAttributeScopedName:
-//	IDENTIFIER_WEBIDL '=' ScopedName;
+ExtendedAttributeIdentList:
+	nameRef=IDENTIFIER_WEBIDL '=' '(' (identifiers+=IDENTIFIER_WEBIDL (',' identifiers+=IDENTIFIER_WEBIDL)*)? ')';
 
 ExtendedAttributeNamedArgList:
-	nameA=IDENTIFIER_WEBIDL '=' nameB=IDENTIFIER_WEBIDL '(' (arguments+=Argument (',' arguments+=Argument)*)? ')';
+	nameRef=IDENTIFIER_WEBIDL '=' nameRefB=IDENTIFIER_WEBIDL '(' (arguments+=Argument (',' arguments+=Argument)*)? ')';
 
 
 terminal INTEGER_WEBIDL returns ecore::EInt:
