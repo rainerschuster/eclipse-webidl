@@ -104,6 +104,10 @@ class XtendExtendedAttributeUtil {
 		contains(input, "SameObject");
 	}
 
+	def static boolean containsTreatNonCallableAsNull(Iterable<ExtendedAttribute> input) {
+		contains(input, "TreatNonCallableAsNull");
+	}
+
 	def static boolean containsTreatNonObjectAsNull(Iterable<ExtendedAttribute> input) {
 		contains(input, "TreatNonObjectAsNull");
 	}

@@ -15,6 +15,7 @@ import java.util.List
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
+import com.rainerschuster.webidl.webIDL.ExtendedAttribute
 
 /**
  * Custom validation rules. 
@@ -161,6 +162,15 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			error('An interface must not have more than one iterable declaration', 
 					iface,
 					WebIDLPackage.Literals.INTERFACE__INTERFACE_MEMBERS)
+		}
+	}
+
+	@Check
+	def checkDeprecatedExtendedAttribute(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef.equals("TreatNonCallableAsNull")) {
+			warning('The extended attribute TreatNonCallableAsNull was renamed to TreatNonObjectAsNull', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 		}
 	}
 
