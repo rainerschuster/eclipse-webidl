@@ -10,8 +10,56 @@ import com.rainerschuster.webidl.webIDL.ExtendedAttributeIdent
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeNamedArgList
 
 // TODO ExtendedAttributeDottedName (from Java binding spec)
-class XtendExtendedAttributeUtil {
-//	val static Logger logger = LoggerFactory.getLogger(typeof(XtendExtendedAttributeUtil));
+class ExtendedAttributeUtil {
+//	static val Logger logger = LoggerFactory.getLogger(typeof(XtendExtendedAttributeUtil));
+
+	public static val String EA_ARRAY_CLASS = "ArrayClass";
+	public static val String EA_CLAMP = "Clamp";
+	public static val String EA_CONSTRUCTOR = "Constructor";
+	public static val String EA_ENFORCE_RANGE = "EnforceRange";
+	public static val String EA_EXPOSED = "Exposed";
+	public static val String EA_IMPLICIT_THIS = "ImplicitThis";
+	public static val String EA_GLOBAL = "Global";
+	public static val String EA_PRIMARY_GLOBAL = "PrimaryGlobal";
+	public static val String EA_LENIENT_THIS = "LenientThis";
+	public static val String EA_NAMED_CONSTRUCTOR = "NamedConstructor";
+	public static val String EA_NEW_OBJECT = "NewObject";
+	public static val String EA_NO_INTERFACE_OBJECT = "NoInterfaceObject";
+	public static val String EA_OVERRIDE_BUILTINS = "OverrideBuiltins";
+	public static val String EA_PUT_FORWARDS = "PutForwards";
+//	public static val String EA_REPLACEABLE_NAMED_PROPERTIES = "ReplaceableNamedProperties";
+	public static val String EA_REPLACEABLE = "Replaceable";
+	public static val String EA_SAME_OBJECT = "SameObject";
+	public static val String EA_TREAT_NON_CALLABLE_AS_NULL = "TreatNonCallableAsNull";
+	public static val String EA_TREAT_NON_OBJECT_AS_NULL = "TreatNonObjectAsNull";
+	public static val String EA_TREAT_NULL_AS = "TreatNullAs";
+	public static val String EA_UNFORGEABLE = "Unforgeable";
+	public static val String EA_UNSCOPEABLE = "Unscopeable";
+
+	public static val KNOWN_EXTENDED_ATTRIBUTES = #[
+		EA_ARRAY_CLASS,
+		EA_CLAMP,
+		EA_CONSTRUCTOR,
+		EA_ENFORCE_RANGE,
+		EA_EXPOSED,
+		EA_IMPLICIT_THIS,
+		EA_GLOBAL,
+		EA_PRIMARY_GLOBAL,
+		EA_LENIENT_THIS,
+		EA_NAMED_CONSTRUCTOR,
+		EA_NEW_OBJECT,
+		EA_NO_INTERFACE_OBJECT,
+		EA_OVERRIDE_BUILTINS,
+		EA_PUT_FORWARDS,
+//		EA_REPLACEABLE_NAMED_PROPERTIES,
+		EA_REPLACEABLE,
+		EA_SAME_OBJECT,
+		EA_TREAT_NON_CALLABLE_AS_NULL,
+		EA_TREAT_NON_OBJECT_AS_NULL,
+		EA_TREAT_NULL_AS,
+		EA_UNFORGEABLE,
+		EA_UNSCOPEABLE
+	];
 
 	def static boolean contains(Iterable<ExtendedAttribute> input, String name) {
 		for (ExtendedAttribute eAttr : input) {
@@ -41,87 +89,87 @@ class XtendExtendedAttributeUtil {
 	}
 
 	def static boolean containsArrayClass(Iterable<ExtendedAttribute> input) {
-		contains(input, "ArrayClass");
+		contains(input, EA_ARRAY_CLASS)
 	}
 
 	def static boolean containsClamp(Iterable<ExtendedAttribute> input) {
-		contains(input, "Clamp");
+		contains(input, EA_CLAMP)
 	}
 
 	def static boolean containsConstructor(Iterable<ExtendedAttribute> input) {
-		contains(input, "Constructor");
+		contains(input, EA_CONSTRUCTOR)
 	}
 
 	def static boolean containsEnforceRange(Iterable<ExtendedAttribute> input) {
-		contains(input, "EnforceRange");
+		contains(input, EA_ENFORCE_RANGE)
+	}
+
+	def static boolean containsExposed(Iterable<ExtendedAttribute> input) {
+		contains(input, EA_EXPOSED)
 	}
 
 	def static boolean containsImplicitThis(Iterable<ExtendedAttribute> input) {
-		contains(input, "ImplicitThis");
+		contains(input, EA_IMPLICIT_THIS)
 	}
 
 	def static boolean containsGlobal(Iterable<ExtendedAttribute> input) {
-		contains(input, "Global");
+		contains(input, EA_GLOBAL)
 	}
 
 	def static boolean containsPrimaryGlobal(Iterable<ExtendedAttribute> input) {
-		contains(input, "PrimaryGlobal");
+		contains(input, EA_PRIMARY_GLOBAL)
 	}
 
 	def static boolean containsLenientThis(Iterable<ExtendedAttribute> input) {
-		contains(input, "LenientThis");
+		contains(input, EA_LENIENT_THIS)
 	}
 
 	def static boolean containsNamedConstructor(Iterable<ExtendedAttribute> input) {
-		contains(input, "NamedConstructor");
+		contains(input, EA_NAMED_CONSTRUCTOR)
 	}
 
 	def static boolean containsNewObject(Iterable<ExtendedAttribute> input) {
-		contains(input, "NewObject");
+		contains(input, EA_NEW_OBJECT)
 	}
 
 	def static boolean containsNoInterfaceObject(Iterable<ExtendedAttribute> input) {
-		contains(input, "NoInterfaceObject");
+		contains(input, EA_NO_INTERFACE_OBJECT)
 	}
 
 	def static boolean containsOverrideBuiltins(Iterable<ExtendedAttribute> input) {
-		contains(input, "OverrideBuiltins");
+		contains(input, EA_OVERRIDE_BUILTINS)
 	}
 
 	def static boolean containsPutForwards(Iterable<ExtendedAttribute> input) {
-		contains(input, "PutForwards");
-	}
-
-	def static boolean containsReplaceableNamedProperties(Iterable<ExtendedAttribute> input) {
-		contains(input, "ReplaceableNamedProperties");
+		contains(input, EA_PUT_FORWARDS)
 	}
 
 	def static boolean containsReplaceable(Iterable<ExtendedAttribute> input) {
-		contains(input, "Replaceable");
+		contains(input, EA_REPLACEABLE)
 	}
 
 	def static boolean containsSameObject(Iterable<ExtendedAttribute> input) {
-		contains(input, "SameObject");
+		contains(input, EA_SAME_OBJECT)
 	}
 
 	def static boolean containsTreatNonCallableAsNull(Iterable<ExtendedAttribute> input) {
-		contains(input, "TreatNonCallableAsNull");
+		contains(input, EA_TREAT_NON_CALLABLE_AS_NULL)
 	}
 
 	def static boolean containsTreatNonObjectAsNull(Iterable<ExtendedAttribute> input) {
-		contains(input, "TreatNonObjectAsNull");
+		contains(input, EA_TREAT_NON_OBJECT_AS_NULL)
 	}
 
 	def static boolean containsTreatNullAs(Iterable<ExtendedAttribute> input) {
-		contains(input, "TreatNullAs");
+		contains(input, EA_TREAT_NULL_AS)
 	}
 
 	def static boolean containsUnforgeable(Iterable<ExtendedAttribute> input) {
-		contains(input, "Unforgeable");
+		contains(input, EA_UNFORGEABLE)
 	}
 
 	def static boolean containsUnscopeable(Iterable<ExtendedAttribute> input) {
-		contains(input, "Unscopeable");
+		contains(input, EA_UNSCOPEABLE)
 	}
 
 	def static List<Constructor> getConstructorValues(Iterable<ExtendedAttribute> input) {
@@ -133,7 +181,7 @@ class XtendExtendedAttributeUtil {
 	}
 
 	def static List<Constructor> getConstructorValuesUnchecked(Iterable<ExtendedAttribute> input) {
-		return getAll(input, "Constructor").map[getConstructorValue(it)].toList;
+		return getAll(input, EA_CONSTRUCTOR).map[getConstructorValue(it)].toList;
 	}
 
 	def static Constructor getConstructorValue(ExtendedAttribute eAttr) {
@@ -156,7 +204,7 @@ class XtendExtendedAttributeUtil {
 	}
 
 	def static List<Constructor> getNamedConstructorValuesUnchecked(Iterable<ExtendedAttribute> input) {
-		return getAll(input, "NamedConstructor").map[getNamedConstructorValue(it)].toList;
+		return getAll(input, EA_NAMED_CONSTRUCTOR).map[getNamedConstructorValue(it)].toList;
 	}
 
 	def static Constructor getNamedConstructorValue(ExtendedAttribute eAttr) {
