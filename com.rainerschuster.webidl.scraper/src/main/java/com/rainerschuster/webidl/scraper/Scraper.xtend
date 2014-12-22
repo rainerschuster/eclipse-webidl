@@ -9,6 +9,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
+import java.io.File
+import java.nio.charset.StandardCharsets
 
 // TODO precompile inner xpath expressions for performance
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
@@ -31,8 +33,15 @@ class Scraper {
 //			val URL url = new URL(urlString);
 //			val Document doc = Jsoup.parse(url, 0);
 
-			val String response = SslTool.request(urlString);
-			val Document doc = Jsoup.parse(response);
+			var Document doc = null;
+			if (urlString.startsWith("http")) {
+				val String response = SslTool.request(urlString);
+				doc = Jsoup.parse(response);
+			} else {
+				// Assume url is a file
+				val File response = new File(urlString);
+				doc = Jsoup.parse(response, StandardCharsets.UTF_8.name);
+			}
 
 			// Note: [@class='idl'] vs. [contains(@class, 'idl')] vs. [contains(concat(' ', normalize-space(@class), ' '), ' idl ')]
 //			val XPath xpathPreIdl = xPathFactory.newXPath();
@@ -42,9 +51,9 @@ class Scraper {
 //			val XPath xpathSpecIdlIdl = xPathFactory.newXPath();
 //			val XPathExpression xpathExpressionSpecIdlIdl = xpathSpecIdlIdl.compile("//spec-idl[contains(@class, 'idl')]");
 
-			System.out.println("Old scraping:");
+//			System.out.println("Old scraping:");
 			printNodeContent(System.out, doc);
-			System.out.println("New scraping:");
+//			System.out.println("New scraping:");
 			printNodeContentSpecial(System.out, doc);
 //			printNodeContent(System.out, doc, xpathExpressionSpecIdlIdl);
 		} catch (ParserConfigurationException e) {
@@ -61,7 +70,7 @@ class Scraper {
 		for (Element element : elements) {
 			// TODO check if this is also necessary in "new", i.e., printNodeContentSpecial version
 			if (element.classNames.contains("extract")) {
-				System.out.println("Ignoring node since it is only an extract.");
+//				System.out.println("Ignoring node since it is only an extract.");
 			} else {
 				out.println(element.text());
 				out.println();
@@ -75,7 +84,7 @@ class Scraper {
 		for (Element element : elements) {
 			// TODO check if this is also necessary in "new", i.e., printNodeContentSpecial version
 			if (element.classNames.contains("extract")) {
-				System.out.println("Ignoring node since it is only an extract.");
+//				System.out.println("Ignoring node since it is only an extract.");
 			} else {
 
 			val String title = element.attr("title");
