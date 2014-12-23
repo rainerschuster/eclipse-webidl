@@ -17,6 +17,8 @@ import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
 import com.rainerschuster.webidl.webIDL.ExtendedAttribute
 import com.rainerschuster.webidl.util.ExtendedAttributeUtil
+import com.rainerschuster.webidl.webIDL.PartialInterface
+import com.rainerschuster.webidl.webIDL.ExtendedDefinition
 
 /**
  * Custom validation rules. 
@@ -35,6 +37,22 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //					INVALID_NAME)
 //		}
 //	}
+
+	// See 3.2. Interfaces
+	@Check
+	def checkExtendedAttributeOnPartialInterface(PartialInterface partialInterface) {
+		val ExtendedDefinition containerDefinition = partialInterface.eContainer as ExtendedDefinition;
+		val List<String> forbiddenExtendedAttributes = #[ExtendedAttributeUtil.EA_ARRAY_CLASS, ExtendedAttributeUtil.EA_CONSTRUCTOR, ExtendedAttributeUtil.EA_IMPLICIT_THIS, ExtendedAttributeUtil.EA_NAMED_CONSTRUCTOR, ExtendedAttributeUtil.EA_NO_INTERFACE_OBJECT];
+		for (String extendedAttribute : forbiddenExtendedAttributes) {
+			if (ExtendedAttributeUtil.contains(containerDefinition.eal.extendedAttributes, extendedAttribute)) {
+				ExtendedAttributeUtil.getAll(containerDefinition.eal.extendedAttributes, extendedAttribute).forEach[
+					warning('The extended attribute "' + it.nameRef + '" must not be specified on partial interface definitions', 
+							it,
+							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				];
+			}
+		}
+	}
 
 	// See 3.2.1. Constants
 
