@@ -5,11 +5,11 @@
 «ENDDEFINE»
 
 «DEFINE model FOR WebIDLProjectInfo»
-«FILE "src/Hello.idl"-»
+«FILE "src/sample.idl"-»
 /*
  * This is an example file
  */
-interface Hello {
+interface Sample {
 };
 «ENDFILE»
 «ENDDEFINE»

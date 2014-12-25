@@ -398,17 +398,31 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            id="com.rainerschuster.webidl.ui.wizard.WebIDLCategory"
+            id="com.rainerschuster.webidl.ui"
             name="WebIDL">
       </category>
       <wizard
-            category="com.rainerschuster.webidl.ui.wizard.WebIDLCategory"
+            category="com.rainerschuster.webidl.ui"
             class="com.rainerschuster.webidl.ui.WebIDLExecutableExtensionFactory:com.rainerschuster.webidl.ui.wizard.WebIDLNewProjectWizard"
             icon="icons/logo.png"
             id="com.rainerschuster.webidl.ui.wizard.WebIDLNewProjectWizard"
             name="WebIDL Project"
             project="true">
       </wizard>
+      <wizard
+            category="com.rainerschuster.webidl.ui"
+            class="com.rainerschuster.webidl.ui.wizard.WebIDLNewFileResourceWizard"
+            icon="icons/logo.png"
+            id="com.rainerschuster.webidl.ui.wizard.WebIDLNewWizard"
+            name="WebIDL File">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="*">
+            <newWizardShortcut id="com.rainerschuster.webidl.ui.wizard.WebIDLNewProjectWizard"/>
+      </perspectiveExtension>
    </extension>
 
 </plugin>
