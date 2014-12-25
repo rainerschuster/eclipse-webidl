@@ -11,6 +11,7 @@ import org.eclipse.xpand2.XpandFacade;
 import org.eclipse.xpand2.output.Outlet;
 import org.eclipse.xpand2.output.OutputImpl;
 import org.eclipse.xtend.type.impl.java.JavaBeansMetaModel;
+import org.eclipse.xtext.ui.XtextProjectHelper;
 import org.eclipse.xtext.ui.util.ProjectFactory;
 
 import com.google.common.collect.ImmutableList;
@@ -66,6 +67,23 @@ public class WebIDLProjectCreator extends org.eclipse.xtext.ui.wizard.AbstractPr
 		facade.evaluate("com::rainerschuster::webidl::ui::wizard::WebIDLNewProject::main", getProjectInfo());
 
 		project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+	}
+
+    protected String[] getProjectNatures() {
+        return new String[] {
+//        	JavaCore.NATURE_ID,
+//			"org.eclipse.pde.PluginNature", //$NON-NLS-1$
+			XtextProjectHelper.NATURE_ID
+		};
+    }
+
+    protected String[] getBuilders() {
+    	return new String[]{
+//    		JavaCore.BUILDER_ID,
+//			"org.eclipse.pde.ManifestBuilder",  //$NON-NLS-1$
+//			"org.eclipse.pde.SchemaBuilder", //$NON-NLS-1$
+			XtextProjectHelper.BUILDER_ID
+		};
 	}
 
 }
