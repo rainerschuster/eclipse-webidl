@@ -70,9 +70,9 @@ class ExtendedAttributeUtil {
 		return false;
 	}
 
-	def static ExtendedAttribute getSingle(Iterable<ExtendedAttribute> input, String name) {
-		val List<ExtendedAttribute> attributes = getAll(input, name);
-		if (attributes == null) {
+	def static ExtendedAttribute getSingleExtendedAttribute(Iterable<ExtendedAttribute> input, String name) {
+		val List<ExtendedAttribute> attributes = com.rainerschuster.webidl.util.ExtendedAttributeUtil.getAllExtendedAttributes(input, name).toList;
+		if (attributes.nullOrEmpty) {
 			// TODO throw NoResultException (see Query class)!
 			return null;
 		}
@@ -84,8 +84,8 @@ class ExtendedAttributeUtil {
 		}
 	}
 
-	def static List<ExtendedAttribute> getAll(Iterable<ExtendedAttribute> input, String name) {
-		input.filter[it.nameRef.equals(name)].toList;
+	def static getAllExtendedAttributes(Iterable<ExtendedAttribute> input, String name) {
+		input.filter[it.nameRef.equals(name)]
 	}
 
 	def static boolean containsArrayClass(Iterable<ExtendedAttribute> input) {
@@ -181,7 +181,7 @@ class ExtendedAttributeUtil {
 	}
 
 	def static List<Constructor> getConstructorValuesUnchecked(Iterable<ExtendedAttribute> input) {
-		return getAll(input, EA_CONSTRUCTOR).map[getConstructorValue(it)].toList;
+		return com.rainerschuster.webidl.util.ExtendedAttributeUtil.getAllExtendedAttributes(input, EA_CONSTRUCTOR).map[getConstructorValue(it)].toList;
 	}
 
 	def static Constructor getConstructorValue(ExtendedAttribute eAttr) {
@@ -204,7 +204,7 @@ class ExtendedAttributeUtil {
 	}
 
 	def static List<Constructor> getNamedConstructorValuesUnchecked(Iterable<ExtendedAttribute> input) {
-		return getAll(input, EA_NAMED_CONSTRUCTOR).map[getNamedConstructorValue(it)].toList;
+		return com.rainerschuster.webidl.util.ExtendedAttributeUtil.getAllExtendedAttributes(input, EA_NAMED_CONSTRUCTOR).map[getNamedConstructorValue(it)].toList;
 	}
 
 	def static Constructor getNamedConstructorValue(ExtendedAttribute eAttr) {
