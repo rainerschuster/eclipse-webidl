@@ -42,8 +42,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	// See 3.2. Interfaces
 	@Check
 	def checkExtendedAttributeOnPartialInterface(PartialInterface partialInterface) {
-		val containerDefinition = partialInterface.eContainer as ExtendedDefinition;
 		val forbiddenExtendedAttributes = #[EA_ARRAY_CLASS, EA_CONSTRUCTOR, EA_IMPLICIT_THIS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT];
+		val containerDefinition = partialInterface.eContainer as ExtendedDefinition;
 		val extendedAttributes = containerDefinition.eal.extendedAttributes;
 		for (String extendedAttribute : forbiddenExtendedAttributes) {
 			if (extendedAttributes.contains(extendedAttribute)) {
@@ -121,15 +121,14 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkSpecialKeywordOnce(Operation operation) {
-		operation.specials.forEach[
-			val special = it;
+		for (Special special : operation.specials) {
 			if (operation.specials.filter[it == special].length >= 2) {
 				// TODO This marks the first special (although this one is not the problem)!
 				error('A given special keyword must not appear twice on an operation', 
 						operation,
 						WebIDLPackage.Literals.OPERATION__SPECIALS)
 			}
-		]
+		}
 	}
 
 	// See 3.2.4.1. Legacy callers
@@ -188,7 +187,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkDeprecatedExtendedAttribute(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef.equals(EA_TREAT_NON_CALLABLE_AS_NULL)) {
+		if (EA_TREAT_NON_CALLABLE_AS_NULL.equals(extendedAttribute.nameRef)) {
 			warning('The extended attribute TreatNonCallableAsNull was renamed to TreatNonObjectAsNull', 
 					extendedAttribute,
 					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
