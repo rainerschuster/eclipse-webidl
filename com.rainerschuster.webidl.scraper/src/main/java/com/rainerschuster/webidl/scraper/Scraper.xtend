@@ -67,8 +67,8 @@ class Scraper {
 		}
 	}
 
-	private def int printNodeContent(PrintStream out, Document doc, String selector) {
-		val Elements elements = doc.select(selector);
+	private def int printNodeContent(PrintStream out, Document doc, String query) {
+		val Elements elements = doc.select(query);
 		for (Element element : elements) {
 			// TODO check if this is also necessary in "new", i.e., printNodeContentSpecial version
 			if (element.classNames.contains("extract")) {
