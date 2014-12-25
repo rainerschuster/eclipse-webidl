@@ -143,6 +143,7 @@ SerializationPattern
 
 SerializationPatternMap
 	: getter?='getter' 
+	| inherit?='inherit'? attribute?='attribute' // TODO getter is specified, but attribute not directly!
 	| inherit?='inherit' (',' identifiers+=IDENTIFIER_WEBIDL)*
 	| identifiers+=IDENTIFIER_WEBIDL (',' identifiers+=IDENTIFIER_WEBIDL)*
 ;
