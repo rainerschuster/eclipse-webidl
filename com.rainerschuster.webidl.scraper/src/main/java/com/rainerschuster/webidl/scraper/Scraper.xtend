@@ -11,6 +11,7 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import java.io.File
 import java.nio.charset.StandardCharsets
+import com.rainerschuster.webidl.scraper.util.SslUtil
 
 // TODO precompile inner xpath expressions for performance
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
@@ -20,7 +21,7 @@ class Scraper {
 
 	def static void main(String[] args) {
 		if (args.length == 1) {
-			SslTool.disableCertificateValidation();
+			SslUtil.disableCertificateValidation();
 			(new Scraper()).scrapeUrl(args.get(0));
 		} else {
 			System.out.println("Usage: Scraper <idlurl>");
@@ -35,7 +36,7 @@ class Scraper {
 
 			var Document doc = null;
 			if (urlString.startsWith("http")) {
-				val String response = SslTool.request(urlString);
+				val String response = SslUtil.request(urlString);
 				doc = Jsoup.parse(response);
 			} else {
 				// Assume url is a file
