@@ -61,7 +61,7 @@ class ExtendedAttributeUtil {
 		EA_UNSCOPEABLE
 	];
 
-	def static boolean contains(Iterable<ExtendedAttribute> input, String name) {
+	def static boolean containsExtendedAttribute(Iterable<ExtendedAttribute> input, String name) {
 		for (ExtendedAttribute eAttr : input) {
 			if (eAttr.nameRef.equals(name)) {
 				return true;
@@ -89,87 +89,87 @@ class ExtendedAttributeUtil {
 	}
 
 	def static boolean containsArrayClass(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_ARRAY_CLASS)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_ARRAY_CLASS)
 	}
 
 	def static boolean containsClamp(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_CLAMP)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_CLAMP)
 	}
 
 	def static boolean containsConstructor(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_CONSTRUCTOR)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_CONSTRUCTOR)
 	}
 
 	def static boolean containsEnforceRange(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_ENFORCE_RANGE)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_ENFORCE_RANGE)
 	}
 
 	def static boolean containsExposed(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_EXPOSED)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_EXPOSED)
 	}
 
 	def static boolean containsImplicitThis(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_IMPLICIT_THIS)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_IMPLICIT_THIS)
 	}
 
 	def static boolean containsGlobal(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_GLOBAL)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_GLOBAL)
 	}
 
 	def static boolean containsPrimaryGlobal(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_PRIMARY_GLOBAL)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_PRIMARY_GLOBAL)
 	}
 
 	def static boolean containsLenientThis(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_LENIENT_THIS)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LENIENT_THIS)
 	}
 
 	def static boolean containsNamedConstructor(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_NAMED_CONSTRUCTOR)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_NAMED_CONSTRUCTOR)
 	}
 
 	def static boolean containsNewObject(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_NEW_OBJECT)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_NEW_OBJECT)
 	}
 
 	def static boolean containsNoInterfaceObject(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_NO_INTERFACE_OBJECT)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_NO_INTERFACE_OBJECT)
 	}
 
 	def static boolean containsOverrideBuiltins(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_OVERRIDE_BUILTINS)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_OVERRIDE_BUILTINS)
 	}
 
 	def static boolean containsPutForwards(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_PUT_FORWARDS)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_PUT_FORWARDS)
 	}
 
 	def static boolean containsReplaceable(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_REPLACEABLE)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_REPLACEABLE)
 	}
 
 	def static boolean containsSameObject(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_SAME_OBJECT)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_SAME_OBJECT)
 	}
 
 	def static boolean containsTreatNonCallableAsNull(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_TREAT_NON_CALLABLE_AS_NULL)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_TREAT_NON_CALLABLE_AS_NULL)
 	}
 
 	def static boolean containsTreatNonObjectAsNull(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_TREAT_NON_OBJECT_AS_NULL)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_TREAT_NON_OBJECT_AS_NULL)
 	}
 
 	def static boolean containsTreatNullAs(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_TREAT_NULL_AS)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_TREAT_NULL_AS)
 	}
 
 	def static boolean containsUnforgeable(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_UNFORGEABLE)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_UNFORGEABLE)
 	}
 
 	def static boolean containsUnscopeable(Iterable<ExtendedAttribute> input) {
-		contains(input, EA_UNSCOPEABLE)
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_UNSCOPEABLE)
 	}
 
 	def static List<Constructor> getConstructorValues(Iterable<ExtendedAttribute> input) {

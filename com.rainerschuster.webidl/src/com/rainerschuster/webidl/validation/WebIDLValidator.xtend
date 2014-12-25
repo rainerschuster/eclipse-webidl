@@ -46,7 +46,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		val containerDefinition = partialInterface.eContainer as ExtendedDefinition;
 		val extendedAttributes = containerDefinition.eal.extendedAttributes;
 		for (String extendedAttribute : forbiddenExtendedAttributes) {
-			if (extendedAttributes.contains(extendedAttribute)) {
+			if (extendedAttributes.containsExtendedAttribute(extendedAttribute)) {
 				extendedAttributes.getAll(extendedAttribute).forEach[
 					warning('The extended attribute "' + it.nameRef + '" must not be specified on partial interface definitions', 
 							it,
