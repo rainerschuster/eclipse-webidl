@@ -5,11 +5,18 @@ package com.rainerschuster.webidl.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import com.rainerschuster.webidl.ui.wizard.WebIDLProjectCreator;
+
 /**
  * Use this class to register components to be used within the IDE.
  */
 public class WebIDLUiModule extends com.rainerschuster.webidl.ui.AbstractWebIDLUiModule {
 	public WebIDLUiModule(AbstractUIPlugin plugin) {
 		super(plugin);
+	}
+
+	// contributed by org.eclipse.xtext.ui.generator.projectWizard.SimpleProjectWizardFragment
+	public Class<? extends org.eclipse.xtext.ui.wizard.IProjectCreator> bindIProjectCreator() {
+		return WebIDLProjectCreator.class;
 	}
 }

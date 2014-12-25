@@ -395,4 +395,20 @@
     </provider>
   </extension>
 
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="com.rainerschuster.webidl.ui.wizard.WebIDLCategory"
+            name="WebIDL">
+      </category>
+      <wizard
+            category="com.rainerschuster.webidl.ui.wizard.WebIDLCategory"
+            class="com.rainerschuster.webidl.ui.WebIDLExecutableExtensionFactory:com.rainerschuster.webidl.ui.wizard.WebIDLNewProjectWizard"
+            icon="icons/logo.png"
+            id="com.rainerschuster.webidl.ui.wizard.WebIDLNewProjectWizard"
+            name="WebIDL Project"
+            project="true">
+      </wizard>
+   </extension>
+
 </plugin>

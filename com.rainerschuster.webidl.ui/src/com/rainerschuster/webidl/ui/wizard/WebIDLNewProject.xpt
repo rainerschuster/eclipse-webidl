@@ -1,0 +1,15 @@
+«IMPORT com::rainerschuster::webidl::ui::wizard»
+
+«DEFINE main FOR WebIDLProjectInfo»
+«EXPAND model FOR this»
+«ENDDEFINE»
+
+«DEFINE model FOR WebIDLProjectInfo»
+«FILE "src/Hello.idl"-»
+/*
+ * This is an example file
+ */
+interface Hello {
+};
+«ENDFILE»
+«ENDDEFINE»
