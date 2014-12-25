@@ -53,7 +53,8 @@ class Scraper {
 //			val XPathExpression xpathExpressionSpecIdlIdl = xpathSpecIdlIdl.compile("//spec-idl[contains(@class, 'idl')]");
 
 //			System.out.println("Old scraping:");
-			printNodeContent(System.out, doc);
+			printNodeContent(System.out, doc, "pre.idl");
+			printNodeContent(System.out, doc, "code.idl-code");
 //			System.out.println("New scraping:");
 			printNodeContentSpecial(System.out, doc);
 //			printNodeContent(System.out, doc, xpathExpressionSpecIdlIdl);
@@ -66,8 +67,8 @@ class Scraper {
 		}
 	}
 
-	private def int printNodeContent(PrintStream out, Document doc) {
-		val Elements elements = doc.select("pre.idl");
+	private def int printNodeContent(PrintStream out, Document doc, String selector) {
+		val Elements elements = doc.select(selector);
 		for (Element element : elements) {
 			// TODO check if this is also necessary in "new", i.e., printNodeContentSpecial version
 			if (element.classNames.contains("extract")) {
