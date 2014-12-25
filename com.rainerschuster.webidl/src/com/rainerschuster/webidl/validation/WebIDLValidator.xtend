@@ -16,9 +16,10 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
 import com.rainerschuster.webidl.webIDL.ExtendedAttribute
-import com.rainerschuster.webidl.util.ExtendedAttributeUtil
 import com.rainerschuster.webidl.webIDL.PartialInterface
 import com.rainerschuster.webidl.webIDL.ExtendedDefinition
+
+import static extension com.rainerschuster.webidl.util.ExtendedAttributeUtil.*
 
 /**
  * Custom validation rules. 
@@ -41,11 +42,12 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	// See 3.2. Interfaces
 	@Check
 	def checkExtendedAttributeOnPartialInterface(PartialInterface partialInterface) {
-		val ExtendedDefinition containerDefinition = partialInterface.eContainer as ExtendedDefinition;
-		val List<String> forbiddenExtendedAttributes = #[ExtendedAttributeUtil.EA_ARRAY_CLASS, ExtendedAttributeUtil.EA_CONSTRUCTOR, ExtendedAttributeUtil.EA_IMPLICIT_THIS, ExtendedAttributeUtil.EA_NAMED_CONSTRUCTOR, ExtendedAttributeUtil.EA_NO_INTERFACE_OBJECT];
+		val containerDefinition = partialInterface.eContainer as ExtendedDefinition;
+		val forbiddenExtendedAttributes = #[EA_ARRAY_CLASS, EA_CONSTRUCTOR, EA_IMPLICIT_THIS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT];
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
 		for (String extendedAttribute : forbiddenExtendedAttributes) {
-			if (ExtendedAttributeUtil.contains(containerDefinition.eal.extendedAttributes, extendedAttribute)) {
-				ExtendedAttributeUtil.getAll(containerDefinition.eal.extendedAttributes, extendedAttribute).forEach[
+			if (extendedAttributes.contains(extendedAttribute)) {
+				extendedAttributes.getAll(extendedAttribute).forEach[
 					warning('The extended attribute "' + it.nameRef + '" must not be specified on partial interface definitions', 
 							it,
 							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
@@ -186,7 +188,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkDeprecatedExtendedAttribute(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef.equals(ExtendedAttributeUtil.EA_TREAT_NON_CALLABLE_AS_NULL)) {
+		if (extendedAttribute.nameRef.equals(EA_TREAT_NON_CALLABLE_AS_NULL)) {
 			warning('The extended attribute TreatNonCallableAsNull was renamed to TreatNonObjectAsNull', 
 					extendedAttribute,
 					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
@@ -195,7 +197,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkUnknownExtendedAttribute(ExtendedAttribute extendedAttribute) {
-		if (!ExtendedAttributeUtil.KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef)) {
+		if (!KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef)) {
 			warning('The extended attribute "' + extendedAttribute.nameRef + '" is no known extended attribute', 
 					extendedAttribute,
 					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
