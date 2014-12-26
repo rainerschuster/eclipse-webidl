@@ -114,7 +114,7 @@ Typedef:
 ;
 
 ImplementsStatement:
-	ifaceA=[Interface|IDENTIFIER_WEBIDL] 'implements' ifaceB=[Interface|IDENTIFIER_WEBIDL] ';'
+	ifaceA=[Interface|IDENTIFIER_WEBIDL] 'implements' ifaceB=[InterfaceOrTypedef|IDENTIFIER_WEBIDL] ';'
 ;
 
 Const:
