@@ -367,7 +367,7 @@ NonAnyType:
 	| {RegExpType} 'RegExp' typeSuffix+=TypeSuffix*
 	| {ErrorType} 'Error' typeSuffix+=TypeSuffix*
 	| {DOMExceptionType} 'DOMException' typeSuffix+=TypeSuffix*
-	| BufferRelatedType typeSuffix+=TypeSuffix*
+//	| BufferRelatedType typeSuffix+=TypeSuffix* // TODO enable - disabled on purpose to support typedarray.idl
 ;
 
 BufferRelatedType
