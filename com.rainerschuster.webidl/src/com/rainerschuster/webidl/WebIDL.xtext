@@ -22,6 +22,16 @@ Definition:
 	| ImplementsStatement
 ;
 
+InterfaceOrTypedef:
+	Interface
+	| Typedef
+;
+
+DictionaryOrTypedef:
+	Dictionary
+	| Typedef
+;
+
 Callback:
 	'callback' CallbackRestOrInterface
 ;
@@ -32,7 +42,7 @@ CallbackRestOrInterface:
 ;
 
 Interface:
-	'interface' name=IDENTIFIER_WEBIDL (':' inherits=[Interface|IDENTIFIER_WEBIDL])? '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
+	'interface' name=IDENTIFIER_WEBIDL (':' inherits=[InterfaceOrTypedef|IDENTIFIER_WEBIDL])? '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
 ;
 
 Partial:
@@ -65,7 +75,7 @@ InterfaceMember:
 ;
 
 Dictionary:
-	'dictionary' name=IDENTIFIER_WEBIDL (':' inherits=[Dictionary|IDENTIFIER_WEBIDL])? '{' dictionaryMembers+=ExtendedDictionaryMember* '}' ';'
+	'dictionary' name=IDENTIFIER_WEBIDL (':' inherits=[DictionaryOrTypedef|IDENTIFIER_WEBIDL])? '{' dictionaryMembers+=ExtendedDictionaryMember* '}' ';'
 ;
 
 ExtendedDictionaryMember:
