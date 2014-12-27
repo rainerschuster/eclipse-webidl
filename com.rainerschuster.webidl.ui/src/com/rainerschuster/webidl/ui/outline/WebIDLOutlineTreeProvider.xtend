@@ -153,7 +153,13 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	}
 
 	def _text(ImplementsStatement implementsStatement) {
-		implementsStatement.ifaceA?.name + ' implements ' + implementsStatement.ifaceB?.name
+		implementsStatement.ifaceA?.name + ' implements ' + /*implementsStatement.ifaceB?.name*/ {
+			val ifaceB = implementsStatement.ifaceB;
+			switch (ifaceB) {
+				Interface: ifaceB.name
+				Typedef: ifaceB.name
+			}
+		}
 	}
 
 	def _text(CallbackRest callbackRest) {
