@@ -130,38 +130,6 @@ class Scraper {
 				}
 			}
 		}
-
-//		val Elements elements = elementsQuery.get(0).children;
-//		var Element dt = null;
-//		var String refNameText = null;
-//		var String refName = null;
-//		var boolean first = true;
-//		var int index = 0;
-//		for (Element element : elements) {
-//			if ("dt".equals(element.tagName)) {
-//				dt = element;
-//				refNameText = dt.text();
-//				refName = refNameText.substring(1, refNameText.length - 1).toLowerCase();
-//				first = true;
-//				index = 0;
-//			} else if ("dd".equals(element.tagName)) {
-//				val Elements refs = element.select("a");
-//				if (refs.size() != 1) {
-//					System.err.println("Unexpected number of links " + refs.size() + "!");
-//				}
-//				for (Element ref : refs) {
-//					out.println("CALL scrape " + ref.attr("href") + " -o " + refName + ".idl");
-//				}
-//				if (first) {
-//					first = false;
-//				} else {
-//					index++;
-//					System.err.println("More than one link for " + refNameText + "!");
-//				}
-//			} else {
-//				System.err.println("Unexpected child element!");
-//			}
-//		}
 	}
 
 	private def int printNodeContent(PrintStream out, Document doc, String query) {
