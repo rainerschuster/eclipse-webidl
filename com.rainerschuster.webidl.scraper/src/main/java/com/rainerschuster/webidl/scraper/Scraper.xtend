@@ -74,11 +74,11 @@ class Scraper {
 //				// Needed for http://www.w3.org/TR/service-workers/
 //				printNodeContent(out, doc, "pre code");
 //				System.out.println("New scraping:");
-//				printNodeContentSpecial(out, doc);
-				printReferences(out, doc, "dl#ref-list");
-				printReferences(out, doc, "div#anolis-references dl");
-				printReferences(out, doc, "section#normative-references dl.bibliography");
-				printReferences(out, doc, "section#informative-references dl.bibliography");
+				printNodeContentSpecial(out, doc);
+//				printReferences(out, doc, "dl#ref-list");
+//				printReferences(out, doc, "div#anolis-references dl");
+//				printReferences(out, doc, "section#normative-references dl.bibliography");
+//				printReferences(out, doc, "section#informative-references dl.bibliography");
 			} catch (ParserConfigurationException e) {
 				e.printStackTrace();
 			} catch (MalformedURLException e) {
@@ -153,11 +153,17 @@ class Scraper {
 			if (element.classNames.contains("extract")) {
 //				System.out.println("Ignoring node since it is only an extract.");
 			} else {
-
+				val definitionList = definitionList(element);
 				val String title = element.attr("title");
 				val boolean isEnum = title.startsWith("enum");
 				val boolean isCallback = title.startsWith("callback");
 				val boolean isTypedef = title.startsWith("typedef");
+
+				// TODO filter other EAs!
+				val eas = definitionList.keySet().filter[it.text().startsWith("Constructor")].toList();
+				if (eas.size > 0) {
+					out.println("[" + eas.map[it.text()].join(",") + "]");
+				}
 				out.print(title);
 				if (!isCallback && !isTypedef) {
 					out.println(" {");
@@ -165,9 +171,9 @@ class Scraper {
 					out.println();
 				}
 
-				val Elements nodeListInner = element.select("dt");
-				val List<String> innerListText = nodeListInner.map[it.text()];
-	
+				val members = definitionList.keySet().filter[!eas.contains(it)].toList();
+				val List<String> innerListText = members.map[it.text()];
+
 				if (isEnum) {
 					out.println(innerListText.map["\"" + it  + "\""].join(", "));
 				} else if (isCallback) {
