@@ -15,7 +15,6 @@ import com.rainerschuster.webidl.scraper.util.SslUtil
 import org.apache.commons.cli.ParseException
 import org.eclipse.xtend.lib.annotations.Accessors
 
-// TODO precompile inner xpath expressions for performance
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
 class Scraper {
 
@@ -32,6 +31,9 @@ class Scraper {
 
 			if (scraper.options.commandLine.args.empty) {
 				System.out.println("No URL specified!");
+				scraper.options.printUsage();
+			} else if (scraper.options.commandLine.args.size > 1) {
+				System.out.println("Unexpected arguments: Exactly one URL is required!");
 				scraper.options.printUsage();
 			} else {
 				// Main code
@@ -52,45 +54,33 @@ class Scraper {
 				val outputFilename = options.commandLine.getOptionValue("o");
 				out = new PrintStream(outputFilename);
 			}
-		try {
-//			val URL url = new URL(urlString);
-//			val Document doc = Jsoup.parse(url, 0);
+			try {
+				var Document doc = null;
+				if (urlString.startsWith("http")) {
+					val String response = SslUtil.request(urlString);
+					doc = Jsoup.parse(response);
+				} else {
+					// Assume url is a file
+					val File response = new File(urlString);
+					doc = Jsoup.parse(response, StandardCharsets.UTF_8.name);
+				}
 
-			var Document doc = null;
-			if (urlString.startsWith("http")) {
-				val String response = SslUtil.request(urlString);
-				doc = Jsoup.parse(response);
-			} else {
-				// Assume url is a file
-				val File response = new File(urlString);
-				doc = Jsoup.parse(response, StandardCharsets.UTF_8.name);
+//				System.out.println("Old scraping:");
+//				printNodeContent(out, doc, "pre.idl");
+//				printNodeContent(out, doc, "code.idl-code");
+//				// Needed for http://www.w3.org/TR/service-workers/
+//				printNodeContent(out, doc, "pre code");
+//				System.out.println("New scraping:");
+				printNodeContentSpecial(out, doc);
+//				printReferences(out, doc, "dl#ref-list");
+//				printReferences(out, doc, "div#anolis-references dl");
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-
-			// Note: [@class='idl'] vs. [contains(@class, 'idl')] vs. [contains(concat(' ', normalize-space(@class), ' '), ' idl ')]
-//			val XPath xpathPreIdl = xPathFactory.newXPath();
-//			val XPathExpression xpathExpressionPreIdl = xpathPreIdl.compile("//pre[contains(concat(' ', normalize-space(@class), ' '), ' idl ')]");
-//			val XPath xpathDlIdl = xPathFactory.newXPath();
-//			val XPathExpression xpathExpressionDlIdl = xpathDlIdl.compile("//dl[contains(concat(' ', normalize-space(@class), ' '), ' idl ')]");
-//			val XPath xpathSpecIdlIdl = xPathFactory.newXPath();
-//			val XPathExpression xpathExpressionSpecIdlIdl = xpathSpecIdlIdl.compile("//spec-idl[contains(@class, 'idl')]");
-
-////			System.out.println("Old scraping:");
-//			printNodeContent(out, doc, "pre.idl");
-//			printNodeContent(out, doc, "code.idl-code");
-//			// Needed for http://www.w3.org/TR/service-workers/
-//			printNodeContent(out, doc, "pre code");
-////			System.out.println("New scraping:");
-			printNodeContentSpecial(out, doc);
-////			printNodeContent(out, doc, xpathExpressionSpecIdlIdl);
-//			printReferences(out, doc, "dl#ref-list");
-//			printReferences(out, doc, "div#anolis-references dl");
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		} finally {
 			if (out != null) {
 				out.close();
@@ -122,7 +112,7 @@ class Scraper {
 					System.err.println("Unexpected number of links " + refs.size() + "!");
 				}
 				for (Element ref : refs) {
-					out.println("CALL scrape " + ref.attr("href") + " > " + refName + ".idl");
+					out.println("CALL scrape " + ref.attr("href") + " -o " + refName + ".idl");
 				}
 				if (first) {
 					first = false;
