@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets
 import com.rainerschuster.webidl.scraper.util.SslUtil
 import org.apache.commons.cli.ParseException
 import org.eclipse.xtend.lib.annotations.Accessors
+import com.google.common.collect.LinkedListMultimap
 
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
 class Scraper {
@@ -74,6 +75,8 @@ class Scraper {
 				printNodeContentSpecial(out, doc);
 //				printReferences(out, doc, "dl#ref-list");
 //				printReferences(out, doc, "div#anolis-references dl");
+//				printReferences(out, doc, "section#normative-references dl.bibliography");
+//				printReferences(out, doc, "section#informative-references dl.bibliography");
 			} catch (ParserConfigurationException e) {
 				e.printStackTrace();
 			} catch (MalformedURLException e) {
@@ -86,6 +89,20 @@ class Scraper {
 				out.close();
 			}
 		}
+	}
+
+	private def definitionList(Element root) {
+		val LinkedListMultimap<Element, Element> listMultimap = LinkedListMultimap.create();
+
+		var Element dt = null;
+		for (Element element : root.children) {
+			switch (element.tagName) {
+				case "dt": {dt = element;}
+				case "dd": {listMultimap.put(dt, element);}
+				default: {System.err.println("Unexpected child element!");}
+			}
+		}
+		return listMultimap;
 	}
 
 	private def void printReferences(PrintStream out, Document doc, String query) {
@@ -148,33 +165,32 @@ class Scraper {
 //				System.out.println("Ignoring node since it is only an extract.");
 			} else {
 
-			val String title = element.attr("title");
-			val boolean isEnum = title.startsWith("enum");
-			val boolean isCallback = title.startsWith("callback");
-			val boolean isTypedef = title.startsWith("typedef");
-			out.print(title);
-			if (!isCallback && !isTypedef) {
-				out.println(" {");
-			} else {
-				out.println();
-			}
-			
-			val Elements nodeListInner = element.select("dt");
-			val List<String> innerListText = nodeListInner.map[it.text()];
+				val String title = element.attr("title");
+				val boolean isEnum = title.startsWith("enum");
+				val boolean isCallback = title.startsWith("callback");
+				val boolean isTypedef = title.startsWith("typedef");
+				out.print(title);
+				if (!isCallback && !isTypedef) {
+					out.println(" {");
+				} else {
+					out.println();
+				}
 
-			if (isEnum) {
-				out.println(innerListText.map["\"" + it  + "\""].join(", "));
-			} else if (isCallback) {
-				out.println("(" + innerListText.join(", ") + ")");
-			} else {
-				innerListText.forEach[out.println(it + ";")];
-			}
+				val Elements nodeListInner = element.select("dt");
+				val List<String> innerListText = nodeListInner.map[it.text()];
+	
+				if (isEnum) {
+					out.println(innerListText.map["\"" + it  + "\""].join(", "));
+				} else if (isCallback) {
+					out.println("(" + innerListText.join(", ") + ")");
+				} else {
+					innerListText.forEach[out.println(it + ";")];
+				}
 
-			if (!isCallback && !isTypedef) {
-				out.print("}");
-			}
-			out.println(";");
-				
+				if (!isCallback && !isTypedef) {
+					out.print("}");
+				}
+				out.println(";");
 			}
 		}
 		return elements.size();
