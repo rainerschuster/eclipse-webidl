@@ -12,6 +12,8 @@ import org.jsoup.select.Elements
 import java.io.File
 import java.nio.charset.StandardCharsets
 import com.rainerschuster.webidl.scraper.util.SslUtil
+import org.apache.commons.cli.ParseException
+import org.eclipse.xtend.lib.annotations.Accessors
 
 // TODO precompile inner xpath expressions for performance
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
@@ -19,17 +21,37 @@ class Scraper {
 
 //	XPathFactory xPathFactory = XPathFactory.newInstance();
 
+	@Accessors
+	ScraperOptions options = new ScraperOptions();
+
 	def static void main(String[] args) {
-		if (args.length == 1) {
-			SslUtil.disableCertificateValidation();
-			(new Scraper()).scrapeUrl(args.get(0));
-		} else {
-			System.out.println("Usage: Scraper <idlurl>");
+		val Scraper scraper = new Scraper();
+		scraper.options.defineOptions();
+		try {
+			scraper.options.parseOptions(args);
+
+			if (scraper.options.commandLine.args.empty) {
+				System.out.println("No URL specified!");
+				scraper.options.printUsage();
+			} else {
+				// Main code
+				SslUtil.disableCertificateValidation();
+				scraper.scrapeUrl(scraper.options.commandLine.args.get(0));
+			}
+		} catch (ParseException pe) {
+			System.out.println(pe.message);
+			scraper.options.printUsage();
 		}
 	}
 
 	// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
 	def scrapeUrl(String urlString) {
+		var out = System.out;
+		try {
+			if (options.commandLine.hasOption("o")) {
+				val outputFilename = options.commandLine.getOptionValue("o");
+				out = new PrintStream(outputFilename);
+			}
 		try {
 //			val URL url = new URL(urlString);
 //			val Document doc = Jsoup.parse(url, 0);
@@ -52,18 +74,65 @@ class Scraper {
 //			val XPath xpathSpecIdlIdl = xPathFactory.newXPath();
 //			val XPathExpression xpathExpressionSpecIdlIdl = xpathSpecIdlIdl.compile("//spec-idl[contains(@class, 'idl')]");
 
-//			System.out.println("Old scraping:");
-			printNodeContent(System.out, doc, "pre.idl");
-			printNodeContent(System.out, doc, "code.idl-code");
-//			System.out.println("New scraping:");
-			printNodeContentSpecial(System.out, doc);
-//			printNodeContent(System.out, doc, xpathExpressionSpecIdlIdl);
+////			System.out.println("Old scraping:");
+//			printNodeContent(out, doc, "pre.idl");
+//			printNodeContent(out, doc, "code.idl-code");
+//			// Needed for http://www.w3.org/TR/service-workers/
+//			printNodeContent(out, doc, "pre code");
+////			System.out.println("New scraping:");
+			printNodeContentSpecial(out, doc);
+////			printNodeContent(out, doc, xpathExpressionSpecIdlIdl);
+//			printReferences(out, doc, "dl#ref-list");
+//			printReferences(out, doc, "div#anolis-references dl");
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		} finally {
+			if (out != null) {
+				out.close();
+			}
+		}
+	}
+
+	private def void printReferences(PrintStream out, Document doc, String query) {
+		val Elements elementsQuery = doc.select(query);
+		if (elementsQuery.isEmpty()) {
+			return;
+		}
+		val Elements elements = elementsQuery.get(0).children;
+		var Element dt = null;
+		var String refNameText = null;
+		var String refName = null;
+		var boolean first = true;
+		var int index = 0;
+		for (Element element : elements) {
+			if ("dt".equals(element.tagName)) {
+				dt = element;
+				refNameText = dt.text();
+				refName = refNameText.substring(1, refNameText.length - 1).toLowerCase();
+				first = true;
+				index = 0;
+			} else if ("dd".equals(element.tagName)) {
+				val Elements refs = element.select("a");
+				if (refs.size() != 1) {
+					System.err.println("Unexpected number of links " + refs.size() + "!");
+				}
+				for (Element ref : refs) {
+					out.println("CALL scrape " + ref.attr("href") + " > " + refName + ".idl");
+				}
+				if (first) {
+					first = false;
+				} else {
+					index++;
+					System.err.println("More than one link for " + refNameText + "!");
+				}
+			} else {
+				System.err.println("Unexpected child element!");
+			}
 		}
 	}
 
@@ -92,15 +161,15 @@ class Scraper {
 			val String title = element.attr("title");
 			val boolean isEnum = title.startsWith("enum");
 			val boolean isCallback = title.startsWith("callback");
+			val boolean isTypedef = title.startsWith("typedef");
 			out.print(title);
-			if (!isCallback) {
+			if (!isCallback && !isTypedef) {
 				out.println(" {");
 			} else {
 				out.println();
 			}
 			
 			val Elements nodeListInner = element.select("dt");
-			// TODO more html replacement!
 			val List<String> innerListText = nodeListInner.map[it.text()];
 
 			if (isEnum) {
@@ -111,7 +180,7 @@ class Scraper {
 				innerListText.forEach[out.println(it + ";")];
 			}
 
-			if (!isCallback) {
+			if (!isCallback && !isTypedef) {
 				out.print("}");
 			}
 			out.println(";");
@@ -120,64 +189,5 @@ class Scraper {
 		}
 		return elements.size();
 	}
-
-//	private def int printNodeContent(PrintStream out, Document doc, XPathExpression xpathExpression) throws XPathExpressionException {
-//		val NodeList nodeList = xpathExpression.evaluate(doc, XPathConstants.NODESET) as NodeList;
-//		val List<Node> list = nodeListToList(nodeList);
-//		for (Node node : list) {
-//			// TODO check if this is also necessary in "new", i.e., printNodeContentSpecial version
-//			if (node.attributes.getNamedItem("class").textContent.split(" ").contains("extract")) {
-//				System.out.println("Ignoring node since it is only an extract.");
-//			} else {
-//				out.println(node.textContent);
-//				out.println();
-//			}
-//		}
-//		return nodeList.getLength();
-//	}
-//
-//	private def int printNodeContentSpecial(PrintStream out, Document doc, XPathExpression xpathExpression) throws XPathExpressionException {
-//		val NodeList nodeList = xpathExpression.evaluate(doc, XPathConstants.NODESET) as NodeList;
-//		val List<Node> list = nodeListToList(nodeList);
-//		for (Node node : list) {
-//			val String title = node.getAttributes().getNamedItem("title").textContent;
-//			val boolean isEnum = title.startsWith("enum");
-//			val boolean isCallback = title.startsWith("callback");
-//			out.print(title);
-//			if (!isCallback) {
-//				out.println(" {");
-//			} else {
-//				out.println();
-//			}
-//			val XPath xpathInner = xPathFactory.newXPath();
-//			val NodeList nodeListInner = xpathInner.evaluate("./dt", node, XPathConstants.NODESET) as NodeList;
-//			val List<Node> innerList = nodeListToList(nodeListInner);
-//			// TODO more html replacement!
-//			val List<String> innerListText = innerList.map[it.textContent.replace("&lt;", "<").replace("&gt;", ">")];
-//
-//			if (isEnum) {
-//				out.println(innerListText.map["\"" + it  + "\""].join(", "));
-//			} else if (isCallback) {
-//				out.println("(" + innerListText.join(", ") + ")");
-//			} else {
-//				innerListText.forEach[out.println(it + ";")];
-//			}
-//
-//			if (!isCallback) {
-//				out.print("}");
-//			}
-//			out.println(";");
-//		}
-//		return nodeList.getLength();
-//	}
-//
-//	private def List<Node> nodeListToList(NodeList nodeList) {
-//		val List<Node> list = new ArrayList<Node>(nodeList.getLength());
-//		for (var int i = 0; i < nodeList.getLength(); i++) {
-//			val Node node = nodeList.item(i);
-//			list.add(node);
-//		}
-//		return list;
-//	}
 
 }
