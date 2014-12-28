@@ -15,6 +15,8 @@ import com.rainerschuster.webidl.scraper.util.SslUtil
 import org.apache.commons.cli.ParseException
 import org.eclipse.xtend.lib.annotations.Accessors
 import com.google.common.collect.LinkedListMultimap
+import com.google.common.collect.ListMultimap
+import java.util.Map
 
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
 class Scraper {
@@ -72,11 +74,11 @@ class Scraper {
 //				// Needed for http://www.w3.org/TR/service-workers/
 //				printNodeContent(out, doc, "pre code");
 //				System.out.println("New scraping:");
-				printNodeContentSpecial(out, doc);
-//				printReferences(out, doc, "dl#ref-list");
-//				printReferences(out, doc, "div#anolis-references dl");
-//				printReferences(out, doc, "section#normative-references dl.bibliography");
-//				printReferences(out, doc, "section#informative-references dl.bibliography");
+//				printNodeContentSpecial(out, doc);
+				printReferences(out, doc, "dl#ref-list");
+				printReferences(out, doc, "div#anolis-references dl");
+				printReferences(out, doc, "section#normative-references dl.bibliography");
+				printReferences(out, doc, "section#informative-references dl.bibliography");
 			} catch (ParserConfigurationException e) {
 				e.printStackTrace();
 			} catch (MalformedURLException e) {
@@ -110,37 +112,56 @@ class Scraper {
 		if (elementsQuery.isEmpty()) {
 			return;
 		}
-		val Elements elements = elementsQuery.get(0).children;
-		var Element dt = null;
-		var String refNameText = null;
-		var String refName = null;
-		var boolean first = true;
-		var int index = 0;
-		for (Element element : elements) {
-			if ("dt".equals(element.tagName)) {
-				dt = element;
-				refNameText = dt.text();
-				refName = refNameText.substring(1, refNameText.length - 1).toLowerCase();
-				first = true;
-				index = 0;
-			} else if ("dd".equals(element.tagName)) {
-				val Elements refs = element.select("a");
+		val Element root = elementsQuery.get(0);
+		val ListMultimap<Element, Element> definitionList = definitionList(root);
+		
+		for (Element dt : definitionList.keySet) {
+			val String refNameText = dt.text();
+			val String refName = refNameText.substring(1, refNameText.length - 1).toLowerCase();
+
+			val List<Element> dds = definitionList.get(dt);
+			for (Element dd : dds) {
+				val Elements refs = dd.select("a");
 				if (refs.size() != 1) {
 					System.err.println("Unexpected number of links " + refs.size() + "!");
 				}
 				for (Element ref : refs) {
 					out.println("CALL scrape " + ref.attr("href") + " -o " + refName + ".idl");
 				}
-				if (first) {
-					first = false;
-				} else {
-					index++;
-					System.err.println("More than one link for " + refNameText + "!");
-				}
-			} else {
-				System.err.println("Unexpected child element!");
 			}
 		}
+
+//		val Elements elements = elementsQuery.get(0).children;
+//		var Element dt = null;
+//		var String refNameText = null;
+//		var String refName = null;
+//		var boolean first = true;
+//		var int index = 0;
+//		for (Element element : elements) {
+//			if ("dt".equals(element.tagName)) {
+//				dt = element;
+//				refNameText = dt.text();
+//				refName = refNameText.substring(1, refNameText.length - 1).toLowerCase();
+//				first = true;
+//				index = 0;
+//			} else if ("dd".equals(element.tagName)) {
+//				val Elements refs = element.select("a");
+//				if (refs.size() != 1) {
+//					System.err.println("Unexpected number of links " + refs.size() + "!");
+//				}
+//				for (Element ref : refs) {
+//					out.println("CALL scrape " + ref.attr("href") + " -o " + refName + ".idl");
+//				}
+//				if (first) {
+//					first = false;
+//				} else {
+//					index++;
+//					System.err.println("More than one link for " + refNameText + "!");
+//				}
+//			} else {
+//				System.err.println("Unexpected child element!");
+//			}
+//		}
 	}
 
 	private def int printNodeContent(PrintStream out, Document doc, String query) {
