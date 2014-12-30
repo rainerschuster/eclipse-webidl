@@ -20,6 +20,11 @@ import com.rainerschuster.webidl.webIDL.PartialInterface
 import com.rainerschuster.webidl.webIDL.ExtendedDefinition
 
 import static extension com.rainerschuster.webidl.util.ExtendedAttributeUtil.*
+import com.rainerschuster.webidl.webIDL.Definitions
+import com.rainerschuster.webidl.webIDL.Dictionary
+import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.Typedef
+import com.rainerschuster.webidl.webIDL.Definition
 
 /**
  * Custom validation rules. 
@@ -38,6 +43,51 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //					INVALID_NAME)
 //		}
 //	}
+
+
+	// See 3.1. Names
+
+	// TODO See org.eclipse.xtext.validation.NamesAreUniqueValidationHelper
+	@Check
+	def checkUniqueNames(Definitions definitions) {
+		for (definition : definitions.definitions.map[it.def]) {
+			// TODO Only interface, dictionary, enumeration, callback function and typedef should be checked!
+			val definitionName = definitionToName(definition);
+			if (definitionName != null) {
+				checkUniqueNames(definitions, definition);
+			}
+		}
+	}
+
+	private def checkUniqueNames(Definitions definitions, Definition definition) {
+		val String definitionName = definitionToName(definition);
+		val duplicateList = definitions.definitions.map[it.def].filter[it != definition && definitionName.equals(definitionToName(it))];
+		if (!duplicateList.isEmpty()) {
+		duplicateList.forEach[
+			val sf = switch (it) {
+//				CallbackRestOrInterface: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
+				Interface: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
+				Dictionary: WebIDLPackage.Literals.DICTIONARY__NAME
+				com.rainerschuster.webidl.webIDL.Enum: WebIDLPackage.Literals.ENUM__NAME
+				CallbackRest: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
+				Typedef: WebIDLPackage.Literals.TYPEDEF__NAME
+			};
+			error('Duplicate definition "' + definitionToName(it) + '"', 
+					it,
+					sf)
+		];
+		}
+	}
+
+	private def definitionToName(Definition definition) {
+		switch(definition) {
+			Interface: definition.name
+			Dictionary: definition.name
+			com.rainerschuster.webidl.webIDL.Enum: definition.name
+			CallbackRest: definition.name
+			Typedef: definition.name
+		}
+	}
 
 	// See 3.2. Interfaces
 	@Check
