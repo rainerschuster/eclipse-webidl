@@ -27,6 +27,12 @@ import com.rainerschuster.webidl.webIDL.Typedef
 import com.rainerschuster.webidl.webIDL.Definition
 import com.rainerschuster.webidl.webIDL.ReferenceType
 import com.rainerschuster.webidl.webIDL.PrimitiveType
+import com.rainerschuster.webidl.webIDL.Attribute
+import com.rainerschuster.webidl.webIDL.SequenceType
+import com.rainerschuster.webidl.webIDL.UnionType
+import java.util.Set
+import com.rainerschuster.webidl.webIDL.Type
+import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
 
 /**
  * Custom validation rules. 
@@ -134,6 +140,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkConstantType(Const constant) {
+		// TODO What about arrays?
 		if (!(constant.type instanceof PrimitiveType || (constant.type instanceof ReferenceType && (constant.type as ReferenceType).typeRef instanceof Typedef && ((constant.type as ReferenceType).typeRef as Typedef).type instanceof com.rainerschuster.webidl.webIDL.PrimitiveType))) {
 			error('The type of a constant must not be a primitive type or a Typedef with primitive type', 
 					constant,
@@ -148,9 +155,63 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //		if (attribute.static && "prototype".equals(attribute.name)) {
 //			error('The identifier of a static attribute must not be “prototype”', 
 //					attribute,
-//					WebIDLPackage.Literals.ATTRIBUTE_NAME)
+//					WebIDLPackage.Literals.ATTRIBUTE__NAME)
 //		}
 //	}
+
+	// http://heycam.github.io/webidl/#dfn-flattened-union-member-types
+	def Set<Type> flattenedMemberTypes(UnionType unionType) {
+		val Set<Type> s = #{};
+		for (u : unionType.unionMemberTypes) {
+			if (u instanceof UnionType) {
+				s.addAll(flattenedMemberTypes(u));
+			} else {
+				s.add(u);
+			}
+		}
+		return s;
+	}
+
+	@Check
+	def checkAttributeType(Attribute attribute) {
+		// TODO this check is not exact enough (see specification, esp. resolved typedefs)!
+		if (attribute.type instanceof ReferenceType) {
+			val Definition ref = (attribute.type as ReferenceType).typeRef;
+			if (ref instanceof SequenceType) {
+				error('The type of an attribute must not be a sequence type', 
+						attribute,
+						WebIDLPackage.Literals.ATTRIBUTE__NAME)
+			}
+			if (ref instanceof Dictionary) {
+				error('The type of an attribute must not be a dictionary', 
+						attribute,
+						WebIDLPackage.Literals.ATTRIBUTE__NAME)
+			}
+			if (ref instanceof UnionType && flattenedMemberTypes(ref as UnionType).exists[it instanceof SequenceType || it instanceof Dictionary]) {
+				error('The type of an attribute must not be a union type that has a nullable or non-nullable sequence type or dictionary as one of its flattened member types', 
+						attribute,
+						WebIDLPackage.Literals.ATTRIBUTE__NAME)
+			}
+		}
+	}
+
+	// TODO Refactor this once Attribute is refactored (static inlined etc.)
+	@Check
+	def checkExtendedAttributeOnAttribute(Attribute attribute) {
+		val allowedExtendedAttributesStatic = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
+		val allowedExtendedAttributesRegular = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE];
+		if (attribute.eContainer instanceof ExtendedInterfaceMember) {
+			val containerDefinition = attribute.eContainer as ExtendedInterfaceMember;
+			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+			for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+				if (!allowedExtendedAttributesRegular.contains(extendedAttribute.nameRef)) {
+					error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on attributes', 
+							extendedAttribute,
+							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				}
+			}
+		}
+	}
 
 	// See 3.2.3. Operations
 
