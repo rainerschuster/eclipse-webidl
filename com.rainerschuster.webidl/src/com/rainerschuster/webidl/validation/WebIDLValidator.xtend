@@ -89,6 +89,21 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	// See 3.2. Interfaces
 	@Check
+	def checkExtendedAttributeOnInterface(Interface iface) {
+		val allowedExtendedAttributes = #[EA_ARRAY_CLASS, EA_CONSTRUCTOR, EA_EXPOSED, EA_GLOBAL, EA_IMPLICIT_THIS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT, EA_OVERRIDE_BUILTINS, EA_PRIMARY_GLOBAL, EA_UNFORGEABLE];
+		val containerDefinition = iface.eContainer as ExtendedDefinition;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+			if (!allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on interface definitions', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.2. Interfaces
+	@Check
 	def checkExtendedAttributeOnPartialInterface(PartialInterface partialInterface) {
 		val forbiddenExtendedAttributes = #[EA_ARRAY_CLASS, EA_CONSTRUCTOR, EA_IMPLICIT_THIS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT];
 		val containerDefinition = partialInterface.eContainer as ExtendedDefinition;
