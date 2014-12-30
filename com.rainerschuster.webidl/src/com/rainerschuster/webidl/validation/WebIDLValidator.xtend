@@ -266,6 +266,40 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
+	@Check
+	def checkExtendedAttributeOnOperation(Operation operation) {
+		val allowedExtendedAttributes = #[EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE];
+		if (operation.eContainer instanceof ExtendedInterfaceMember) {
+			val containerDefinition = operation.eContainer as ExtendedInterfaceMember;
+			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+			for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+				if (!allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+					error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on operations', 
+							extendedAttribute,
+							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				}
+			}
+		}
+	}
+
+	// TODO Is this also true for other arguments (like callback, constructor etc.)?
+	@Check
+	def checkExtendedAttributeOnOperationArguments(Operation operation) {
+		val allowedExtendedAttributes = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_TREAT_NULL_AS];
+		if (operation.eContainer instanceof ExtendedInterfaceMember) {
+			for (argument : operation.arguments) {
+				val extendedAttributes = argument.eal.extendedAttributes;
+				for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+					if (!allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+						error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on operation arguments', 
+								extendedAttribute,
+								WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+					}
+				}
+			}
+		}
+	}
+
 	// See 3.2.4.1. Legacy callers
 
 	@Check
