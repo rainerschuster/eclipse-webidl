@@ -25,6 +25,8 @@ import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.CallbackRest
 import com.rainerschuster.webidl.webIDL.Typedef
 import com.rainerschuster.webidl.webIDL.Definition
+import com.rainerschuster.webidl.webIDL.ReferenceType
+import com.rainerschuster.webidl.webIDL.PrimitiveType
 
 /**
  * Custom validation rules. 
@@ -125,6 +127,15 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	def checkConstantName(Const constant) {
 		if ("prototype".equals(constant.name)) {
 			error('The identifier of a constant must not be “prototype”', 
+					constant,
+					WebIDLPackage.Literals.CONST__NAME)
+		}
+	}
+
+	@Check
+	def checkConstantType(Const constant) {
+		if (!(constant.type instanceof PrimitiveType || (constant.type instanceof ReferenceType && (constant.type as ReferenceType).typeRef instanceof Typedef && ((constant.type as ReferenceType).typeRef as Typedef).type instanceof com.rainerschuster.webidl.webIDL.PrimitiveType))) {
+			error('The type of a constant must not be a primitive type or a Typedef with primitive type', 
 					constant,
 					WebIDLPackage.Literals.CONST__NAME)
 		}
