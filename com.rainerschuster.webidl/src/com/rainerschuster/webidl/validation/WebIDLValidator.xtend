@@ -33,6 +33,7 @@ import com.rainerschuster.webidl.webIDL.UnionType
 import java.util.Set
 import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
+import com.rainerschuster.webidl.webIDL.ExtendedAttributeArgList
 
 /**
  * Custom validation rules. 
@@ -372,4 +373,38 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
+
+	// See 4.3.1. [ArrayClass]
+	@Check
+	def checkExtendedAttributeArrayClassInherits(Interface iface) {
+		// FIXME use inherited interfaces instead!
+		if (iface.inherits != null) {
+			val containerDefinition = iface.eContainer as ExtendedDefinition;
+			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+			if (extendedAttributes.containsExtendedAttribute(EA_ARRAY_CLASS)) {
+				// TODO can there be more than one?
+				val extendedAttribute = extendedAttributes.getSingleExtendedAttribute(EA_ARRAY_CLASS);
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on an interface that inherits from another', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeArrayClassTakeNoArguments(Interface iface) {
+		val containerDefinition = iface.eContainer as ExtendedDefinition;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		if (extendedAttributes.containsExtendedAttribute(EA_ARRAY_CLASS)) {
+			// TODO can there be more than one?
+			val extendedAttribute = extendedAttributes.getSingleExtendedAttribute(EA_ARRAY_CLASS);
+			val boolean takesArguments = extendedAttribute instanceof ExtendedAttributeArgList && !(extendedAttribute as ExtendedAttributeArgList).arguments.nullOrEmpty;
+			if (takesArguments) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+						
+			}
+		}
+	}
 }
