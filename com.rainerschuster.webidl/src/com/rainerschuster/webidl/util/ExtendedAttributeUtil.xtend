@@ -8,6 +8,7 @@ import com.rainerschuster.webidl.webIDL.ExtendedAttributeNoArgs
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeArgList
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeIdent
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeNamedArgList
+import com.rainerschuster.webidl.webIDL.ExtendedAttributeIdentList
 
 // TODO ExtendedAttributeDottedName (from Java binding spec)
 class ExtendedAttributeUtil {
@@ -234,6 +235,43 @@ class ExtendedAttributeUtil {
 		}
 
 		return result;
+	}
+
+	// 3.11. Extended attributes
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-xattr-no-arguments}
+	 */
+	def static takesNoArguments(ExtendedAttribute extendedAttribute) {
+		extendedAttribute instanceof ExtendedAttributeNoArgs
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-xattr-argument-list}
+	 */
+	def static takesAnArgumentList(ExtendedAttribute extendedAttribute) {
+		extendedAttribute instanceof ExtendedAttributeArgList
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-xattr-named-argument-list}
+	 */
+	def static takesANamedArgumentList(ExtendedAttribute extendedAttribute) {
+		extendedAttribute instanceof ExtendedAttributeNamedArgList
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-xattr-identifier}
+	 */
+	def static takesAnIdentifier(ExtendedAttribute extendedAttribute) {
+		extendedAttribute instanceof ExtendedAttributeIdent
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-xattr-identifier-list}
+	 */
+	def static takesAnIdentifierList(ExtendedAttribute extendedAttribute) {
+		extendedAttribute instanceof ExtendedAttributeIdentList
 	}
 
 }
