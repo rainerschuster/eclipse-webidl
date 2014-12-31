@@ -33,7 +33,6 @@ import com.rainerschuster.webidl.webIDL.UnionType
 import java.util.Set
 import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
-import com.rainerschuster.webidl.webIDL.ExtendedAttributeArgList
 
 /**
  * Custom validation rules. 
@@ -200,7 +199,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkExtendedAttributeOnAttribute(Attribute attribute) {
 		val allowedExtendedAttributesStatic = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
-		val allowedExtendedAttributesRegular = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE];
+		val allowedExtendedAttributesRegular = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE, EA_UNSCOPEABLE];
 		if (attribute.eContainer instanceof ExtendedInterfaceMember) {
 			val containerDefinition = attribute.eContainer as ExtendedInterfaceMember;
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
@@ -269,7 +268,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnOperation(Operation operation) {
-		val allowedExtendedAttributes = #[EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE];
+		val allowedExtendedAttributes = #[EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE, EA_UNSCOPEABLE];
 		if (operation.eContainer instanceof ExtendedInterfaceMember) {
 			val containerDefinition = operation.eContainer as ExtendedInterfaceMember;
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
@@ -374,6 +373,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	}
 
 
+
 	// See 4.3.1. [ArrayClass]
 	@Check
 	def checkExtendedAttributeArrayClassInherits(Interface iface) {
@@ -392,14 +392,13 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	}
 
 	@Check
-	def checkExtendedAttributeArrayClassTakeNoArguments(Interface iface) {
+	def checkExtendedAttributeArrayClassTakesNoArguments(Interface iface) {
 		val containerDefinition = iface.eContainer as ExtendedDefinition;
 		val extendedAttributes = containerDefinition.eal.extendedAttributes;
 		if (extendedAttributes.containsExtendedAttribute(EA_ARRAY_CLASS)) {
 			// TODO can there be more than one?
 			val extendedAttribute = extendedAttributes.getSingleExtendedAttribute(EA_ARRAY_CLASS);
-			val boolean takesArguments = extendedAttribute instanceof ExtendedAttributeArgList && !(extendedAttribute as ExtendedAttributeArgList).arguments.nullOrEmpty;
-			if (takesArguments) {
+			if (!extendedAttribute.takesNoArguments()) {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
 						extendedAttribute,
 						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
@@ -407,4 +406,5 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			}
 		}
 	}
+
 }
