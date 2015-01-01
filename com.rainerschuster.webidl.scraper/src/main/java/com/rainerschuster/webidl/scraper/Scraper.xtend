@@ -16,12 +16,12 @@ import org.apache.commons.cli.ParseException
 import org.eclipse.xtend.lib.annotations.Accessors
 import com.google.common.collect.LinkedListMultimap
 import com.google.common.collect.ListMultimap
-import java.util.Map
-
+// TODO pre.extraidl https://dvcs.w3.org/hg/innerhtml/raw-file/tip/index.html
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
 class Scraper {
 
 //	XPathFactory xPathFactory = XPathFactory.newInstance();
+	String outputFilenameBase = "";
 
 	@Accessors
 	ScraperOptions options = new ScraperOptions();
@@ -52,10 +52,17 @@ class Scraper {
 	// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
 	def scrapeUrl(String urlString) {
 		var out = System.out;
+		var outRefs = System.out;
 		try {
 			if (options.commandLine.hasOption("o")) {
-				val outputFilename = options.commandLine.getOptionValue("o");
-				out = new PrintStream(outputFilename);
+				outputFilenameBase = options.commandLine.getOptionValue("o");
+				if (outputFilenameBase.endsWith(".idl")) {
+					outputFilenameBase = outputFilenameBase.substring(0, outputFilenameBase.length - ".idl".length);
+				}
+				val File outFile = new File(outputFilenameBase + ".idl");
+				out = new PrintStream(outFile);
+				val File outRefsFile = new File(outputFilenameBase + ".cmd");
+				outRefs = new PrintStream(outRefsFile);
 			}
 			try {
 				var Document doc = null;
@@ -69,16 +76,26 @@ class Scraper {
 				}
 
 //				System.out.println("Old scraping:");
-//				printNodeContent(out, doc, "pre.idl");
-//				printNodeContent(out, doc, "code.idl-code");
+				var scrapeCount = 0;
+				scrapeCount += printNodeContent(out, doc, "pre.extraidl");
+				scrapeCount += printNodeContent(out, doc, "pre.idl");
+				scrapeCount += printNodeContent(out, doc, "code.idl-code");
 //				// Needed for http://www.w3.org/TR/service-workers/
-//				printNodeContent(out, doc, "pre code");
+//				scrapeCount += printNodeContent(out, doc, "pre code");
 //				System.out.println("New scraping:");
-				printNodeContentSpecial(out, doc);
-//				printReferences(out, doc, "dl#ref-list");
-//				printReferences(out, doc, "div#anolis-references dl");
-//				printReferences(out, doc, "section#normative-references dl.bibliography");
-//				printReferences(out, doc, "section#informative-references dl.bibliography");
+				scrapeCount += printNodeContentSpecial(out, doc);
+
+				if (scrapeCount > 0) {
+					var referenceCount = 0;
+					referenceCount += printReferences(outRefs, doc, "dl#ref-list");
+					referenceCount += printReferences(outRefs, doc, "div#anolis-references dl");
+					referenceCount += printReferences(outRefs, doc, "section#normative-references dl.bibliography");
+					referenceCount += printReferences(outRefs, doc, "section#informative-references dl.bibliography");
+					System.out.println("Scrape count: " + scrapeCount + ", reference count: " + referenceCount);
+					if (referenceCount == 0) {
+						System.out.println("Found IDL fragments, but no references!");
+					}
+				}
 			} catch (ParserConfigurationException e) {
 				e.printStackTrace();
 			} catch (MalformedURLException e) {
@@ -89,6 +106,9 @@ class Scraper {
 		} finally {
 			if (out != null) {
 				out.close();
+			}
+			if (outRefs != null) {
+				outRefs.close();
 			}
 		}
 	}
@@ -107,10 +127,10 @@ class Scraper {
 		return listMultimap;
 	}
 
-	private def void printReferences(PrintStream out, Document doc, String query) {
+	private def int printReferences(PrintStream out, Document doc, String query) {
 		val Elements elementsQuery = doc.select(query);
 		if (elementsQuery.isEmpty()) {
-			return;
+			return 0;
 		}
 		val Element root = elementsQuery.get(0);
 		val ListMultimap<Element, Element> definitionList = definitionList(root);
@@ -130,6 +150,7 @@ class Scraper {
 				}
 			}
 		}
+		return definitionList.size();
 	}
 
 	private def int printNodeContent(PrintStream out, Document doc, String query) {
@@ -161,7 +182,7 @@ class Scraper {
 
 				// TODO filter other EAs!
 				val eas = definitionList.keySet().filter[it.text().startsWith("Constructor")].toList();
-				if (eas.size > 0) {
+				if (eas.size() > 0) {
 					out.println("[" + eas.map[it.text()].join(",") + "]");
 				}
 				out.print(title);
