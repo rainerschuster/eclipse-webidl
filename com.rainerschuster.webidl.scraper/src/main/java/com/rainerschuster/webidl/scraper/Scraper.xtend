@@ -213,14 +213,25 @@ class Scraper {
 	}
 
 	private def int printNodeContent(PrintStream out, Document doc, String query) {
+		val StringBuilder sb = new StringBuilder();
 		val Elements elements = doc.select(query);
 		for (Element element : elements) {
 			// TODO check if this is also necessary in "new", i.e., printNodeContentSpecial version
 			if (element.classNames.contains("extract")) {
 //				System.out.println("Ignoring node since it is only an extract.");
 			} else {
-				out.println(element.text());
-				out.println();
+				sb.append(element.text() + "\n\n");
+			}
+		}
+		val String trimmed = sb.toString().trim();
+		val String firstHalf = trimmed.substring(0, trimmed.length/2).trim();
+		val String secondHalf = trimmed.substring(trimmed.length/2, trimmed.length).trim();
+		if (!trimmed.empty) {
+			if (firstHalf.equals(secondHalf)) {
+				System.out.println("Ignoring half");
+				out.println(firstHalf);
+			} else {
+				out.println(trimmed);
 			}
 		}
 		return elements.size();
