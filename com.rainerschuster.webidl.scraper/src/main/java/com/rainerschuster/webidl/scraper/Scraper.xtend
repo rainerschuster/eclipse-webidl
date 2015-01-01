@@ -26,6 +26,7 @@ class Scraper {
 
 //	XPathFactory xPathFactory = XPathFactory.newInstance();
 	String outputFilenameBase = "";
+	String mode = "";
 	Map<String, String> refToHref = Maps.newHashMap();
 	Queue<String> refQueue = Queues.newLinkedBlockingQueue();
 
@@ -48,19 +49,36 @@ class Scraper {
 				// Main code
 				SslUtil.disableCertificateValidation();
 
-				if (scraper.options.commandLine.hasOption("o")) {
-					scraper.outputFilenameBase = scraper.options.commandLine.getOptionValue("o");
-					if (scraper.outputFilenameBase.endsWith(".idl")) {
-						scraper.outputFilenameBase = scraper.outputFilenameBase.substring(0, scraper.outputFilenameBase.length - ".idl".length);
+				if (scraper.options.commandLine.hasOption("r")) {
+					scraper.refToHref.put("html", "https://html.spec.whatwg.org/");
+					scraper.refQueue.add("html");
+					scraper.refToHref.put("svg2", "https://svgwg.org/svg2-draft/single-page.html");
+					scraper.refQueue.add("svg2");
+					scraper.refToHref.put("navigation timing", "http://www.w3.org/TR/navigation-timing/");
+					scraper.refQueue.add("navigation timing");
+					scraper.refToHref.put("requestanimationframe", "https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/RequestAnimationFrame/Overview.html");
+					scraper.refQueue.add("requestanimationframe");
+					scraper.refToHref.put("mediasource", "http://w3c.github.io/media-source/");
+					scraper.refQueue.add("mediasource");
+//					scraper.refToHref.put("customelements", "http://w3c.github.io/webcomponents/spec/custom/");
+//					scraper.refQueue.add("customelements");
+					scraper.refToHref.put("shadowdom", "http://w3c.github.io/webcomponents/spec/shadow/");
+					scraper.refQueue.add("shadowdom");
+//					scraper.refToHref.put("htmlimports", "http://w3c.github.io/webcomponents/spec/imports/");
+//					scraper.refQueue.add("htmlimports");
+					scraper.processQueue();
+				} else {
+					if (scraper.options.commandLine.hasOption("o")) {
+						scraper.outputFilenameBase = scraper.options.commandLine.getOptionValue("o");
+						if (scraper.outputFilenameBase.endsWith(".idl")) {
+							scraper.outputFilenameBase = scraper.outputFilenameBase.substring(0, scraper.outputFilenameBase.length - ".idl".length);
+						}
+					}
+					if (scraper.options.commandLine.hasOption("m")) {
+						scraper.mode = scraper.options.commandLine.getOptionValue("m");
 					}
 				}
-				scraper.scrapeUrl(scraper.options.commandLine.args.get(0));
-
-//				scraper.refToHref.put("html", "https://html.spec.whatwg.org/");
-//				scraper.refQueue.add("html");
-//				scraper.refToHref.put("svg2", "https://svgwg.org/svg2-draft/single-page.html");
-//				scraper.refQueue.add("svg2");
-//				scraper.processQueue();
+				scraper.scrapeUrl(scraper.options.commandLine.args.get(0), "preCode".equalsIgnoreCase(scraper.mode));
 			}
 		} catch (ParseException pe) {
 			System.out.println(pe.message);
@@ -78,8 +96,12 @@ class Scraper {
 		}
 	}
 
-	// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
+
 	def scrapeUrl(String urlString) {
+		scrapeUrl(urlString, false);
+	}
+	// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
+	def scrapeUrl(String urlString, boolean preCodeMode) {
 		System.out.println("Scraping " + urlString);
 		var out = System.out;
 		var outRefs = System.out;
@@ -108,7 +130,9 @@ class Scraper {
 				scrapeCount += printNodeContent(out, doc, "pre.idl");
 				scrapeCount += printNodeContent(out, doc, "code.idl-code");
 //				// Needed for http://www.w3.org/TR/service-workers/
-//				scrapeCount += printNodeContent(out, doc, "pre code");
+				if (preCodeMode) {
+					scrapeCount += printNodeContent(out, doc, "pre code");
+				}
 //				System.out.println("New scraping:");
 				scrapeCount += printNodeContentSpecial(out, doc);
 

@@ -27,9 +27,14 @@ public class ScraperOptions {
 			.hasArg()
 	        .withDescription("parse mode")
 	        .create("m");
+		
+		final Option recursiveOption = OptionBuilder.withArgName( "recursive" )
+				.withDescription("recursive")
+				.create("r");
 
 		options.addOption(fileOption);
 		options.addOption(modeOption);
+		options.addOption(recursiveOption);
 	}
 
 	public void parseOptions(String[] args) throws ParseException {
