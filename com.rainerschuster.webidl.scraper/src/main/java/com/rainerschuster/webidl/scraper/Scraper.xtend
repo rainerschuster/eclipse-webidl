@@ -16,12 +16,19 @@ import org.apache.commons.cli.ParseException
 import org.eclipse.xtend.lib.annotations.Accessors
 import com.google.common.collect.LinkedListMultimap
 import com.google.common.collect.ListMultimap
+import java.util.Map
+import com.google.common.collect.Maps
+import java.util.Queue
+import com.google.common.collect.Queues
+
 // TODO pre.extraidl https://dvcs.w3.org/hg/innerhtml/raw-file/tip/index.html
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
 class Scraper {
 
 //	XPathFactory xPathFactory = XPathFactory.newInstance();
 	String outputFilenameBase = "";
+	Map<String, String> refToHref = Maps.newHashMap();
+	Queue<String> refQueue = Queues.newLinkedBlockingQueue();
 
 	@Accessors
 	ScraperOptions options = new ScraperOptions();
@@ -41,11 +48,32 @@ class Scraper {
 			} else {
 				// Main code
 				SslUtil.disableCertificateValidation();
-				scraper.scrapeUrl(scraper.options.commandLine.args.get(0));
+
+//				if (scraper.options.commandLine.hasOption("o")) {
+//					scraper.outputFilenameBase = scraper.options.commandLine.getOptionValue("o");
+//					if (scraper.outputFilenameBase.endsWith(".idl")) {
+//						scraper.outputFilenameBase = scraper.outputFilenameBase.substring(0, scraper.outputFilenameBase.length - ".idl".length);
+//					}
+//				}
+//
+//				scraper.scrapeUrl(scraper.options.commandLine.args.get(0));
+				scraper.refToHref.put("html", "https://html.spec.whatwg.org/");
+				scraper.refQueue.add("html");
+				scraper.processQueue();
 			}
 		} catch (ParseException pe) {
 			System.out.println(pe.message);
 			scraper.options.printUsage();
+		}
+	}
+
+	def void processQueue() {
+		while (!refQueue.empty) {
+			System.out.println("Queue iteration");
+			val String next = refQueue.poll();
+			val href = refToHref.get(next);
+			outputFilenameBase = next;
+			scrapeUrl(href);
 		}
 	}
 
@@ -54,11 +82,7 @@ class Scraper {
 		var out = System.out;
 		var outRefs = System.out;
 		try {
-			if (options.commandLine.hasOption("o")) {
-				outputFilenameBase = options.commandLine.getOptionValue("o");
-				if (outputFilenameBase.endsWith(".idl")) {
-					outputFilenameBase = outputFilenameBase.substring(0, outputFilenameBase.length - ".idl".length);
-				}
+			if (!outputFilenameBase.nullOrEmpty) {
 				val File outFile = new File(outputFilenameBase + ".idl");
 				out = new PrintStream(outFile);
 				val File outRefsFile = new File(outputFilenameBase + ".cmd");
@@ -87,13 +111,13 @@ class Scraper {
 
 				if (scrapeCount > 0) {
 					var referenceCount = 0;
-					referenceCount += printReferences(outRefs, doc, "dl#ref-list");
-					referenceCount += printReferences(outRefs, doc, "div#anolis-references dl");
-					referenceCount += printReferences(outRefs, doc, "section#normative-references dl.bibliography");
-					referenceCount += printReferences(outRefs, doc, "section#informative-references dl.bibliography");
+					referenceCount += printReferences(outRefs, doc, "dl#ref-list", scrapeCount);
+					referenceCount += printReferences(outRefs, doc, "div#anolis-references dl", scrapeCount);
+					referenceCount += printReferences(outRefs, doc, "section#normative-references dl.bibliography", scrapeCount);
+					referenceCount += printReferences(outRefs, doc, "section#informative-references dl.bibliography", scrapeCount);
 					System.out.println("Scrape count: " + scrapeCount + ", reference count: " + referenceCount);
 					if (referenceCount == 0) {
-						System.out.println("Found IDL fragments, but no references!");
+						System.err.println("Found IDL fragments, but no references!");
 					}
 				}
 			} catch (ParserConfigurationException e) {
@@ -127,7 +151,7 @@ class Scraper {
 		return listMultimap;
 	}
 
-	private def int printReferences(PrintStream out, Document doc, String query) {
+	private def int printReferences(PrintStream out, Document doc, String query, int idlCount) {
 		val Elements elementsQuery = doc.select(query);
 		if (elementsQuery.isEmpty()) {
 			return 0;
@@ -146,6 +170,14 @@ class Scraper {
 					System.err.println("Unexpected number of links " + refs.size() + "!");
 				}
 				for (Element ref : refs) {
+					if (refToHref.containsKey(refName)) {
+						if (idlCount > 0 && !ref.attr("href").equals(refToHref.get(refName))) {
+							System.err.println("Same name but different href: " + ref.attr("href") + " vs. " + refToHref.get(refName));
+						}
+					} else {
+						refToHref.put(refName, ref.attr("href"));
+						refQueue.add(refName);
+					}
 					out.println("CALL scrape " + ref.attr("href") + " -o " + refName + ".idl");
 				}
 			}
