@@ -21,7 +21,6 @@ import com.google.common.collect.Maps
 import java.util.Queue
 import com.google.common.collect.Queues
 
-// TODO pre.extraidl https://dvcs.w3.org/hg/innerhtml/raw-file/tip/index.html
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
 class Scraper {
 
@@ -49,17 +48,19 @@ class Scraper {
 				// Main code
 				SslUtil.disableCertificateValidation();
 
-//				if (scraper.options.commandLine.hasOption("o")) {
-//					scraper.outputFilenameBase = scraper.options.commandLine.getOptionValue("o");
-//					if (scraper.outputFilenameBase.endsWith(".idl")) {
-//						scraper.outputFilenameBase = scraper.outputFilenameBase.substring(0, scraper.outputFilenameBase.length - ".idl".length);
-//					}
-//				}
-//
-//				scraper.scrapeUrl(scraper.options.commandLine.args.get(0));
-				scraper.refToHref.put("html", "https://html.spec.whatwg.org/");
-				scraper.refQueue.add("html");
-				scraper.processQueue();
+				if (scraper.options.commandLine.hasOption("o")) {
+					scraper.outputFilenameBase = scraper.options.commandLine.getOptionValue("o");
+					if (scraper.outputFilenameBase.endsWith(".idl")) {
+						scraper.outputFilenameBase = scraper.outputFilenameBase.substring(0, scraper.outputFilenameBase.length - ".idl".length);
+					}
+				}
+				scraper.scrapeUrl(scraper.options.commandLine.args.get(0));
+
+//				scraper.refToHref.put("html", "https://html.spec.whatwg.org/");
+//				scraper.refQueue.add("html");
+//				scraper.refToHref.put("svg2", "https://svgwg.org/svg2-draft/single-page.html");
+//				scraper.refQueue.add("svg2");
+//				scraper.processQueue();
 			}
 		} catch (ParseException pe) {
 			System.out.println(pe.message);
@@ -79,6 +80,7 @@ class Scraper {
 
 	// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
 	def scrapeUrl(String urlString) {
+		System.out.println("Scraping " + urlString);
 		var out = System.out;
 		var outRefs = System.out;
 		try {
@@ -101,6 +103,7 @@ class Scraper {
 
 //				System.out.println("Old scraping:");
 				var scrapeCount = 0;
+				// Needed for https://dvcs.w3.org/hg/innerhtml/raw-file/tip/index.html
 				scrapeCount += printNodeContent(out, doc, "pre.extraidl");
 				scrapeCount += printNodeContent(out, doc, "pre.idl");
 				scrapeCount += printNodeContent(out, doc, "code.idl-code");
