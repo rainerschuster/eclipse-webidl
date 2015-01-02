@@ -52,7 +52,6 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //		}
 //	}
 
-
 	// See 3.1. Names
 
 	// TODO See org.eclipse.xtext.validation.NamesAreUniqueValidationHelper
@@ -102,7 +101,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		val containerDefinition = iface.eContainer as ExtendedDefinition;
 		val extendedAttributes = containerDefinition.eal.extendedAttributes;
 		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
-			if (!allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+			if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on interface definitions', 
 						extendedAttribute,
 						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
@@ -119,7 +118,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		for (String extendedAttribute : forbiddenExtendedAttributes) {
 			if (extendedAttributes.containsExtendedAttribute(extendedAttribute)) {
 				extendedAttributes.getAllExtendedAttributes(extendedAttribute).forEach[
-					warning('The extended attribute "' + it.nameRef + '" must not be specified on partial interface definitions', 
+					error('The extended attribute "' + it.nameRef + '" must not be specified on partial interface definitions', 
 							it,
 							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 				];
@@ -204,7 +203,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			val containerDefinition = attribute.eContainer as ExtendedInterfaceMember;
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
 			for (ExtendedAttribute extendedAttribute : extendedAttributes) {
-				if (!allowedExtendedAttributesRegular.contains(extendedAttribute.nameRef)) {
+				if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributesRegular.contains(extendedAttribute.nameRef)) {
 					error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on attributes', 
 							extendedAttribute,
 							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
@@ -273,7 +272,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			val containerDefinition = operation.eContainer as ExtendedInterfaceMember;
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
 			for (ExtendedAttribute extendedAttribute : extendedAttributes) {
-				if (!allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
 					error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on operations', 
 							extendedAttribute,
 							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
@@ -290,7 +289,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			for (argument : operation.arguments) {
 				val extendedAttributes = argument.eal.extendedAttributes;
 				for (ExtendedAttribute extendedAttribute : extendedAttributes) {
-					if (!allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+					if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
 						error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on operation arguments', 
 								extendedAttribute,
 								WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
@@ -402,7 +401,6 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
 						extendedAttribute,
 						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-						
 			}
 		}
 	}
