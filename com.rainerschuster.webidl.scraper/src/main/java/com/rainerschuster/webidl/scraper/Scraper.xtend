@@ -77,8 +77,8 @@ class Scraper {
 					if (scraper.options.commandLine.hasOption("m")) {
 						scraper.mode = scraper.options.commandLine.getOptionValue("m");
 					}
+					scraper.scrapeUrl(scraper.options.commandLine.args.get(0), "preCode".equalsIgnoreCase(scraper.mode));
 				}
-				scraper.scrapeUrl(scraper.options.commandLine.args.get(0), "preCode".equalsIgnoreCase(scraper.mode));
 			}
 		} catch (ParseException pe) {
 			System.out.println(pe.message);
