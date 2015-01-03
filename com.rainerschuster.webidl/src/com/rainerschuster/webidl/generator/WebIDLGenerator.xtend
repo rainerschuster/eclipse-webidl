@@ -66,13 +66,12 @@ class WebIDLGenerator implements IGenerator {
 	@Inject extension IQualifiedNameProvider
 
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		// TODO Same for CallbackFunction!
-		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
-			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
-		};
-		for (e : resource.allContents.toIterable.filter(typeof(CallbackRest))) {
-			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
-		};
+//		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
+//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
+//		};
+//		for (e : resource.allContents.toIterable.filter(typeof(CallbackRest))) {
+//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
+//		};
 	}
 
 	// TODO consider eCrossReferences for implementsStatements!
