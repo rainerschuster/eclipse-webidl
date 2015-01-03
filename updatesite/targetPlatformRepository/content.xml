@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?metadataRepository version='1.1.0'?>
 <repository name='TychoTargetPlatform' type='org.eclipse.equinox.internal.p2.metadata.repository.LocalMetadataRepository' version='0.0.1'>
-  <units size='139'>
+  <units size='143'>
     <unit id='org.eclipse.team.core' version='3.7.0.v20130514-1224'>
       <update id='org.eclipse.team.core' range='[0.0.0,3.7.0.v20130514-1224)' severity='0'/>
       <properties size='8'>
@@ -121,61 +121,6 @@
         <instructions size='1'>
           <instruction key='manifest'>
             Bundle-SymbolicName: org.eclipse.core.databinding.observable&#xA;Bundle-Version: 1.4.1.v20140210-1835
-          </instruction>
-        </instructions>
-      </touchpointData>
-    </unit>
-    <unit id='com.rainerschuster.webidl' version='1.0.0.201412141631'>
-      <update id='com.rainerschuster.webidl' range='[0.0.0,1.0.0.201412141631)' severity='0'/>
-      <properties size='5'>
-        <property name='org.eclipse.equinox.p2.name' value='com.rainerschuster.webidl'/>
-        <property name='org.eclipse.equinox.p2.provider' value='My Company'/>
-        <property name='maven-groupId' value='com.rainerschuster.webidl'/>
-        <property name='maven-artifactId' value='com.rainerschuster.webidl'/>
-        <property name='maven-version' value='1.0.0-SNAPSHOT'/>
-      </properties>
-      <provides size='15'>
-        <provided namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl' version='1.0.0.201412141631'/>
-        <provided namespace='osgi.bundle' name='com.rainerschuster.webidl' version='1.0.0.201412141631'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.services' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.webIDL' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.webIDL.impl' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.webIDL.util' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.serializer' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.parser.antlr' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.parser.antlr.internal' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.validation' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.scoping' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.generator' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.formatting' version='0.0.0'/>
-        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
-      </provides>
-      <requires size='15'>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.xbase' range='0.0.0' optional='true' greedy='false'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.generator' range='0.0.0' optional='true' greedy='false'/>
-        <required namespace='osgi.bundle' name='org.apache.commons.logging' range='1.0.4' optional='true' greedy='false'/>
-        <required namespace='osgi.bundle' name='org.eclipse.emf.codegen.ecore' range='0.0.0' optional='true' greedy='false'/>
-        <required namespace='osgi.bundle' name='org.eclipse.emf.mwe.utils' range='0.0.0' optional='true' greedy='false'/>
-        <required namespace='osgi.bundle' name='org.eclipse.emf.mwe2.launch' range='0.0.0' optional='true' greedy='false'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.util' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.emf.ecore' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.emf.common' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.xbase.lib' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.antlr.runtime' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.common.types' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.objectweb.asm' range='[5.0.1,6.0.0)' optional='true' greedy='false'/>
-        <required namespace='java.package' name='org.apache.log4j' range='0.0.0'/>
-      </requires>
-      <artifacts size='1'>
-        <artifact classifier='osgi.bundle' id='com.rainerschuster.webidl' version='1.0.0.201412141631'/>
-      </artifacts>
-      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
-      <touchpointData size='1'>
-        <instructions size='1'>
-          <instruction key='manifest'>
-            Bundle-SymbolicName: com.rainerschuster.webidl; singleton:=true&#xA;Bundle-Version: 1.0.0.201412141631
           </instruction>
         </instructions>
       </touchpointData>
@@ -428,6 +373,29 @@
         </instructions>
       </touchpointData>
     </unit>
+    <unit id='com.rainerschuster.webidl.sdk.feature.group' version='1.0.0.201501030650' singleton='false'>
+      <update id='com.rainerschuster.webidl.sdk.feature.group' range='[0.0.0,1.0.0.201501030650)' severity='0'/>
+      <properties size='5'>
+        <property name='org.eclipse.equinox.p2.name' value='WebIDL SDK Feature'/>
+        <property name='org.eclipse.equinox.p2.type.group' value='true'/>
+        <property name='maven-groupId' value='com.rainerschuster.webidl'/>
+        <property name='maven-artifactId' value='com.rainerschuster.webidl.sdk'/>
+        <property name='maven-version' value='1.0.0-SNAPSHOT'/>
+      </properties>
+      <provides size='1'>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.sdk.feature.group' version='1.0.0.201501030650'/>
+      </provides>
+      <requires size='3'>
+        <required namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl' range='[1.0.0.201501030650,1.0.0.201501030650]'/>
+        <required namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.ui' range='[1.0.0.201501030650,1.0.0.201501030650]'/>
+        <required namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.sdk.feature.jar' range='[1.0.0.201501030650,1.0.0.201501030650]'>
+          <filter>
+            (org.eclipse.update.install.features=true)
+          </filter>
+        </required>
+      </requires>
+      <touchpoint id='null' version='0.0.0'/>
+    </unit>
     <unit id='org.w3c.dom.events' version='3.0.0.draft20060413_v201105210656' singleton='false'>
       <update id='org.w3c.dom.events' range='[0.0.0,3.0.0.draft20060413_v201105210656)' severity='0'/>
       <properties size='5'>
@@ -539,29 +507,6 @@
           </instruction>
         </instructions>
       </touchpointData>
-    </unit>
-    <unit id='com.rainerschuster.webidl.sdk.feature.group' version='1.0.0.201412141631' singleton='false'>
-      <update id='com.rainerschuster.webidl.sdk.feature.group' range='[0.0.0,1.0.0.201412141631)' severity='0'/>
-      <properties size='5'>
-        <property name='org.eclipse.equinox.p2.name' value='WebIDL SDK Feature'/>
-        <property name='org.eclipse.equinox.p2.type.group' value='true'/>
-        <property name='maven-groupId' value='com.rainerschuster.webidl'/>
-        <property name='maven-artifactId' value='com.rainerschuster.webidl.sdk'/>
-        <property name='maven-version' value='1.0.0-SNAPSHOT'/>
-      </properties>
-      <provides size='1'>
-        <provided namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.sdk.feature.group' version='1.0.0.201412141631'/>
-      </provides>
-      <requires size='3'>
-        <required namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl' range='[1.0.0.201412141631,1.0.0.201412141631]'/>
-        <required namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.ui' range='[1.0.0.201412141631,1.0.0.201412141631]'/>
-        <required namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.sdk.feature.jar' range='[1.0.0.201412141631,1.0.0.201412141631]'>
-          <filter>
-            (org.eclipse.update.install.features=true)
-          </filter>
-        </required>
-      </requires>
-      <touchpoint id='null' version='0.0.0'/>
     </unit>
     <unit id='org.eclipse.swt.win32.win32.x86_64' version='3.103.1.v20140903-1947'>
       <update id='org.eclipse.swt.win32.win32.x86_64' range='[0.0.0,3.103.1.v20140903-1947)' severity='0'/>
@@ -998,33 +943,6 @@
         </instructions>
       </touchpointData>
     </unit>
-    <unit id='com.rainerschuster.webidl.sdk.feature.jar' version='1.0.0.201412141631'>
-      <properties size='4'>
-        <property name='org.eclipse.equinox.p2.name' value='WebIDL SDK Feature'/>
-        <property name='maven-groupId' value='com.rainerschuster.webidl'/>
-        <property name='maven-artifactId' value='com.rainerschuster.webidl.sdk'/>
-        <property name='maven-version' value='1.0.0-SNAPSHOT'/>
-      </properties>
-      <provides size='3'>
-        <provided namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.sdk.feature.jar' version='1.0.0.201412141631'/>
-        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='feature' version='1.0.0'/>
-        <provided namespace='org.eclipse.update.feature' name='com.rainerschuster.webidl.sdk' version='1.0.0.201412141631'/>
-      </provides>
-      <filter>
-        (org.eclipse.update.install.features=true)
-      </filter>
-      <artifacts size='1'>
-        <artifact classifier='org.eclipse.update.feature' id='com.rainerschuster.webidl.sdk' version='1.0.0.201412141631'/>
-      </artifacts>
-      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
-      <touchpointData size='1'>
-        <instructions size='1'>
-          <instruction key='zipped'>
-            true
-          </instruction>
-        </instructions>
-      </touchpointData>
-    </unit>
     <unit id='org.eclipse.core.expressions' version='3.4.600.v20140128-0851'>
       <update id='org.eclipse.core.expressions' range='[0.0.0,3.4.600.v20140128-0851)' severity='0'/>
       <properties size='8'>
@@ -1105,6 +1023,66 @@
         <instructions size='1'>
           <instruction key='manifest'>
             Bundle-SymbolicName: org.eclipse.emf.codegen; singleton:=true&#xA;Bundle-Version: 2.10.0.v20140901-1055
+          </instruction>
+        </instructions>
+      </touchpointData>
+    </unit>
+    <unit id='org.eclipse.swt.gtk.linux.x86' version='3.103.1.v20140903-1947'>
+      <update id='org.eclipse.swt.gtk.linux.x86' range='[0.0.0,3.103.1.v20140903-1947)' severity='0'/>
+      <properties size='8'>
+        <property name='df_LT.providerName' value='Eclipse.org'/>
+        <property name='df_LT.fragmentName' value='Standard Widget Toolkit for GTK'/>
+        <property name='org.eclipse.equinox.p2.name' value='%fragmentName'/>
+        <property name='org.eclipse.equinox.p2.provider' value='%providerName'/>
+        <property name='org.eclipse.equinox.p2.bundle.localization' value='fragment'/>
+        <property name='maven-groupId' value='org.eclipse.swt'/>
+        <property name='maven-artifactId' value='org.eclipse.swt.gtk.linux.x86'/>
+        <property name='maven-version' value='3.103.1-SNAPSHOT'/>
+      </properties>
+      <provides size='28'>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='org.eclipse.swt.gtk.linux.x86' version='3.103.1.v20140903-1947'/>
+        <provided namespace='osgi.bundle' name='org.eclipse.swt.gtk.linux.x86' version='3.103.1.v20140903-1947'/>
+        <provided namespace='java.package' name='org.eclipse.swt' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.accessibility' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.awt' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.browser' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.custom' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.dnd' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.events' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.graphics' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.layout' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.opengl' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.printing' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.program' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.widgets' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.image' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.theme' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.accessibility.gtk' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.cairo' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.cde' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.gnome' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.gtk' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.mozilla' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.opengl.glx' version='0.0.0'/>
+        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
+        <provided namespace='osgi.fragment' name='org.eclipse.swt' version='3.103.1.v20140903-1947'/>
+        <provided namespace='org.eclipse.equinox.p2.localization' name='df_LT' version='1.0.0'/>
+      </provides>
+      <requires size='1'>
+        <required namespace='osgi.bundle' name='org.eclipse.swt' range='[3.0.0,4.0.0)'/>
+      </requires>
+      <filter>
+        (&amp;(osgi.arch=x86)(osgi.os=linux)(osgi.ws=gtk))
+      </filter>
+      <artifacts size='1'>
+        <artifact classifier='osgi.bundle' id='org.eclipse.swt.gtk.linux.x86' version='3.103.1.v20140903-1947'/>
+      </artifacts>
+      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
+      <touchpointData size='1'>
+        <instructions size='1'>
+          <instruction key='manifest'>
+            Bundle-SymbolicName: org.eclipse.swt.gtk.linux.x86; singleton:=true&#xA;Bundle-Version: 3.103.1.v20140903-1947&#xA;Fragment-Host: org.eclipse.swt; bundle-version=&quot;[3.0.0,4.0.0)&quot;
           </instruction>
         </instructions>
       </touchpointData>
@@ -1570,6 +1548,60 @@
         </instructions>
       </touchpointData>
     </unit>
+    <unit id='org.eclipse.swt.cocoa.macosx.x86_64' version='3.103.1.v20140903-1947'>
+      <update id='org.eclipse.swt.cocoa.macosx.x86_64' range='[0.0.0,3.103.1.v20140903-1947)' severity='0'/>
+      <properties size='8'>
+        <property name='df_LT.providerName' value='Eclipse.org'/>
+        <property name='df_LT.fragmentName' value='Standard Widget Toolkit for Mac OS X (Cocoa)'/>
+        <property name='org.eclipse.equinox.p2.name' value='%fragmentName'/>
+        <property name='org.eclipse.equinox.p2.provider' value='%providerName'/>
+        <property name='org.eclipse.equinox.p2.bundle.localization' value='fragment'/>
+        <property name='maven-groupId' value='org.eclipse.swt'/>
+        <property name='maven-artifactId' value='org.eclipse.swt.cocoa.macosx.x86_64'/>
+        <property name='maven-version' value='3.103.1-SNAPSHOT'/>
+      </properties>
+      <provides size='22'>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='org.eclipse.swt.cocoa.macosx.x86_64' version='3.103.1.v20140903-1947'/>
+        <provided namespace='osgi.bundle' name='org.eclipse.swt.cocoa.macosx.x86_64' version='3.103.1.v20140903-1947'/>
+        <provided namespace='java.package' name='org.eclipse.swt' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.accessibility' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.awt' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.browser' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.custom' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.dnd' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.events' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.graphics' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.layout' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.opengl' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.printing' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.program' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.widgets' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.image' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.theme' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.cocoa' version='0.0.0'/>
+        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
+        <provided namespace='osgi.fragment' name='org.eclipse.swt' version='3.103.1.v20140903-1947'/>
+        <provided namespace='org.eclipse.equinox.p2.localization' name='df_LT' version='1.0.0'/>
+      </provides>
+      <requires size='1'>
+        <required namespace='osgi.bundle' name='org.eclipse.swt' range='[3.0.0,4.0.0)'/>
+      </requires>
+      <filter>
+        (&amp;(osgi.arch=x86_64)(osgi.os=macosx)(osgi.ws=cocoa))
+      </filter>
+      <artifacts size='1'>
+        <artifact classifier='osgi.bundle' id='org.eclipse.swt.cocoa.macosx.x86_64' version='3.103.1.v20140903-1947'/>
+      </artifacts>
+      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
+      <touchpointData size='1'>
+        <instructions size='1'>
+          <instruction key='manifest'>
+            Bundle-SymbolicName: org.eclipse.swt.cocoa.macosx.x86_64; singleton:=true&#xA;Bundle-Version: 3.103.1.v20140903-1947&#xA;Fragment-Host: org.eclipse.swt; bundle-version=&quot;[3.0.0,4.0.0)&quot;
+          </instruction>
+        </instructions>
+      </touchpointData>
+    </unit>
     <unit id='org.eclipse.e4.ui.bindings' version='0.10.200.v20140424-2042'>
       <update id='org.eclipse.e4.ui.bindings' range='[0.0.0,0.10.200.v20140424-2042)' severity='0'/>
       <properties size='8'>
@@ -1697,6 +1729,61 @@
         <instructions size='1'>
           <instruction key='manifest'>
             Bundle-SymbolicName: org.eclipse.ui.ide; singleton:=true&#xA;Bundle-Version: 3.10.1.v20140828-0944
+          </instruction>
+        </instructions>
+      </touchpointData>
+    </unit>
+    <unit id='com.rainerschuster.webidl' version='1.0.0.201501030650'>
+      <update id='com.rainerschuster.webidl' range='[0.0.0,1.0.0.201501030650)' severity='0'/>
+      <properties size='5'>
+        <property name='org.eclipse.equinox.p2.name' value='com.rainerschuster.webidl'/>
+        <property name='org.eclipse.equinox.p2.provider' value='My Company'/>
+        <property name='maven-groupId' value='com.rainerschuster.webidl'/>
+        <property name='maven-artifactId' value='com.rainerschuster.webidl'/>
+        <property name='maven-version' value='1.0.0-SNAPSHOT'/>
+      </properties>
+      <provides size='15'>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl' version='1.0.0.201501030650'/>
+        <provided namespace='osgi.bundle' name='com.rainerschuster.webidl' version='1.0.0.201501030650'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.services' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.webIDL' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.webIDL.impl' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.webIDL.util' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.serializer' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.parser.antlr' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.parser.antlr.internal' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.validation' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.scoping' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.generator' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.formatting' version='0.0.0'/>
+        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
+      </provides>
+      <requires size='15'>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.xbase' range='0.0.0' optional='true' greedy='false'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.generator' range='0.0.0' optional='true' greedy='false'/>
+        <required namespace='osgi.bundle' name='org.apache.commons.logging' range='1.0.4' optional='true' greedy='false'/>
+        <required namespace='osgi.bundle' name='org.eclipse.emf.codegen.ecore' range='0.0.0' optional='true' greedy='false'/>
+        <required namespace='osgi.bundle' name='org.eclipse.emf.mwe.utils' range='0.0.0' optional='true' greedy='false'/>
+        <required namespace='osgi.bundle' name='org.eclipse.emf.mwe2.launch' range='0.0.0' optional='true' greedy='false'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.util' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.emf.ecore' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.emf.common' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.xbase.lib' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.antlr.runtime' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.common.types' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.objectweb.asm' range='[5.0.1,6.0.0)' optional='true' greedy='false'/>
+        <required namespace='java.package' name='org.apache.log4j' range='0.0.0'/>
+      </requires>
+      <artifacts size='1'>
+        <artifact classifier='osgi.bundle' id='com.rainerschuster.webidl' version='1.0.0.201501030650'/>
+      </artifacts>
+      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
+      <touchpointData size='1'>
+        <instructions size='1'>
+          <instruction key='manifest'>
+            Bundle-SymbolicName: com.rainerschuster.webidl; singleton:=true&#xA;Bundle-Version: 1.0.0.201501030650
           </instruction>
         </instructions>
       </touchpointData>
@@ -1842,6 +1929,66 @@
         <instructions size='1'>
           <instruction key='manifest'>
             Bundle-SymbolicName: org.eclipse.ui.navigator; singleton:=true&#xA;Bundle-Version: 3.5.401.v20140724-1117
+          </instruction>
+        </instructions>
+      </touchpointData>
+    </unit>
+    <unit id='org.eclipse.swt.gtk.linux.x86_64' version='3.103.1.v20140903-1947'>
+      <update id='org.eclipse.swt.gtk.linux.x86_64' range='[0.0.0,3.103.1.v20140903-1947)' severity='0'/>
+      <properties size='8'>
+        <property name='df_LT.providerName' value='Eclipse.org'/>
+        <property name='df_LT.fragmentName' value='Standard Widget Toolkit for GTK'/>
+        <property name='org.eclipse.equinox.p2.name' value='%fragmentName'/>
+        <property name='org.eclipse.equinox.p2.provider' value='%providerName'/>
+        <property name='org.eclipse.equinox.p2.bundle.localization' value='fragment'/>
+        <property name='maven-groupId' value='org.eclipse.swt'/>
+        <property name='maven-artifactId' value='org.eclipse.swt.gtk.linux.x86_64'/>
+        <property name='maven-version' value='3.103.1-SNAPSHOT'/>
+      </properties>
+      <provides size='28'>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='org.eclipse.swt.gtk.linux.x86_64' version='3.103.1.v20140903-1947'/>
+        <provided namespace='osgi.bundle' name='org.eclipse.swt.gtk.linux.x86_64' version='3.103.1.v20140903-1947'/>
+        <provided namespace='java.package' name='org.eclipse.swt' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.accessibility' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.awt' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.browser' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.custom' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.dnd' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.events' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.graphics' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.layout' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.opengl' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.printing' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.program' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.widgets' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.image' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.theme' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.accessibility.gtk' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.cairo' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.cde' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.gnome' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.gtk' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.mozilla' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.opengl.glx' version='0.0.0'/>
+        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
+        <provided namespace='osgi.fragment' name='org.eclipse.swt' version='3.103.1.v20140903-1947'/>
+        <provided namespace='org.eclipse.equinox.p2.localization' name='df_LT' version='1.0.0'/>
+      </provides>
+      <requires size='1'>
+        <required namespace='osgi.bundle' name='org.eclipse.swt' range='[3.0.0,4.0.0)'/>
+      </requires>
+      <filter>
+        (&amp;(osgi.arch=x86_64)(osgi.os=linux)(osgi.ws=gtk))
+      </filter>
+      <artifacts size='1'>
+        <artifact classifier='osgi.bundle' id='org.eclipse.swt.gtk.linux.x86_64' version='3.103.1.v20140903-1947'/>
+      </artifacts>
+      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
+      <touchpointData size='1'>
+        <instructions size='1'>
+          <instruction key='manifest'>
+            Bundle-SymbolicName: org.eclipse.swt.gtk.linux.x86_64; singleton:=true&#xA;Bundle-Version: 3.103.1.v20140903-1947&#xA;Fragment-Host: org.eclipse.swt; bundle-version=&quot;[3.0.0,4.0.0)&quot;
           </instruction>
         </instructions>
       </touchpointData>
@@ -4213,6 +4360,55 @@
         </instructions>
       </touchpointData>
     </unit>
+    <unit id='com.rainerschuster.webidl.ui' version='1.0.0.201501030650'>
+      <update id='com.rainerschuster.webidl.ui' range='[0.0.0,1.0.0.201501030650)' severity='0'/>
+      <properties size='5'>
+        <property name='org.eclipse.equinox.p2.name' value='com.rainerschuster.webidl.ui'/>
+        <property name='org.eclipse.equinox.p2.provider' value='My Company'/>
+        <property name='maven-groupId' value='com.rainerschuster.webidl'/>
+        <property name='maven-artifactId' value='com.rainerschuster.webidl.ui'/>
+        <property name='maven-version' value='1.0.0-SNAPSHOT'/>
+      </properties>
+      <provides size='7'>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.ui' version='1.0.0.201501030650'/>
+        <provided namespace='osgi.bundle' name='com.rainerschuster.webidl.ui' version='1.0.0.201501030650'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.ui.quickfix' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.ui.contentassist' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.ui.contentassist.antlr' version='0.0.0'/>
+        <provided namespace='java.package' name='com.rainerschuster.webidl.ui.internal' version='0.0.0'/>
+        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
+      </provides>
+      <requires size='17'>
+        <required namespace='osgi.bundle' name='com.rainerschuster.webidl' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.ui' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.ui.editors' range='3.5.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.ui.ide' range='3.5.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.ui.shared' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.ui' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.builder' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.xbase.lib' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.antlr.runtime' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.common.types.ui' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtext.ui.codetemplates.ui' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.compare' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.core.runtime' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.core.resources' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xtend' range='0.0.0'/>
+        <required namespace='osgi.bundle' name='org.eclipse.xpand' range='0.0.0'/>
+        <required namespace='java.package' name='org.apache.log4j' range='0.0.0'/>
+      </requires>
+      <artifacts size='1'>
+        <artifact classifier='osgi.bundle' id='com.rainerschuster.webidl.ui' version='1.0.0.201501030650'/>
+      </artifacts>
+      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
+      <touchpointData size='1'>
+        <instructions size='1'>
+          <instruction key='manifest'>
+            Bundle-SymbolicName: com.rainerschuster.webidl.ui; singleton:=true&#xA;Bundle-Version: 1.0.0.201501030650
+          </instruction>
+        </instructions>
+      </touchpointData>
+    </unit>
     <unit id='org.eclipse.equinox.p2.engine' version='2.3.0.v20140506-1720'>
       <update id='org.eclipse.equinox.p2.engine' range='[0.0.0,2.3.0.v20140506-1720)' severity='0'/>
       <properties size='8'>
@@ -5563,51 +5759,6 @@
         </instructions>
       </touchpointData>
     </unit>
-    <unit id='com.rainerschuster.webidl.ui' version='1.0.0.201412141631'>
-      <update id='com.rainerschuster.webidl.ui' range='[0.0.0,1.0.0.201412141631)' severity='0'/>
-      <properties size='5'>
-        <property name='org.eclipse.equinox.p2.name' value='com.rainerschuster.webidl.ui'/>
-        <property name='org.eclipse.equinox.p2.provider' value='My Company'/>
-        <property name='maven-groupId' value='com.rainerschuster.webidl'/>
-        <property name='maven-artifactId' value='com.rainerschuster.webidl.ui'/>
-        <property name='maven-version' value='1.0.0-SNAPSHOT'/>
-      </properties>
-      <provides size='7'>
-        <provided namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.ui' version='1.0.0.201412141631'/>
-        <provided namespace='osgi.bundle' name='com.rainerschuster.webidl.ui' version='1.0.0.201412141631'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.ui.quickfix' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.ui.contentassist' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.ui.contentassist.antlr' version='0.0.0'/>
-        <provided namespace='java.package' name='com.rainerschuster.webidl.ui.internal' version='0.0.0'/>
-        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
-      </provides>
-      <requires size='13'>
-        <required namespace='osgi.bundle' name='com.rainerschuster.webidl' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.ui' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.ui.editors' range='3.5.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.ui.ide' range='3.5.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.ui.shared' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.ui' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.builder' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.xbase.lib' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.antlr.runtime' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.common.types.ui' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.xtext.ui.codetemplates.ui' range='0.0.0'/>
-        <required namespace='osgi.bundle' name='org.eclipse.compare' range='0.0.0'/>
-        <required namespace='java.package' name='org.apache.log4j' range='0.0.0'/>
-      </requires>
-      <artifacts size='1'>
-        <artifact classifier='osgi.bundle' id='com.rainerschuster.webidl.ui' version='1.0.0.201412141631'/>
-      </artifacts>
-      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
-      <touchpointData size='1'>
-        <instructions size='1'>
-          <instruction key='manifest'>
-            Bundle-SymbolicName: com.rainerschuster.webidl.ui; singleton:=true&#xA;Bundle-Version: 1.0.0.201412141631
-          </instruction>
-        </instructions>
-      </touchpointData>
-    </unit>
     <unit id='org.eclipse.e4.core.di.extensions' version='0.12.0.v20140417-2033'>
       <update id='org.eclipse.e4.core.di.extensions' range='[0.0.0,0.12.0.v20140417-2033)' severity='0'/>
       <properties size='8'>
@@ -5711,6 +5862,33 @@
         <instructions size='1'>
           <instruction key='manifest'>
             Bundle-SymbolicName: org.eclipse.equinox.p2.repository;singleton:=true&#xA;Bundle-Version: 2.3.0.v20131211-1531
+          </instruction>
+        </instructions>
+      </touchpointData>
+    </unit>
+    <unit id='com.rainerschuster.webidl.sdk.feature.jar' version='1.0.0.201501030650'>
+      <properties size='4'>
+        <property name='org.eclipse.equinox.p2.name' value='WebIDL SDK Feature'/>
+        <property name='maven-groupId' value='com.rainerschuster.webidl'/>
+        <property name='maven-artifactId' value='com.rainerschuster.webidl.sdk'/>
+        <property name='maven-version' value='1.0.0-SNAPSHOT'/>
+      </properties>
+      <provides size='3'>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='com.rainerschuster.webidl.sdk.feature.jar' version='1.0.0.201501030650'/>
+        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='feature' version='1.0.0'/>
+        <provided namespace='org.eclipse.update.feature' name='com.rainerschuster.webidl.sdk' version='1.0.0.201501030650'/>
+      </provides>
+      <filter>
+        (org.eclipse.update.install.features=true)
+      </filter>
+      <artifacts size='1'>
+        <artifact classifier='org.eclipse.update.feature' id='com.rainerschuster.webidl.sdk' version='1.0.0.201501030650'/>
+      </artifacts>
+      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
+      <touchpointData size='1'>
+        <instructions size='1'>
+          <instruction key='zipped'>
+            true
           </instruction>
         </instructions>
       </touchpointData>
@@ -6819,6 +6997,64 @@
         <instructions size='1'>
           <instruction key='manifest'>
             Bundle-SymbolicName: org.eclipse.core.databinding.property&#xA;Bundle-Version: 1.4.200.v20140214-0004
+          </instruction>
+        </instructions>
+      </touchpointData>
+    </unit>
+    <unit id='org.eclipse.swt.win32.win32.x86' version='3.103.1.v20140903-1947'>
+      <update id='org.eclipse.swt.win32.win32.x86' range='[0.0.0,3.103.1.v20140903-1947)' severity='0'/>
+      <properties size='8'>
+        <property name='df_LT.providerName' value='Eclipse.org'/>
+        <property name='df_LT.fragmentName' value='Standard Widget Toolkit for Windows'/>
+        <property name='org.eclipse.equinox.p2.name' value='%fragmentName'/>
+        <property name='org.eclipse.equinox.p2.provider' value='%providerName'/>
+        <property name='org.eclipse.equinox.p2.bundle.localization' value='fragment'/>
+        <property name='maven-groupId' value='org.eclipse.swt'/>
+        <property name='maven-artifactId' value='org.eclipse.swt.win32.win32.x86'/>
+        <property name='maven-version' value='3.103.1-SNAPSHOT'/>
+      </properties>
+      <provides size='26'>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='org.eclipse.swt.win32.win32.x86' version='3.103.1.v20140903-1947'/>
+        <provided namespace='osgi.bundle' name='org.eclipse.swt.win32.win32.x86' version='3.103.1.v20140903-1947'/>
+        <provided namespace='java.package' name='org.eclipse.swt' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.accessibility' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.awt' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.browser' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.custom' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.dnd' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.events' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.graphics' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.layout' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.opengl' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.printing' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.program' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.widgets' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.image' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.theme' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.ole.win32' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.gdip' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.ole.win32' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.win32' version='0.0.0'/>
+        <provided namespace='java.package' name='org.eclipse.swt.internal.opengl.win32' version='0.0.0'/>
+        <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
+        <provided namespace='osgi.fragment' name='org.eclipse.swt' version='3.103.1.v20140903-1947'/>
+        <provided namespace='org.eclipse.equinox.p2.localization' name='df_LT' version='1.0.0'/>
+      </provides>
+      <requires size='1'>
+        <required namespace='osgi.bundle' name='org.eclipse.swt' range='[3.0.0,4.0.0)'/>
+      </requires>
+      <filter>
+        (&amp;(osgi.arch=x86)(osgi.os=win32)(osgi.ws=win32))
+      </filter>
+      <artifacts size='1'>
+        <artifact classifier='osgi.bundle' id='org.eclipse.swt.win32.win32.x86' version='3.103.1.v20140903-1947'/>
+      </artifacts>
+      <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
+      <touchpointData size='1'>
+        <instructions size='1'>
+          <instruction key='manifest'>
+            Bundle-SymbolicName: org.eclipse.swt.win32.win32.x86; singleton:=true&#xA;Bundle-Version: 3.103.1.v20140903-1947&#xA;Fragment-Host: org.eclipse.swt; bundle-version=&quot;[3.0.0,4.0.0)&quot;
           </instruction>
         </instructions>
       </touchpointData>
