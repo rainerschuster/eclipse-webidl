@@ -1,0 +1,2 @@
+language: java
+#script: com.rainerschuster.webidl.releng/ && mvn clean install
