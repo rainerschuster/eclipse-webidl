@@ -8,4 +8,20 @@ package com.rainerschuster.webidl;
  */
 public class WebIDLRuntimeModule extends com.rainerschuster.webidl.AbstractWebIDLRuntimeModule {
 
+//	// contributed by org.eclipse.xtext.generator.scoping.AbstractScopingFragment
+//	public void configureIScopeProviderDelegate(com.google.inject.Binder binder) {
+//		binder.bind(org.eclipse.xtext.scoping.IScopeProvider.class).annotatedWith(com.google.inject.name.Names.named(org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider.NAMED_DELEGATE)).to(org.eclipse.xtext.scoping.impl.SimpleLocalScopeProvider.class);
+//	}
+
+//	@Override
+//	public void configureIScopeProviderDelegate(com.google.inject.Binder binder) {
+//        binder.bind(org.eclipse.xtext.scoping.IScopeProvider.class)
+//                .annotatedWith(com.google.inject.name.Names.named(AbstractDeclarativeScopeProvider.NAMED_DELEGATE))
+//                .to(WebIDLImportUriGlobalScopeProvider.class);
+//    }
+
+//	@Override
+//	public Class<? extends IGlobalScopeProvider> bindIGlobalScopeProvider() {
+//		return WebIDLImportUriGlobalScopeProvider.class;
+//	}
 }
