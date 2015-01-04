@@ -24,7 +24,6 @@ import com.google.common.collect.Queues
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
 class Scraper {
 
-//	XPathFactory xPathFactory = XPathFactory.newInstance();
 	String outputFilenameBase = "";
 	String mode = "";
 	Map<String, String> refToHref = Maps.newHashMap();
@@ -109,8 +108,8 @@ class Scraper {
 			if (!outputFilenameBase.nullOrEmpty) {
 				val File outFile = new File(outputFilenameBase + ".idl");
 				out = new PrintStream(outFile);
-				val File outRefsFile = new File(outputFilenameBase + ".cmd");
-				outRefs = new PrintStream(outRefsFile);
+//				val File outRefsFile = new File(outputFilenameBase + ".cmd");
+//				outRefs = new PrintStream(outRefsFile);
 			}
 			try {
 				var Document doc = null;
@@ -138,10 +137,10 @@ class Scraper {
 
 				if (scrapeCount > 0) {
 					var referenceCount = 0;
-					referenceCount += printReferences(outRefs, doc, "dl#ref-list", scrapeCount);
-					referenceCount += printReferences(outRefs, doc, "div#anolis-references dl", scrapeCount);
-					referenceCount += printReferences(outRefs, doc, "section#normative-references dl.bibliography", scrapeCount);
-					referenceCount += printReferences(outRefs, doc, "section#informative-references dl.bibliography", scrapeCount);
+					referenceCount += scrapeReferences(outRefs, doc, "dl#ref-list", scrapeCount);
+					referenceCount += scrapeReferences(outRefs, doc, "div#anolis-references dl", scrapeCount);
+					referenceCount += scrapeReferences(outRefs, doc, "section#normative-references dl.bibliography", scrapeCount);
+					referenceCount += scrapeReferences(outRefs, doc, "section#informative-references dl.bibliography", scrapeCount);
 					System.out.println("Scrape count: " + scrapeCount + ", reference count: " + referenceCount);
 					if (referenceCount == 0) {
 						System.err.println("Found IDL fragments, but no references!");
@@ -158,9 +157,9 @@ class Scraper {
 			if (out != null) {
 				out.close();
 			}
-			if (outRefs != null) {
-				outRefs.close();
-			}
+//			if (outRefs != null) {
+//				outRefs.close();
+//			}
 		}
 	}
 
@@ -178,7 +177,7 @@ class Scraper {
 		return listMultimap;
 	}
 
-	private def int printReferences(PrintStream out, Document doc, String query, int idlCount) {
+	private def int scrapeReferences(PrintStream out, Document doc, String query, int idlCount) {
 		val Elements elementsQuery = doc.select(query);
 		if (elementsQuery.isEmpty()) {
 			return 0;
@@ -205,7 +204,7 @@ class Scraper {
 						refToHref.put(refName, ref.attr("href"));
 						refQueue.add(refName);
 					}
-					out.println("CALL scrape " + ref.attr("href") + " -o " + refName + ".idl");
+//					out.println("CALL scrape " + ref.attr("href") + " -o " + refName + ".idl");
 				}
 			}
 		}
@@ -216,9 +215,8 @@ class Scraper {
 		val StringBuilder sb = new StringBuilder();
 		val Elements elements = doc.select(query);
 		for (Element element : elements) {
-			// TODO check if this is also necessary in "new", i.e., printNodeContentSpecial version
 			if (element.classNames.contains("extract")) {
-//				System.out.println("Ignoring node since it is only an extract.");
+				System.out.println("Ignoring node since it is only an extract.");
 			} else {
 				sb.append(element.text() + "\n\n");
 			}
@@ -240,9 +238,8 @@ class Scraper {
 	private def int printNodeContentSpecial(PrintStream out, Document doc) {
 		val Elements elements = doc.select("dl.idl");
 		for (Element element : elements) {
-			// TODO check if this is also necessary in "new", i.e., printNodeContentSpecial version
 			if (element.classNames.contains("extract")) {
-//				System.out.println("Ignoring node since it is only an extract.");
+				System.out.println("Ignoring node since it is only an extract.");
 			} else {
 				val definitionList = definitionList(element);
 				val String title = element.attr("title");
