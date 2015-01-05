@@ -3,6 +3,7 @@
 
 <product name="com.rainerschuster.webidl.rcp" uid="WebIDL Language" id="com.rainerschuster.webidl.rcp.product" application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
 
+
    <configIni use="default">
    </configIni>
 
@@ -13,9 +14,12 @@
       </vmArgsMac>
    </launcherArgs>
 
-   <windowImages/>
+   <windowImages i64="/icons/logo64.png"/>
+
 
    <launcher name="webidl">
+      <linux icon="/icons/logo.xpm"/>
+      <macosx icon="/icons/logo.icns"/>
       <solaris/>
       <win useIco="true">
          <ico path="/icons/logo.ico"/>
@@ -29,6 +33,7 @@
             winExtraLargeHigh="/icons/logo-256x256-32bit.bmp"/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
