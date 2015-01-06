@@ -14,6 +14,8 @@
 		<module>../com.rainerschuster.webidl.tests</module>
 		<module>../com.rainerschuster.webidl.sdk</module>
 		<module>../com.rainerschuster.webidl.updatesite</module>
+		<module>../com.rainerschuster.webidl.rcp</module>
+		<module>../com.rainerschuster.webidl.feature</module>
 		<module>../com.rainerschuster.webidl.product</module>
 		<module>../com.rainerschuster.webidl.scraper</module>
 	</modules>
