@@ -14,29 +14,33 @@
       </vmArgsMac>
    </launcherArgs>
 
-   <windowImages i64="/icons/logo64.png"/>
-
+   <windowImages i16="/com.rainerschuster.webidl.sdk/icons/eclipse16.gif" i32="/com.rainerschuster.webidl.sdk/icons/eclipse32.gif" i48="/com.rainerschuster.webidl.sdk/icons/eclipse48.gif" i64="/com.rainerschuster.webidl.sdk/icons/eclipse64.png" i128="/com.rainerschuster.webidl.sdk/icons/eclipse128.png" i256="/com.rainerschuster.webidl.sdk/icons/eclipse256.png"/>
 
    <launcher name="webidl">
-      <linux icon="/icons/logo.xpm"/>
-      <macosx icon="/icons/logo.icns"/>
-      <solaris/>
+      <linux icon="/icons/icon.xpm"/>
+      <macosx icon="/icons/Eclipse.icns"/>
+      <solaris
+            solarisLarge="/icons/Eclipse.l.pm"
+            solarisMedium="/icons/Eclipse.m.pm"
+            solarisSmall="/icons/Eclipse.s.pm"
+            solarisTiny="/icons/Eclipse.t.pm"/>
       <win useIco="true">
-         <ico path="/icons/logo.ico"/>
+         <ico path="/icons/eclipse.ico"/>
          <bmp
-            winSmallHigh="/icons/logo-16x16-32bit.bmp"
-            winSmallLow="/icons/logo-16x16-8bit.bmp"
-            winMediumHigh="/icons/logo-32x32-32bit.bmp"
-            winMediumLow="/icons/logo-32x32-8bit.bmp"
-            winLargeHigh="/icons/logo-48x48-32bit.bmp"
-            winLargeLow="/icons/logo-48x48-8bit.bmp"
-            winExtraLargeHigh="/icons/logo-256x256-32bit.bmp"/>
+            winSmallHigh="/icons/icon_16x16_32bit.bmp"
+            winSmallLow="/icons/icon_16x16_8bit.bmp"
+            winMediumHigh="/icons/icon_32x32_32bit.bmp"
+            winMediumLow="/icons/icon_32x32_8bit.bmp"
+            winLargeHigh="/icons/icon_48x48_32bit.bmp"
+            winLargeLow="/icons/icon_48x48_8bit.bmp"
+            winExtraLargeHigh="/icons/icon_256x256_32bit.bmp"/>
       </win>
    </launcher>
 
 
    <vm>
    </vm>
+
 
    <plugins>
    </plugins>
@@ -58,6 +62,8 @@
    </configurations>
 
    <repositories>
+      <repository location="http://rainerschuster.github.io/webidl-eclipse/updatesite/repository/" enabled="true" />
+      <repository location="http://rainerschuster.github.io/webidl-eclipse/updatesite/repository/" enabled="true" />
       <repository location="http://rainerschuster.github.io/webidl-eclipse/updatesite/repository/" enabled="true" />
    </repositories>
 
