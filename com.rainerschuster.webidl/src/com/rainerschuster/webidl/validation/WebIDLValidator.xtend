@@ -4,43 +4,39 @@
 package com.rainerschuster.webidl.validation
 
 import com.rainerschuster.webidl.webIDL.Argument
+import com.rainerschuster.webidl.webIDL.Attribute
+import com.rainerschuster.webidl.webIDL.CallbackRest
 import com.rainerschuster.webidl.webIDL.Const
+import com.rainerschuster.webidl.webIDL.Definition
+import com.rainerschuster.webidl.webIDL.Definitions
+import com.rainerschuster.webidl.webIDL.Dictionary
+import com.rainerschuster.webidl.webIDL.Enum
+import com.rainerschuster.webidl.webIDL.ExtendedAttribute
+import com.rainerschuster.webidl.webIDL.ExtendedDefinition
+import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
+import com.rainerschuster.webidl.webIDL.ImplementsStatement
 import com.rainerschuster.webidl.webIDL.Interface
+import com.rainerschuster.webidl.webIDL.InterfaceMember
 import com.rainerschuster.webidl.webIDL.Iterable_
 import com.rainerschuster.webidl.webIDL.Operation
+import com.rainerschuster.webidl.webIDL.PartialInterface
+import com.rainerschuster.webidl.webIDL.PrimitiveType
 import com.rainerschuster.webidl.webIDL.PromiseType
+import com.rainerschuster.webidl.webIDL.ReferenceType
+import com.rainerschuster.webidl.webIDL.SequenceType
 import com.rainerschuster.webidl.webIDL.Special
+import com.rainerschuster.webidl.webIDL.Type
+import com.rainerschuster.webidl.webIDL.Typedef
+import com.rainerschuster.webidl.webIDL.UnionType
 import com.rainerschuster.webidl.webIDL.WebIDLPackage
 import java.util.List
+import java.util.Set
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
-import com.rainerschuster.webidl.webIDL.ExtendedAttribute
-import com.rainerschuster.webidl.webIDL.PartialInterface
-import com.rainerschuster.webidl.webIDL.ExtendedDefinition
 
+import static extension com.rainerschuster.webidl.util.TypeUtil.*
 import static extension com.rainerschuster.webidl.util.ExtendedAttributeUtil.*
-import com.rainerschuster.webidl.webIDL.Definitions
-import com.rainerschuster.webidl.webIDL.Dictionary
-import com.rainerschuster.webidl.webIDL.CallbackRest
-import com.rainerschuster.webidl.webIDL.Typedef
-import com.rainerschuster.webidl.webIDL.Definition
-import com.rainerschuster.webidl.webIDL.ReferenceType
-import com.rainerschuster.webidl.webIDL.PrimitiveType
-import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.SequenceType
-import com.rainerschuster.webidl.webIDL.UnionType
-import java.util.Set
-import com.rainerschuster.webidl.webIDL.Type
-import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
-import com.rainerschuster.webidl.util.TypeUtil
-import com.rainerschuster.webidl.webIDL.ImplementsStatement
-import com.rainerschuster.webidl.webIDL.InterfaceMember
-import com.rainerschuster.webidl.webIDL.Serializer
-import com.rainerschuster.webidl.webIDL.Stringifier
-import com.rainerschuster.webidl.webIDL.StaticMember
-import com.rainerschuster.webidl.webIDL.Maplike
-import com.rainerschuster.webidl.webIDL.Setlike
 
 /**
  * Custom validation rules. 
@@ -82,7 +78,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //				CallbackRestOrInterface: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
 				Interface: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
 				Dictionary: WebIDLPackage.Literals.DICTIONARY__NAME
-				com.rainerschuster.webidl.webIDL.Enum: WebIDLPackage.Literals.ENUM__NAME
+				Enum: WebIDLPackage.Literals.ENUM__NAME
 				CallbackRest: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
 				Typedef: WebIDLPackage.Literals.TYPEDEF__NAME
 			};
@@ -97,7 +93,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		switch(definition) {
 			Interface: definition.name
 			Dictionary: definition.name
-			com.rainerschuster.webidl.webIDL.Enum: definition.name
+			Enum: definition.name
 			CallbackRest: definition.name
 			Typedef: definition.name
 		}
@@ -149,7 +145,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkConstantType(Const constant) {
 		// TODO What about arrays?
-		if (!(constant.type instanceof PrimitiveType || (constant.type instanceof ReferenceType && (constant.type as ReferenceType).typeRef instanceof Typedef && ((constant.type as ReferenceType).typeRef as Typedef).type instanceof com.rainerschuster.webidl.webIDL.PrimitiveType))) {
+		if (!(constant.type instanceof PrimitiveType || (constant.type instanceof ReferenceType && (constant.type as ReferenceType).typeRef instanceof Typedef && ((constant.type as ReferenceType).typeRef as Typedef).type instanceof PrimitiveType))) {
 			error('The type of a constant must not be a primitive type or a Typedef with primitive type', 
 					constant,
 					WebIDLPackage.Literals.CONST__NAME)
@@ -367,8 +363,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	 * The list of enumeration values must not include duplicates.
 	 */
 	@Check
-	def checkEnumerationValuesNoDuplicates(com.rainerschuster.webidl.webIDL.Enum enumeration) {
-		val List<String> enumerationValues = TypeUtil.enumerationValues(enumeration);
+	def checkEnumerationValuesNoDuplicates(Enum enumeration) {
+		val List<String> enumerationValues = enumeration.enumerationValues();
 		val Set<String> enumerationValuesSet = newHashSet(enumerationValues);
 		if (enumerationValues.size() != enumerationValuesSet.size()) {
 			error('The list of enumeration values must not include duplicates', 
@@ -405,33 +401,28 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	/**
-	 * For a given interface, there must not be any member defined on any of its consequential interfaces whose identifier is the same as any other member defined on any of those consequential interfaces or on the original interface itself
-	 */
-	@Check
-	def checkConsequentialInterfaceMembers(Interface iface) {
-		// TODO This check is not complete since the consequentialInterface's members are not checked against the other's members
-		val ownMembers = iface.interfaceMembers.map[it.interfaceMember];
-		val ownMembersNames = ownMembers.map[interfaceMemberToName(it)];
-		val consequentialInterfaces = TypeUtil.consequentialInterfaces(iface);
-		for (consequentialInterface : consequentialInterfaces) {
-			val otherMembers = consequentialInterface.interfaceMembers.map[it.interfaceMember];
-//			val otherMembersNames = otherMembers.map[interfaceMemberToName(it)];
-			for (otherMember : otherMembers) {
-				val same = ownMembers.filter[ownMembersNames.contains(interfaceMemberToName(it))];
-				if (!same.empty) {
-					error('For a given interface, there must not be any member defined on any of its consequential interfaces whose identifier is the same as any other member defined on any of those consequential interfaces or on the original interface itself', 
-							otherMember,
-							WebIDLPackage.Literals.INTERFACE__INTERFACE_MEMBERS)
-				}
-			}
-		}
-//		if (implementsStatement.ifaceA == implementsStatement.ifaceB) {
-//			error('The two identifiers in an implements statement must identify two different interfaces.', 
-//					implementsStatement,
-//					WebIDLPackage.Literals.CONST__TYPE)
+//	/**
+//	 * For a given interface, there must not be any member defined on any of its consequential interfaces whose identifier is the same as any other member defined on any of those consequential interfaces or on the original interface itself
+//	 */
+//	@Check
+//	def checkConsequentialInterfaceMembers(Interface iface) {
+//		// TODO This check is not complete since the consequentialInterface's members are not checked against the other's members
+//		val ownMembers = iface.interfaceMembers.map[it.interfaceMember];
+//		val ownMembersNames = ownMembers.map[interfaceMemberToName(it)];
+//		val consequentialInterfaces = iface.consequentialInterfaces();
+//		for (consequentialInterface : consequentialInterfaces) {
+//			val otherMembers = consequentialInterface.interfaceMembers.map[it.interfaceMember];
+////			val otherMembersNames = otherMembers.map[interfaceMemberToName(it)];
+//			for (otherMember : otherMembers) {
+//				val same = ownMembers.filter[ownMembersNames.contains(interfaceMemberToName(it))];
+//				if (!same.empty) {
+//					error('For a given interface, there must not be any member defined on any of its consequential interfaces whose identifier is the same as any other member defined on any of those consequential interfaces or on the original interface itself', 
+//							otherMember,
+//							WebIDLPackage.Literals.INTERFACE__INTERFACE_MEMBERS)
+//				}
+//			}
 //		}
-	}
+//	}
 
 	// FIXME Move to NameUtil
 	private def interfaceMemberToName(InterfaceMember interfaceMember) {
@@ -447,17 +438,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //			Setlike: interfaceMember.name
 		}
 	}
-/*
-InterfaceMember:
-	Const
-	| Operation
-	| Serializer
-	| Stringifier
-	| StaticMember
-	| Iterable_
-	| Attribute
-	| Maplike
-	| Setlike */
+
 	/**
 	 * The interface identified on the left-hand side of an implements statement must not inherit from the interface identifier on the right-hand side, and vice versa.
 	 */

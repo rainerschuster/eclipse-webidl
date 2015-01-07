@@ -3,7 +3,6 @@ package com.rainerschuster.webidl.util
 class NameUtil {
 
 	static val reservedIdentifiers = #[
-//		"prototype", // TODO prototype is no reserved identifier
 		"constructor",
 		"toString",
 		"toJSON"
