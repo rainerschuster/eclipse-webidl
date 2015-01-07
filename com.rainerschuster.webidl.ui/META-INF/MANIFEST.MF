@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.rainerschuster.webidl.ui
-Bundle-Vendor: My Company
+Bundle-Vendor: rainerschuster.com
 Bundle-Version: 1.0.0.qualifier
 Bundle-SymbolicName: com.rainerschuster.webidl.ui; singleton:=true
 Bundle-ActivationPolicy: lazy
