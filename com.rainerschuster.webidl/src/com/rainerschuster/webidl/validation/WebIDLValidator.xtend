@@ -33,6 +33,14 @@ import com.rainerschuster.webidl.webIDL.UnionType
 import java.util.Set
 import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
+import com.rainerschuster.webidl.util.TypeUtil
+import com.rainerschuster.webidl.webIDL.ImplementsStatement
+import com.rainerschuster.webidl.webIDL.InterfaceMember
+import com.rainerschuster.webidl.webIDL.Serializer
+import com.rainerschuster.webidl.webIDL.Stringifier
+import com.rainerschuster.webidl.webIDL.StaticMember
+import com.rainerschuster.webidl.webIDL.Maplike
+import com.rainerschuster.webidl.webIDL.Setlike
 
 /**
  * Custom validation rules. 
@@ -84,6 +92,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		];
 	}
 
+	// FIXME Move to NameUtil
 	private def definitionToName(Definition definition) {
 		switch(definition) {
 			Interface: definition.name
@@ -352,6 +361,125 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 					WebIDLPackage.Literals.INTERFACE__INTERFACE_MEMBERS)
 		}
 	}
+
+	// See 3.5. Enumerations
+	/**
+	 * The list of enumeration values must not include duplicates.
+	 */
+	@Check
+	def checkEnumerationValuesNoDuplicates(com.rainerschuster.webidl.webIDL.Enum enumeration) {
+		val List<String> enumerationValues = TypeUtil.enumerationValues(enumeration);
+		val Set<String> enumerationValuesSet = newHashSet(enumerationValues);
+		if (enumerationValues.size() != enumerationValuesSet.size()) {
+			error('The list of enumeration values must not include duplicates', 
+					enumeration,
+					WebIDLPackage.Literals.ENUM__VALUES)
+		}
+	}
+
+	// See 3.6. Callback functions
+	/**
+	 * Callback functions must not be used as the type of a constant.
+	 */
+	@Check
+	def checkConstTypeNotCallbackFunction(Const const) {
+		if (const.type instanceof ReferenceType) {
+			if ((const.type as ReferenceType).typeRef instanceof CallbackRest) {
+				error('Callback functions must not be used as the type of a constant', 
+						const,
+						WebIDLPackage.Literals.CONST__TYPE)
+			}
+		}
+	}
+
+	// See 3.8. Implements statements
+	/**
+	 * The two identifiers must identify two different interfaces.
+	 */
+	@Check
+	def checkImplementsStatementIdentifiers(ImplementsStatement implementsStatement) {
+		if (implementsStatement.ifaceA == implementsStatement.ifaceB) {
+			error('The two identifiers in an implements statement must identify two different interfaces.', 
+					implementsStatement,
+					WebIDLPackage.Literals.CONST__TYPE)
+		}
+	}
+
+	/**
+	 * For a given interface, there must not be any member defined on any of its consequential interfaces whose identifier is the same as any other member defined on any of those consequential interfaces or on the original interface itself
+	 */
+	@Check
+	def checkConsequentialInterfaceMembers(Interface iface) {
+		// TODO This check is not complete since the consequentialInterface's members are not checked against the other's members
+		val ownMembers = iface.interfaceMembers.map[it.interfaceMember];
+		val ownMembersNames = ownMembers.map[interfaceMemberToName(it)];
+		val consequentialInterfaces = TypeUtil.consequentialInterfaces(iface);
+		for (consequentialInterface : consequentialInterfaces) {
+			val otherMembers = consequentialInterface.interfaceMembers.map[it.interfaceMember];
+//			val otherMembersNames = otherMembers.map[interfaceMemberToName(it)];
+			for (otherMember : otherMembers) {
+				val same = ownMembers.filter[ownMembersNames.contains(interfaceMemberToName(it))];
+				if (!same.empty) {
+					error('For a given interface, there must not be any member defined on any of its consequential interfaces whose identifier is the same as any other member defined on any of those consequential interfaces or on the original interface itself', 
+							otherMember,
+							WebIDLPackage.Literals.INTERFACE__INTERFACE_MEMBERS)
+				}
+			}
+		}
+//		if (implementsStatement.ifaceA == implementsStatement.ifaceB) {
+//			error('The two identifiers in an implements statement must identify two different interfaces.', 
+//					implementsStatement,
+//					WebIDLPackage.Literals.CONST__TYPE)
+//		}
+	}
+
+	// FIXME Move to NameUtil
+	private def interfaceMemberToName(InterfaceMember interfaceMember) {
+		switch(interfaceMember) {
+			Const: interfaceMember.name
+			Operation: interfaceMember.name
+//			Serializer: interfaceMember.name
+//			Stringifier: interfaceMember.name
+//			StaticMember: interfaceMember.name
+//			Iterable_: interfaceMember.name
+			Attribute: interfaceMember.name
+//			Maplike: interfaceMember.name
+//			Setlike: interfaceMember.name
+		}
+	}
+/*
+InterfaceMember:
+	Const
+	| Operation
+	| Serializer
+	| Stringifier
+	| StaticMember
+	| Iterable_
+	| Attribute
+	| Maplike
+	| Setlike */
+	/**
+	 * The interface identified on the left-hand side of an implements statement must not inherit from the interface identifier on the right-hand side, and vice versa.
+	 */
+	@Check
+	def checkImplementsStatementInherits(ImplementsStatement implementsStatement) {
+		// FIXME use inherited interfaces instead?!
+		// TODO Check typedefs!
+		val ifaceA = implementsStatement.ifaceA;
+		val ifaceB = implementsStatement.ifaceB;
+		if (ifaceA != null && ifaceA.inherits == ifaceB) {
+			error('The interface identified on the left-hand side of an implements statement must not inherit from the interface identifier on the right-hand side', 
+						implementsStatement,
+						WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_A)
+		}
+		if (ifaceB != null && (ifaceB instanceof Interface && (ifaceB as Interface).inherits == ifaceA)) {
+			error('The interface identified on the right-hand side of an implements statement must not inherit from the interface identifier on the left-hand side', 
+						implementsStatement,
+						WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_B)
+		}
+	}
+
+	// See 3.11. Extended attributes
 
 	@Check
 	def checkDeprecatedExtendedAttribute(ExtendedAttribute extendedAttribute) {
