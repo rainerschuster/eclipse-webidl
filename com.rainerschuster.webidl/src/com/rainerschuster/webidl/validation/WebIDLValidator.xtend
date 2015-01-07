@@ -16,7 +16,6 @@ import com.rainerschuster.webidl.webIDL.ExtendedDefinition
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
 import com.rainerschuster.webidl.webIDL.ImplementsStatement
 import com.rainerschuster.webidl.webIDL.Interface
-import com.rainerschuster.webidl.webIDL.InterfaceMember
 import com.rainerschuster.webidl.webIDL.Iterable_
 import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.PartialInterface
@@ -35,8 +34,9 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
 
-import static extension com.rainerschuster.webidl.util.TypeUtil.*
+import static extension com.rainerschuster.webidl.util.NameUtil.*
 import static extension com.rainerschuster.webidl.util.ExtendedAttributeUtil.*
+import static extension com.rainerschuster.webidl.util.TypeUtil.*
 
 /**
  * Custom validation rules. 
@@ -63,7 +63,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	def checkUniqueNames(Definitions definitions) {
 		for (definition : definitions.definitions.map[it.def]) {
 			// TODO Only interface, dictionary, enumeration, callback function and typedef should be checked!
-			val definitionName = definitionToName(definition);
+			val definitionName = definition.definitionToName();
 			if (definitionName != null) {
 				checkUniqueNames(definitions, definition);
 			}
@@ -71,8 +71,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	}
 
 	private def checkUniqueNames(Definitions definitions, Definition definition) {
-		val String definitionName = definitionToName(definition);
-		val duplicateList = definitions.definitions.map[it.def].filter[it != definition && definitionName.equals(definitionToName(it))];
+		val String definitionName = definition.definitionToName();
+		val duplicateList = definitions.definitions.map[it.def].filter[it != definition && definitionName.equals(it.definitionToName())];
 		duplicateList.forEach[
 			val feature = switch (it) {
 //				CallbackRestOrInterface: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
@@ -82,21 +82,10 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 				CallbackRest: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
 				Typedef: WebIDLPackage.Literals.TYPEDEF__NAME
 			};
-			error('Duplicate definition "' + definitionToName(it) + '"', 
+			error('Duplicate definition "' + it.definitionToName() + '"', 
 					it,
 					feature)
 		];
-	}
-
-	// FIXME Move to NameUtil
-	private def definitionToName(Definition definition) {
-		switch(definition) {
-			Interface: definition.name
-			Dictionary: definition.name
-			Enum: definition.name
-			CallbackRest: definition.name
-			Typedef: definition.name
-		}
 	}
 
 	// See 3.2. Interfaces
@@ -202,7 +191,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	// TODO Refactor this once Attribute is refactored (static inlined etc.)
 	@Check
 	def checkExtendedAttributeOnAttribute(Attribute attribute) {
-		val allowedExtendedAttributesStatic = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
+//		val allowedExtendedAttributesStatic = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
 		val allowedExtendedAttributesRegular = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE, EA_UNSCOPEABLE];
 		if (attribute.eContainer instanceof ExtendedInterfaceMember) {
 			val containerDefinition = attribute.eContainer as ExtendedInterfaceMember;
@@ -423,21 +412,6 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //			}
 //		}
 //	}
-
-	// FIXME Move to NameUtil
-	private def interfaceMemberToName(InterfaceMember interfaceMember) {
-		switch(interfaceMember) {
-			Const: interfaceMember.name
-			Operation: interfaceMember.name
-//			Serializer: interfaceMember.name
-//			Stringifier: interfaceMember.name
-//			StaticMember: interfaceMember.name
-//			Iterable_: interfaceMember.name
-			Attribute: interfaceMember.name
-//			Maplike: interfaceMember.name
-//			Setlike: interfaceMember.name
-		}
-	}
 
 	/**
 	 * The interface identified on the left-hand side of an implements statement must not inherit from the interface identifier on the right-hand side, and vice versa.

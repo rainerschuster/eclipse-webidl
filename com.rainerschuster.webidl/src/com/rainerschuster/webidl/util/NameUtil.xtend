@@ -1,5 +1,15 @@
 package com.rainerschuster.webidl.util
 
+import com.rainerschuster.webidl.webIDL.InterfaceMember
+import com.rainerschuster.webidl.webIDL.Definition
+import com.rainerschuster.webidl.webIDL.Interface
+import com.rainerschuster.webidl.webIDL.Dictionary
+import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.Typedef
+import com.rainerschuster.webidl.webIDL.Const
+import com.rainerschuster.webidl.webIDL.Operation
+import com.rainerschuster.webidl.webIDL.Attribute
+
 class NameUtil {
 
 	static val reservedIdentifiers = #[
@@ -82,6 +92,32 @@ class NameUtil {
 
 	def static boolean isJavaReservedWord(String word) {
 		javaReservedWords.contains(word)
+	}
+
+
+
+	def static definitionToName(Definition definition) {
+		switch(definition) {
+			Interface: definition.name
+			Dictionary: definition.name
+			com.rainerschuster.webidl.webIDL.Enum: definition.name
+			CallbackRest: definition.name
+			Typedef: definition.name
+		}
+	}
+
+	def static interfaceMemberToName(InterfaceMember interfaceMember) {
+		switch(interfaceMember) {
+			Const: interfaceMember.name
+			Operation: interfaceMember.name
+//			Serializer: interfaceMember.name
+//			Stringifier: interfaceMember.name
+//			StaticMember: interfaceMember.name
+//			Iterable_: interfaceMember.name
+			Attribute: interfaceMember.name
+//			Maplike: interfaceMember.name
+//			Setlike: interfaceMember.name
+		}
 	}
 
 }
