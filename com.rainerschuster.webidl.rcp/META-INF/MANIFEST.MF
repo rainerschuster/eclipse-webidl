@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Rcp
+Bundle-Name: com.rainerschuster.webidl.rcp
 Bundle-SymbolicName: com.rainerschuster.webidl.rcp;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: rainerschuster.com
