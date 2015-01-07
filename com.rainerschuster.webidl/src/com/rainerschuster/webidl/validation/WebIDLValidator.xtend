@@ -133,8 +133,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkConstantType(Const constant) {
 		// TODO What about arrays?
-		val constType = constant.type;
-		if (!(constType instanceof PrimitiveType || (constType instanceof ReferenceType && (constType as ReferenceType).typeRef instanceof Typedef && ((constType as ReferenceType).typeRef as Typedef).type instanceof PrimitiveType))) {
+		val constantType = constant.type;
+		if (!(constantType instanceof PrimitiveType || (constantType instanceof ReferenceType && (constantType as ReferenceType).typeRef instanceof Typedef && ((constantType as ReferenceType).typeRef as Typedef).type instanceof PrimitiveType))) {
 			error('The type of a constant must not be a primitive type or a Typedef with primitive type', 
 					constant,
 					WebIDLPackage.Literals.CONST__NAME)
@@ -357,12 +357,12 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	 * Callback functions must not be used as the type of a constant.
 	 */
 	@Check
-	def checkConstTypeNotCallbackFunction(Const const) {
-		val constType = const.type;
-		if (constType instanceof ReferenceType) {
-			if (constType.typeRef instanceof CallbackRest) {
+	def checkConstTypeNotCallbackFunction(Const constant) {
+		val constantType = constant.type;
+		if (constantType instanceof ReferenceType) {
+			if (constantType.typeRef instanceof CallbackRest) {
 				error('Callback functions must not be used as the type of a constant', 
-						const,
+						constant,
 						WebIDLPackage.Literals.CONST__TYPE)
 			}
 		}
