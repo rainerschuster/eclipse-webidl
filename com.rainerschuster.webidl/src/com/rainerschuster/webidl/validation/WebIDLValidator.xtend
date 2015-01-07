@@ -183,8 +183,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	def checkExtendedAttributeOnAttribute(Attribute attribute) {
 //		val allowedExtendedAttributesStatic = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
 		val allowedExtendedAttributesRegular = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE, EA_UNSCOPEABLE];
-		if (attribute.eContainer instanceof ExtendedInterfaceMember) {
-			val containerDefinition = attribute.eContainer as ExtendedInterfaceMember;
+		val containerDefinition = attribute.eContainer;
+		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
 			for (ExtendedAttribute extendedAttribute : extendedAttributes) {
 				if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributesRegular.contains(extendedAttribute.nameRef)) {
@@ -252,8 +252,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkExtendedAttributeOnOperation(Operation operation) {
 		val allowedExtendedAttributes = #[EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE, EA_UNSCOPEABLE];
-		if (operation.eContainer instanceof ExtendedInterfaceMember) {
-			val containerDefinition = operation.eContainer as ExtendedInterfaceMember;
+		val containerDefinition = operation.eContainer;
+		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
 			for (ExtendedAttribute extendedAttribute : extendedAttributes) {
 				if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
@@ -269,7 +269,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkExtendedAttributeOnOperationArguments(Operation operation) {
 		val allowedExtendedAttributes = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_TREAT_NULL_AS];
-		if (operation.eContainer instanceof ExtendedInterfaceMember) {
+		val containerDefinition = operation.eContainer;
+		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			for (argument : operation.arguments) {
 				val extendedAttributes = argument.eal.extendedAttributes;
 				for (ExtendedAttribute extendedAttribute : extendedAttributes) {
@@ -287,7 +288,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkLegacyCallersDoNotReturnPromiseType(Operation operation) {
-		if (operation.specials.contains(Special.LEGACYCALLER) && operation.type instanceof PromiseType) {
+		val operationType = operation.type;
+		if (operation.specials.contains(Special.LEGACYCALLER) && operationType instanceof PromiseType) {
 			error('Legacy callers must not be defined to return a promise type', 
 					operation,
 					WebIDLPackage.Literals.OPERATION__TYPE)
@@ -298,7 +300,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 //	@Check
 //	def checkStringifierAttributeNotString(Attribute attribute) {
-//		if (attribute.specials.contains(Special.STRINGIFIER) && attribute.type instanceof DOMStringType) {
+//		val attributeType = attribute.type;
+//		if (attribute.specials.contains(Special.STRINGIFIER) && attributeType instanceof DOMStringType) {
 //			error('The stringifier keyword must not be placed on an attribute unless it is declared to be of type DOMString', 
 //					attribute,
 //					WebIDLPackage.Literals.ATTRIBUTE__TYPE)
