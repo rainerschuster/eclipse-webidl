@@ -64,10 +64,10 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap().after(partialDictionaryAccess.semicolonKeyword_5);
 
 		// Enum
-		c.setIndentation(enumAccess.leftCurlyBracketKeyword_2, enumAccess.rightCurlyBracketKeyword_5);
+		c.setIndentation(enumAccess.leftCurlyBracketKeyword_2, enumAccess.rightCurlyBracketKeyword_6);
 		c.setLinewrap().after(enumAccess.leftCurlyBracketKeyword_2);
-		c.setNoSpace.between(enumAccess.rightCurlyBracketKeyword_5, enumAccess.semicolonKeyword_6);
-		c.setLinewrap().after(enumAccess.semicolonKeyword_6);
+		c.setNoSpace.between(enumAccess.rightCurlyBracketKeyword_6, enumAccess.semicolonKeyword_7);
+		c.setLinewrap().after(enumAccess.semicolonKeyword_7);
 
 		// Typedef
 		c.setLinewrap(2).after(typedefAccess.semicolonKeyword_3);

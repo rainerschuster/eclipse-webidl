@@ -101,7 +101,7 @@ DefaultValue:
 ;
 
 Enum:
-	'enum' name=IDENTIFIER_WEBIDL '{' values+=STRING (',' values+=STRING)* '}' ';'
+	'enum' name=IDENTIFIER_WEBIDL '{' values+=STRING (',' values+=STRING)* optionalComma?=','? '}' ';'
 ;
 
 // TODO Rename to CallbackFunction?
