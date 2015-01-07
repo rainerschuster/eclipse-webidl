@@ -82,6 +82,21 @@ class TypeUtil {
 		];
 	}
 
+	// See 3.10.27. Union types
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-flattened-union-member-types}
+	 */
+	static def Set<Type> flattenedMemberTypes(UnionType unionType) {
+		val Set<Type> s = #{};
+		for (u : unionType.unionMemberTypes) {
+			if (u instanceof UnionType) {
+				s.addAll(flattenedMemberTypes(u));
+			} else {
+				s.add(u);
+			}
+		}
+		return s;
+	}
 
 
 

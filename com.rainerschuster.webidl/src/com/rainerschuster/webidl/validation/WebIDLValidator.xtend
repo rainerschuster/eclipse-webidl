@@ -24,7 +24,6 @@ import com.rainerschuster.webidl.webIDL.PromiseType
 import com.rainerschuster.webidl.webIDL.ReferenceType
 import com.rainerschuster.webidl.webIDL.SequenceType
 import com.rainerschuster.webidl.webIDL.Special
-import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.Typedef
 import com.rainerschuster.webidl.webIDL.UnionType
 import com.rainerschuster.webidl.webIDL.WebIDLPackage
@@ -134,7 +133,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkConstantType(Const constant) {
 		// TODO What about arrays?
-		if (!(constant.type instanceof PrimitiveType || (constant.type instanceof ReferenceType && (constant.type as ReferenceType).typeRef instanceof Typedef && ((constant.type as ReferenceType).typeRef as Typedef).type instanceof PrimitiveType))) {
+		val constType = constant.type;
+		if (!(constType instanceof PrimitiveType || (constType instanceof ReferenceType && (constType as ReferenceType).typeRef instanceof Typedef && ((constType as ReferenceType).typeRef as Typedef).type instanceof PrimitiveType))) {
 			error('The type of a constant must not be a primitive type or a Typedef with primitive type', 
 					constant,
 					WebIDLPackage.Literals.CONST__NAME)
@@ -152,24 +152,12 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //		}
 //	}
 
-	// http://heycam.github.io/webidl/#dfn-flattened-union-member-types
-	def Set<Type> flattenedMemberTypes(UnionType unionType) {
-		val Set<Type> s = #{};
-		for (u : unionType.unionMemberTypes) {
-			if (u instanceof UnionType) {
-				s.addAll(flattenedMemberTypes(u));
-			} else {
-				s.add(u);
-			}
-		}
-		return s;
-	}
-
 	@Check
 	def checkAttributeType(Attribute attribute) {
 		// TODO this check is not exact enough (see specification, esp. resolved typedefs)!
-		if (attribute.type instanceof ReferenceType) {
-			val Definition ref = (attribute.type as ReferenceType).typeRef;
+		val attributeType = attribute.type;
+		if (attributeType instanceof ReferenceType) {
+			val Definition ref = attributeType.typeRef;
 			if (ref instanceof SequenceType) {
 				error('The type of an attribute must not be a sequence type', 
 						attribute,
@@ -180,10 +168,12 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 						attribute,
 						WebIDLPackage.Literals.ATTRIBUTE__NAME)
 			}
-			if (ref instanceof UnionType && flattenedMemberTypes(ref as UnionType).exists[it instanceof SequenceType || it instanceof Dictionary]) {
-				error('The type of an attribute must not be a union type that has a nullable or non-nullable sequence type or dictionary as one of its flattened member types', 
-						attribute,
-						WebIDLPackage.Literals.ATTRIBUTE__NAME)
+			if (ref instanceof UnionType) {
+				if (ref.flattenedMemberTypes.exists[it instanceof SequenceType || it instanceof Dictionary]) {
+					error('The type of an attribute must not be a union type that has a nullable or non-nullable sequence type or dictionary as one of its flattened member types', 
+							attribute,
+							WebIDLPackage.Literals.ATTRIBUTE__NAME)
+				}
 			}
 		}
 	}
@@ -368,8 +358,9 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	 */
 	@Check
 	def checkConstTypeNotCallbackFunction(Const const) {
-		if (const.type instanceof ReferenceType) {
-			if ((const.type as ReferenceType).typeRef instanceof CallbackRest) {
+		val constType = const.type;
+		if (constType instanceof ReferenceType) {
+			if (constType.typeRef instanceof CallbackRest) {
 				error('Callback functions must not be used as the type of a constant', 
 						const,
 						WebIDLPackage.Literals.CONST__TYPE)
@@ -422,15 +413,19 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		// TODO Check typedefs!
 		val ifaceA = implementsStatement.ifaceA;
 		val ifaceB = implementsStatement.ifaceB;
-		if (ifaceA != null && ifaceA.inherits == ifaceB) {
-			error('The interface identified on the left-hand side of an implements statement must not inherit from the interface identifier on the right-hand side', 
-						implementsStatement,
-						WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_A)
-		}
-		if (ifaceB != null && (ifaceB instanceof Interface && (ifaceB as Interface).inherits == ifaceA)) {
-			error('The interface identified on the right-hand side of an implements statement must not inherit from the interface identifier on the left-hand side', 
-						implementsStatement,
-						WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_B)
+		if (ifaceA != null && ifaceB != null) {
+			if (ifaceA.inherits == ifaceB) {
+				error('The interface identified on the left-hand side of an implements statement must not inherit from the interface identifier on the right-hand side', 
+							implementsStatement,
+							WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_A)
+			}
+			if (ifaceB instanceof Interface) {
+				if (ifaceB.inherits == ifaceA) {
+					error('The interface identified on the right-hand side of an implements statement must not inherit from the interface identifier on the left-hand side', 
+								implementsStatement,
+								WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_B)
+				}
+			}
 		}
 	}
 
