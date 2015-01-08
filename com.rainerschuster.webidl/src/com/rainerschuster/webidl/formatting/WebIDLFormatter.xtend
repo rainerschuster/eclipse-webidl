@@ -37,19 +37,37 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		}
 		for (Keyword comma : findKeywords(",")) {
 			c.setNoSpace().before(comma);
+//			c.setSpace().after(comma);
+		}
+		for (Keyword semicolon : findKeywords(";")) {
+			c.setNoSpace().before(semicolon);
 		}
 
+		// (Extended) Definition
+//		c.setLinewrap().after(extendedDefinitionAccess.ealExtendedAttributeListParserRuleCall_0_0);
+//		c.setLinewrap().before(definitionRule);
+
+		// Callback function
+		c.setLinewrap().after(callbackRestAccess.semicolonKeyword_6);
+
 		// Interface
+		c.setLinewrap().before(interfaceAccess.interfaceKeyword_0);
 		c.setIndentation(interfaceAccess.leftCurlyBracketKeyword_3, interfaceAccess.rightCurlyBracketKeyword_5);
 		c.setLinewrap().after(interfaceAccess.leftCurlyBracketKeyword_3);
 		c.setNoSpace.between(interfaceAccess.rightCurlyBracketKeyword_5, interfaceAccess.semicolonKeyword_6);
 		c.setLinewrap().after(interfaceAccess.semicolonKeyword_6);
 
 		// Dictionary
+		c.setLinewrap().before(dictionaryAccess.dictionaryKeyword_0);
 		c.setIndentation(dictionaryAccess.leftCurlyBracketKeyword_3, dictionaryAccess.rightCurlyBracketKeyword_5);
 		c.setLinewrap().after(dictionaryAccess.leftCurlyBracketKeyword_3);
 		c.setNoSpace.between(dictionaryAccess.rightCurlyBracketKeyword_5, dictionaryAccess.semicolonKeyword_6);
 		c.setLinewrap().after(dictionaryAccess.semicolonKeyword_6);
+
+		c.setLinewrap().after(dictionaryMemberRule);
+
+		// Partial
+		c.setLinewrap().before(partialAccess.partialKeyword_0);
 
 		// Partial Interface
 		c.setIndentation(partialInterfaceAccess.leftCurlyBracketKeyword_2, partialInterfaceAccess.rightCurlyBracketKeyword_4);
@@ -67,6 +85,7 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		c.setIndentation(enumAccess.leftCurlyBracketKeyword_2, enumAccess.rightCurlyBracketKeyword_6);
 		c.setLinewrap().after(enumAccess.leftCurlyBracketKeyword_2);
 		c.setNoSpace.between(enumAccess.rightCurlyBracketKeyword_6, enumAccess.semicolonKeyword_7);
+		c.setLinewrap().before(enumAccess.rightCurlyBracketKeyword_6);
 		c.setLinewrap().after(enumAccess.semicolonKeyword_7);
 
 		// Typedef
@@ -76,6 +95,19 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		// ImplementsStatement
 		c.setLinewrap(2).after(implementsStatementAccess.semicolonKeyword_3);
 		c.setNoSpace().before(implementsStatementAccess.semicolonKeyword_3);
+
+		// Interface member
+		c.setLinewrap().after(interfaceMemberRule);
+
+		// Operation
+		c.setNoSpace().before(operationAccess.leftParenthesisKeyword_3);
+
+		// Argument
+		c.setNoSpace().before(argumentAccess.ellipsisFullStopFullStopFullStopKeyword_1_1_1_0);
+
+		// Type
+//		c.setNoSpace().before(arrayTypeSuffixAccess.leftSquareBracketKeyword_1);
+		c.setNoSpace().before(nullableTypeSuffixAccess.questionMarkKeyword_1);
 
 		// Comments 
 		c.setLinewrap(0, 1, 2).before(SL_COMMENTRule);
