@@ -5,7 +5,7 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            name="com.rainerschuster.webidl.rcp"
+            name="WebIDL Language"
             application="org.eclipse.ui.ide.workbench">
          <property
                name="appName"
