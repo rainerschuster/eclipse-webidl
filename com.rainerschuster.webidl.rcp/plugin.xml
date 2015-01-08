@@ -9,7 +9,7 @@
             application="org.eclipse.ui.ide.workbench">
          <property
                name="appName"
-               value="com.rainerschuster.webidl.rcp">
+               value="WebIDL Language">
          </property>
          <property
                name="windowImages"
