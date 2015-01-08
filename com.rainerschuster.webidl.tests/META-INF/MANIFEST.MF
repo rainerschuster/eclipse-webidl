@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.rainerschuster.webidl.tests
-Bundle-Vendor: My Company
+Bundle-Vendor: com.rainerschuster
 Bundle-Version: 1.0.0.qualifier
 Bundle-SymbolicName: com.rainerschuster.webidl.tests; singleton:=true
 Bundle-ActivationPolicy: lazy
@@ -10,7 +10,8 @@ Require-Bundle: com.rainerschuster.webidl,
  org.eclipse.core.runtime,
  org.eclipse.xtext.junit4,
  org.eclipse.ui.workbench;resolution:=optional,
- org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional
+ org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional,
+ org.eclipse.xtend2.lib;bundle-version="2.7.3"
 Import-Package: org.apache.log4j,
  org.junit;version="4.5.0",
  org.junit.runner;version="4.5.0",
