@@ -5,8 +5,7 @@ package com.rainerschuster.webidl.ui.labeling
 
 import com.google.inject.Inject
 import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.Callback
-import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.CallbackFunction
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.DictionaryMember
@@ -58,11 +57,11 @@ class WebIDLLabelProvider extends DefaultEObjectLabelProvider {
 //	}
 
 	def image(Interface ele) {
-		'interface.png'
-	}
-
-	def image(Callback ele) {
-		'callback.png'
+		if (ele.callback) {
+			'callback.png'
+		} else {
+			'interface.png'
+		}
 	}
 
 	def image(Dictionary ele) {
@@ -126,7 +125,7 @@ class WebIDLLabelProvider extends DefaultEObjectLabelProvider {
 		'setlike.png'
 	}
 
-	def image(CallbackRest ele) {
+	def image(CallbackFunction ele) {
 		'callbackFunction.png'
 	}
 

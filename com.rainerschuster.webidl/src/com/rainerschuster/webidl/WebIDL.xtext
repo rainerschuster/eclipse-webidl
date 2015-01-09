@@ -13,7 +13,7 @@ ExtendedDefinition:
 ;
 
 Definition:
-	Callback
+	CallbackFunction
 	| Interface
 	| Partial
 	| Dictionary
@@ -32,17 +32,8 @@ DictionaryOrTypedef:
 	| Typedef
 ;
 
-Callback:
-	'callback' CallbackRestOrInterface
-;
-
-CallbackRestOrInterface:
-	CallbackRest
-	| Interface
-;
-
 Interface:
-	'interface' name=IDENTIFIER_WEBIDL (':' inherits=[InterfaceOrTypedef|IDENTIFIER_WEBIDL])? '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
+	callback?='callback'? 'interface' name=IDENTIFIER_WEBIDL (':' inherits=[InterfaceOrTypedef|IDENTIFIER_WEBIDL])? '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
 ;
 
 Partial:
@@ -65,9 +56,8 @@ ExtendedInterfaceMember:
 InterfaceMember:
 	Const
 	| Operation
-	| Serializer
-	| Stringifier
-	| StaticMember
+	| Serializer // Only variant with SerializationPattern
+	| Stringifier // Only EmptyStringifier
 	| Iterable_
 	| Attribute
 	| Maplike
@@ -104,9 +94,8 @@ Enum:
 	'enum' name=IDENTIFIER_WEBIDL '{' values+=STRING (',' values+=STRING)* optionalComma?=','? '}' ';'
 ;
 
-// TODO Rename to CallbackFunction?
-CallbackRest:
-	name=IDENTIFIER_WEBIDL '=' type=ReturnType '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
+CallbackFunction:
+	callback?='callback' name=IDENTIFIER_WEBIDL '=' type=ReturnType '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
 ;
 
 Typedef:
@@ -141,8 +130,8 @@ FloatLiteral returns ecore::EFloat:
 ;
 
 Serializer
-	: 'serializer' operation=Operation
-	| 'serializer' '=' pattern=SerializationPattern ';' // TODO the semicolon is not specified!
+	: /*{EmptySerializer} serializer?='serializer' ';' // TODO the empty serializer is not specified!
+	|*/ serializer?='serializer' '=' pattern=SerializationPattern ';' // TODO the semicolon is not specified!
 ;
 
 SerializationPattern
@@ -164,26 +153,11 @@ SerializationPatternList
 ;
 
 Stringifier
-	: 'stringifier' StringifierRest
-;
-
-StringifierRest
-	: Attribute
-	| Operation
-	| {EmptyStringifier}';'
-;
-
-StaticMember
-	: 'static' StaticMemberRest
-;
-
-StaticMemberRest
-	: Attribute
-	| Operation
+	: {EmptyStringifier} stringifier?='stringifier' ';'
 ;
 
 Attribute
-	: inherit?='inherit'? readOnly?='readonly'? 'attribute' type=Type name=AttributeName ';'
+	: (stringifier?='stringifier'? /*|*/ static?='static'?) inherit?='inherit'? readOnly?='readonly'? 'attribute' type=Type name=AttributeName ';'
 ;
 
 AttributeName:
@@ -196,7 +170,7 @@ AttributeNameKeyword:
 ;
 
 Operation
-	: specials+=Special* type=ReturnType name=IDENTIFIER_WEBIDL? '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
+	: static?='static'? specials+=Special* type=ReturnType name=IDENTIFIER_WEBIDL? '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
 ;
 
 enum Special:
@@ -205,13 +179,9 @@ enum Special:
 	| CREATOR='creator'
 	| DELETER='deleter'
 	| LEGACYCALLER='legacycaller'
-//	| STRINGIFIER='stringifier'
-//	| SERIALIZER='serializer'
+	| STRINGIFIER='stringifier'
+	| SERIALIZER='serializer'
 ;
-
-//OperationRest:
-//	type=ReturnType name=IDENTIFIER_WEBIDL? '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
-//;
 
 Argument:
 	eal=ExtendedAttributeList?

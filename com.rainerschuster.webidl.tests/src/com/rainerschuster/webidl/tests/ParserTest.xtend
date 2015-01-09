@@ -331,15 +331,15 @@ class ParserTest {
 	}
 
 	// See 3.2.4.2. Stringifiers
-// TODO enable!
-//	@Test
-//	def void parseSample_3_2_4_2__01() {
-//		'''
-//			interface A {
-//			  stringifier DOMString ();
-//			};
-//		'''.parse.assertNoErrors
-//	}
+
+	@Test
+	def void parseSample_3_2_4_2__01() {
+		'''
+			interface A {
+			  stringifier DOMString ();
+			};
+		'''.parse.assertNoErrors
+	}
 
 	@Test
 	def void parseSample_3_2_4_2__02() {
@@ -361,24 +361,23 @@ class ParserTest {
 		'''.parse.assertNoErrors
 	}
 
-// TODO enable!
-//	@Test
-//	def void parseSample_3_2_4_2__04() {
-//		'''
-//			[Constructor]
-//			interface Student {
-//			  attribute unsigned long id;
-//			  attribute DOMString? familyName;
-//			  attribute DOMString givenName;
-//			
-//			  stringifier DOMString ();
-//			};
-//		'''.parse.assertNoErrors
-//	}
+	@Test
+	def void parseSample_3_2_4_2__04() {
+		'''
+			[Constructor]
+			interface Student {
+			  attribute unsigned long id;
+			  attribute DOMString? familyName;
+			  attribute DOMString givenName;
+			
+			  stringifier DOMString ();
+			};
+		'''.parse.assertNoErrors
+	}
 
 	// See 3.2.4.3. Serializers
 
-// TODO enable!
+// TODO Check if "serializer;" is valid WebIDL
 //	@Test
 //	def void parseSample_3_2_4_3__01() {
 //		'''
@@ -399,7 +398,7 @@ class ParserTest {
 //		'''.parse.assertNoErrors
 //	}
 
-// TODO enable!
+// TODO Bug in example "DOMString name;" is neither attribute nor operation!
 //	@Test
 //	def void parseSample_3_2_4_3__02() {
 //		'''
@@ -488,6 +487,7 @@ class ParserTest {
 		'''.parse.assertNoErrors
 	}
 
+	// Disabled because Node is not available
 //	@Test
 //	def void parseSample_3_2_6__02() {
 //		'''
@@ -732,6 +732,7 @@ class ParserTest {
 //		'''.parse.assertNoErrors
 //	}
 
+	// Disabled because EventListener is not available
 //	@Test
 //	def void parseSample_3_8__05() {
 //		'''
@@ -847,6 +848,7 @@ class ParserTest {
 
 	// See 4.3.3. [Constructor]
 
+	// Disabled because Node is not available
 //	@Test
 //	def void parseSample_4_3_3__01() {
 //		'''
@@ -891,6 +893,7 @@ class ParserTest {
 
 	// See 4.3.5. [Exposed]
 
+	// Disabled because WorkerGlobalScope is not available
 //	@Test
 //	def void parseSample_4_3_5__01() {
 //		'''
@@ -976,6 +979,7 @@ class ParserTest {
 
 	// See 4.3.9. [NamedConstructor]
 
+	// Disabled because HTMLMediaElement is not available
 //	@Test
 //	def void parseSample_4_3_9__01() {
 //		'''
@@ -989,6 +993,7 @@ class ParserTest {
 
 	// See 4.3.10. [NewObject]
 
+	// Disabled because Node and Element are not available
 //	@Test
 //	def void parseSample_4_3_10__01() {
 //		'''
@@ -1065,6 +1070,7 @@ class ParserTest {
 
 	// See 4.3.15. [SameObject]
 
+	// Disabled because Node and DOMImplementation is not available
 //	@Test
 //	def void parseSample_4_3_15__01() {
 //		'''
@@ -1158,7 +1164,7 @@ class ParserTest {
 	}
 
 	// See 4.3.19. [Unscopeable]
-// TODO enable (check if there is a bug in the spec since g has no return type)!
+// TODO enable (check if there is a bug in the spec since g neither has a return type nor is a special operation)!
 //	@Test
 //	def void parseSample_4_3_19__01() {
 //		'''
@@ -1171,6 +1177,7 @@ class ParserTest {
 
 	// See 4.5.4. Interface prototype object
 
+	// Disabled because Window is not available
 //	@Test
 //	def void parseSample_4_5_4__01() {
 //		'''
@@ -1186,6 +1193,7 @@ class ParserTest {
 
 	// See 4.5.9.2. forEach
 
+	// Disabled because this is only an operation and no full definition
 //	@Test
 //	def void parseSample_4_5_9_2__01() {
 //		'''

@@ -6,7 +6,7 @@ package com.rainerschuster.webidl.generator
 import com.google.inject.Inject
 import com.rainerschuster.webidl.webIDL.Argument
 import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.CallbackFunction
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeList
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
@@ -55,7 +55,7 @@ class WebIDLGenerator implements IGenerator {
 		}
 	'''
 
-	def binding(CallbackRest callback) '''
+	def binding(CallbackFunction callback) '''
 		«IF callback.eContainer.fullyQualifiedName != null»
 			package «callback.eContainer.fullyQualifiedName»;
 

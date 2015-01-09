@@ -5,7 +5,7 @@ package com.rainerschuster.webidl.validation
 
 import com.rainerschuster.webidl.webIDL.Argument
 import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.CallbackFunction
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.Definition
 import com.rainerschuster.webidl.webIDL.Definitions
@@ -75,10 +75,10 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		duplicateList.forEach[
 			val feature = switch (it) {
 //				CallbackRestOrInterface: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
-				Interface: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
+				Interface: WebIDLPackage.Literals.INTERFACE__NAME
 				Dictionary: WebIDLPackage.Literals.DICTIONARY__NAME
 				Enum: WebIDLPackage.Literals.ENUM__NAME
-				CallbackRest: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
+				CallbackFunction: WebIDLPackage.Literals.CALLBACK_FUNCTION__NAME
 				Typedef: WebIDLPackage.Literals.TYPEDEF__NAME
 			};
 			error('Duplicate definition "' + it.definitionToName() + '"', 
@@ -238,18 +238,6 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	}
 
 	@Check
-	def checkSpecialKeywordOnce(Operation operation) {
-		for (Special special : operation.specials) {
-			if (operation.specials.filter[it == special].length >= 2) {
-				// TODO This marks the first special (although this one is not the problem)!
-				error('A given special keyword must not appear twice on an operation', 
-						operation,
-						WebIDLPackage.Literals.OPERATION__SPECIALS)
-			}
-		}
-	}
-
-	@Check
 	def checkExtendedAttributeOnOperation(Operation operation) {
 		val allowedExtendedAttributes = #[EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE, EA_UNSCOPEABLE];
 		val containerDefinition = operation.eContainer;
@@ -280,6 +268,38 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 								WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 					}
 				}
+			}
+		}
+	}
+
+	// See 3.2.4. Special operations
+
+	@Check
+	def checkSpecialKeywordOnce(Operation operation) {
+		for (Special special : operation.specials) {
+			if (operation.specials.filter[it == special].length >= 2) {
+				// TODO This marks the first special (although this one is not the problem)!
+				error('A given special keyword must not appear twice on an operation', 
+						operation,
+						WebIDLPackage.Literals.OPERATION__SPECIALS)
+			}
+		}
+	}
+
+	@Check
+	def checkSpecialOperationsNotVariadicNorOptionalArguments(Operation operation) {
+		// FIXME is this also true for legacy callers?
+		// => Added this exception since HTML specification uses "legacycaller any (any... arguments);"
+		if (!operation.specials.isNullOrEmpty && operation.specials.exists[it != Special.LEGACYCALLER]) {
+			if (operation.variadic) {
+				error('Special operations declared using operations must not be variadic nor have any optional arguments', 
+						operation,
+						WebIDLPackage.Literals.OPERATION__SPECIALS)
+			}
+			if (operation.arguments.exists[optionalArgument]) {
+				error('Special operations declared using operations must not be variadic nor have any optional arguments', 
+						operation,
+						WebIDLPackage.Literals.OPERATION__SPECIALS)
 			}
 		}
 	}
@@ -363,7 +383,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	def checkConstTypeNotCallbackFunction(Const constant) {
 		val constantType = constant.type;
 		if (constantType instanceof ReferenceType) {
-			if (constantType.typeRef instanceof CallbackRest) {
+			if (constantType.typeRef instanceof CallbackFunction) {
 				error('Callback functions must not be used as the type of a constant', 
 						constant,
 						WebIDLPackage.Literals.CONST__TYPE)

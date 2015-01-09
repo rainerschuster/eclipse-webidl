@@ -5,7 +5,7 @@ import com.rainerschuster.webidl.webIDL.ArrayBufferType
 import com.rainerschuster.webidl.webIDL.BooleanType
 import com.rainerschuster.webidl.webIDL.ByteStringType
 import com.rainerschuster.webidl.webIDL.ByteType
-import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.CallbackFunction
 import com.rainerschuster.webidl.webIDL.DOMExceptionType
 import com.rainerschuster.webidl.webIDL.DOMStringType
 import com.rainerschuster.webidl.webIDL.DataViewType
@@ -42,6 +42,9 @@ import com.rainerschuster.webidl.webIDL.UnionType
 import com.rainerschuster.webidl.webIDL.VoidType
 import java.util.List
 import java.util.Set
+import com.rainerschuster.webidl.webIDL.Special
+import com.rainerschuster.webidl.webIDL.Operation
+import com.rainerschuster.webidl.webIDL.Argument
 
 class TypeUtil {
 
@@ -120,7 +123,7 @@ class TypeUtil {
 						Dictionary : {/*logger.debug("DictionaryType"); */return "java.util.HashMap<java.lang.String,java.lang.Object>"}
 						Enum : return "java.lang.String"
 						// TODO implement CallbackFunctionType!
-						CallbackRest : {/*logger.debug("CallbackFunctionType");*/ return resolved.name}
+						CallbackFunction : {/*logger.debug("CallbackFunctionType");*/ return resolved.name}
 						Typedef : {/*logger.debug("Typedef");*/ return resolved.type.toJavaType}
 					}
 				} else {
@@ -236,6 +239,97 @@ class TypeUtil {
 //			Float64ArrayType : return "java.lang.Object"
 			default : {/*logger.warn("Unknown type {}!", type);*/ return null}
 		}
+	}
+
+	// TODO Consider moving these to OperationUtil
+
+	// See 3.2.3. Operations
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
+	 */
+	static def boolean variadic(Operation operation) {
+		operation.arguments.last.ellipsis
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-optional-argument}
+	 */
+	static def boolean optionalArgument(Argument argument) {
+		argument.optional
+	}
+
+	// See 3.2.4. Special operations
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-named-property-getter}
+	 */
+	static def boolean namedPropertyGetter(Operation operation) {
+		namedProperty(operation, Special.GETTER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-named-property-setter}
+	 */
+	static def boolean namedPropertySetter(Operation operation) {
+		namedProperty(operation, Special.SETTER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-named-property-creator}
+	 */
+	static def boolean namedPropertyCreator(Operation operation) {
+		namedProperty(operation, Special.CREATOR)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-named-property-deleter}
+	 */
+	static def boolean namedPropertyDeleter(Operation operation) {
+		namedProperty(operation, Special.DELETER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-getter}
+	 */
+	static def boolean indexedPropertyGetter(Operation operation) {
+		indexedProperty(operation, Special.GETTER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-setter}
+	 */
+	static def boolean indexedPropertySetter(Operation operation) {
+		indexedProperty(operation, Special.SETTER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-creator}
+	 */
+	static def boolean indexedPropertyCreator(Operation operation) {
+		indexedProperty(operation, Special.CREATOR)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-deleter}
+	 */
+	static def boolean indexedPropertyDeleter(Operation operation) {
+		indexedProperty(operation, Special.DELETER)
+	}
+
+	protected static def boolean namedProperty(Operation operation, Special special) {
+		val operationType = operation.type;
+		// TODO What about typedefs?
+		operationType instanceof DOMStringType && operation.specials.contains(special);
+	}
+
+	protected static def boolean indexedProperty(Operation operation, Special special) {
+		val operationType = operation.type;
+		// TODO What about typedefs?
+		if (operationType instanceof LongType) {
+			return operationType.unsigned && operation.specials.contains(special);
+		}
+		return false;
 	}
 
 }

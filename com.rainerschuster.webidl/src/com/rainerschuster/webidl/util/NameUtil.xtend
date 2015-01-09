@@ -4,7 +4,7 @@ import com.rainerschuster.webidl.webIDL.InterfaceMember
 import com.rainerschuster.webidl.webIDL.Definition
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.Dictionary
-import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.CallbackFunction
 import com.rainerschuster.webidl.webIDL.Typedef
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.Operation
@@ -101,7 +101,7 @@ class NameUtil {
 			Interface: definition.name
 			Dictionary: definition.name
 			com.rainerschuster.webidl.webIDL.Enum: definition.name
-			CallbackRest: definition.name
+			CallbackFunction: definition.name
 			Typedef: definition.name
 		}
 	}

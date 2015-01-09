@@ -10,7 +10,7 @@ import com.rainerschuster.webidl.webIDL.Attribute
 import com.rainerschuster.webidl.webIDL.BooleanType
 import com.rainerschuster.webidl.webIDL.ByteStringType
 import com.rainerschuster.webidl.webIDL.ByteType
-import com.rainerschuster.webidl.webIDL.CallbackRest
+import com.rainerschuster.webidl.webIDL.CallbackFunction
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.DOMExceptionType
 import com.rainerschuster.webidl.webIDL.DOMStringType
@@ -134,7 +134,7 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		true
 	}
 
-	def _isLeaf(CallbackRest callbackRest) {
+	def _isLeaf(CallbackFunction callbackFunction) {
 		true
 	}
 
@@ -162,8 +162,8 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		}
 	}
 
-	def _text(CallbackRest callbackRest) {
-		callbackRest.name + ' : ' + (typeName(callbackRest.type)?:callbackRest.type)
+	def _text(CallbackFunction callbackFunction) {
+		callbackFunction.name + ' : ' + (typeName(callbackFunction.type)?:callbackFunction.type)
 	}
 
 	def _text(Const const) {
@@ -198,7 +198,7 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 			 Interface: type.name
 			 Dictionary: type.name
 			 Enum: type.name
-			 CallbackRest: type.name
+			 CallbackFunction: type.name
 			 Typedef: type.name // TODO This may not be specified!
 			 default: null
 		}
