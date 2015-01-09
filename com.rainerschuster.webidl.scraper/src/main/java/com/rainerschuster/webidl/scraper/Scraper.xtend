@@ -55,8 +55,6 @@ class Scraper {
 					scraper.refQueue.add("svg2");
 					scraper.refToHref.put("navigation timing", "http://www.w3.org/TR/navigation-timing/");
 					scraper.refQueue.add("navigation timing");
-					scraper.refToHref.put("requestanimationframe", "https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/RequestAnimationFrame/Overview.html");
-					scraper.refQueue.add("requestanimationframe");
 					scraper.refToHref.put("mediasource", "http://w3c.github.io/media-source/");
 					scraper.refQueue.add("mediasource");
 //					scraper.refToHref.put("customelements", "http://w3c.github.io/webcomponents/spec/custom/");
