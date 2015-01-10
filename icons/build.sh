@@ -27,10 +27,10 @@ convert -background none -resize 512x512 logo.svg icon_512x512.png
 convert -background none -resize 1024x1024 logo.svg icon_512x512@2x.png
 convert -background none logo.svg Eclipse.icns
 # Solaris
-convert -background none logo.svg Eclipse.l.pm
-convert -background none logo.svg Eclipse.m.pm
-convert -background none logo.svg Eclipse.s.pm
-convert -background none logo.svg Eclipse.t.pm
+#convert -background none logo.svg Eclipse.l.pm
+#convert -background none logo.svg Eclipse.m.pm
+#convert -background none logo.svg Eclipse.s.pm
+#convert -background none logo.svg Eclipse.t.pm
 # Windows
 convert -background none -resize 16x16 -type Palette -colors 255 -channel Alpha logo.svg icon_16x16_8bit.bmp
 convert -background none -resize 32x32 -type Palette -colors 255 -channel Alpha logo.svg icon_32x32_8bit.bmp
@@ -44,9 +44,9 @@ convert icon_16x16_8bit.bmp icon_16x16_32bit.bmp icon_32x32_8bit.bmp icon_32x32_
 
 
 cp icon.xpm ../com.rainerschuster.webidl.product/icons/
-# cp Eclipse.icns ../com.rainerschuster.webidl.product/icons/
-cp Eclipse.*.pm ../com.rainerschuster.webidl.product/icons/
-# cp eclipse.ico ../com.rainerschuster.webidl.product/icons/
+#cp Eclipse.icns ../com.rainerschuster.webidl.product/icons/
+#cp Eclipse.*.pm ../com.rainerschuster.webidl.product/icons/
+#cp eclipse.ico ../com.rainerschuster.webidl.product/icons/
 cp icon_*.bmp ../com.rainerschuster.webidl.product/icons/
 cp eclipse*.gif ../com.rainerschuster.webidl.rcp/icons/
 cp eclipse*.png ../com.rainerschuster.webidl.rcp/icons/
