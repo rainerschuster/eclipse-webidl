@@ -257,7 +257,7 @@ SingleType:
 UnionType:
 	'(' unionMemberTypes+=Type ('or' unionMemberTypes+=Type)+ ')'
 ;
-// FIXME for PromiseType and SequenceType the typeSuffix should be NullableTypeSuffix
+
 NonAnyType:
 	PrimitiveType typeSuffix+=TypeSuffix*
 	| {PromiseType} 'Promise' '<' type=ReturnType '>' typeSuffix+=TypeSuffix? // nullable?=Nullable?

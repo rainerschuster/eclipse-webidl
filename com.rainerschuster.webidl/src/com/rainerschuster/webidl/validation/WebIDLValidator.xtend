@@ -36,6 +36,11 @@ import org.eclipse.xtext.validation.Check
 import static extension com.rainerschuster.webidl.util.NameUtil.*
 import static extension com.rainerschuster.webidl.util.ExtendedAttributeUtil.*
 import static extension com.rainerschuster.webidl.util.TypeUtil.*
+import com.rainerschuster.webidl.webIDL.NullableTypeSuffix
+import com.rainerschuster.webidl.webIDL.Type
+import com.rainerschuster.webidl.webIDL.DictionaryMember
+import com.rainerschuster.webidl.webIDL.Maplike
+import com.rainerschuster.webidl.webIDL.Setlike
 
 /**
  * Custom validation rules. 
@@ -73,14 +78,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		val String definitionName = definition.definitionToName();
 		val duplicateList = definitions.definitions.map[it.def].filter[it != definition && definitionName.equals(it.definitionToName())];
 		duplicateList.forEach[
-			val feature = switch (it) {
-//				CallbackRestOrInterface: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
-				Interface: WebIDLPackage.Literals.INTERFACE__NAME
-				Dictionary: WebIDLPackage.Literals.DICTIONARY__NAME
-				Enum: WebIDLPackage.Literals.ENUM__NAME
-				CallbackFunction: WebIDLPackage.Literals.CALLBACK_FUNCTION__NAME
-				Typedef: WebIDLPackage.Literals.TYPEDEF__NAME
-			};
+			val feature = it.definitionToFeature();
 			error('Duplicate definition "' + it.definitionToName() + '"', 
 					it,
 					feature)
@@ -445,8 +443,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			if (ifaceB instanceof Interface) {
 				if (ifaceB.inherits == ifaceA) {
 					error('The interface identified on the right-hand side of an implements statement must not inherit from the interface identifier on the left-hand side', 
-								implementsStatement,
-								WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_B)
+						implementsStatement,
+						WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_B)
 				}
 			}
 		}
@@ -458,8 +456,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	def checkDeprecatedExtendedAttribute(ExtendedAttribute extendedAttribute) {
 		if (EA_TREAT_NON_CALLABLE_AS_NULL.equals(extendedAttribute.nameRef)) {
 			warning('The extended attribute TreatNonCallableAsNull was renamed to TreatNonObjectAsNull', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				extendedAttribute,
+				WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 		}
 	}
 
@@ -467,8 +465,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	def checkUnknownExtendedAttribute(ExtendedAttribute extendedAttribute) {
 		if (!KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef)) {
 			warning('The extended attribute "' + extendedAttribute.nameRef + '" is no known extended attribute', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				extendedAttribute,
+				WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 		}
 	}
 
@@ -485,8 +483,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 				// TODO can there be more than one?
 				val extendedAttribute = extendedAttributes.getSingleExtendedAttribute(EA_ARRAY_CLASS);
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on an interface that inherits from another', 
-						extendedAttribute,
-						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 			}
 		}
 	}
@@ -500,10 +498,65 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			val extendedAttribute = extendedAttributes.getSingleExtendedAttribute(EA_ARRAY_CLASS);
 			if (!extendedAttribute.takesNoArguments()) {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
-						extendedAttribute,
-						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 			}
 		}
 	}
 
+	@Check
+	def checkPromiseTypeTypeSuffix(PromiseType type) {
+		if (!type.typeSuffix.nullOrEmpty) {
+			val firstTypeSuffix = type.typeSuffix.get(0);
+			if (!(firstTypeSuffix instanceof NullableTypeSuffix) || type.typeSuffix.size > 1) {
+				error('Promise types only support the type suffix "?"',
+					type,
+					WebIDLPackage.Literals.TYPE__TYPE_SUFFIX)
+			}
+		}
+	}
+
+	@Check
+	def checkSequenceTypeTypeSuffix(SequenceType type) {
+		if (!type.typeSuffix.nullOrEmpty) {
+			val firstTypeSuffix = type.typeSuffix.get(0);
+			if (!(firstTypeSuffix instanceof NullableTypeSuffix) || type.typeSuffix.size > 1) {
+				error('Sequence types only support the type suffix "?"',
+					type,
+					WebIDLPackage.Literals.TYPE__TYPE_SUFFIX)
+			}
+		}
+	}
+
+
+	private def EStructuralFeature typeToFeature(Type type) {
+		val containerDefinition = type.eContainer;
+		switch (containerDefinition) {
+			Argument: WebIDLPackage.Literals.ARGUMENT__TYPE
+			Attribute: WebIDLPackage.Literals.ATTRIBUTE__TYPE
+			CallbackFunction: WebIDLPackage.Literals.CALLBACK_FUNCTION__TYPE
+			DictionaryMember: WebIDLPackage.Literals.DICTIONARY_MEMBER__TYPE
+			Iterable_: WebIDLPackage.Literals.ITERABLE___TYPES
+			Maplike: if(containerDefinition.keyType == type) {
+				WebIDLPackage.Literals.MAPLIKE__KEY_TYPE
+			} else {
+				WebIDLPackage.Literals.MAPLIKE__VALUE_TYPE
+			}
+			Operation: WebIDLPackage.Literals.OPERATION__TYPE
+			Setlike: WebIDLPackage.Literals.SETLIKE__TYPE
+			Typedef: WebIDLPackage.Literals.TYPEDEF__TYPE
+			UnionType: type.typeToFeature()
+		}
+	}
+
+	private def EStructuralFeature definitionToFeature(Definition definition) {
+		switch (definition) {
+//			CallbackRestOrInterface: WebIDLPackage.Literals.CALLBACK_REST_OR_INTERFACE__NAME
+			Interface: WebIDLPackage.Literals.INTERFACE__NAME
+			Dictionary: WebIDLPackage.Literals.DICTIONARY__NAME
+			Enum: WebIDLPackage.Literals.ENUM__NAME
+			CallbackFunction: WebIDLPackage.Literals.CALLBACK_FUNCTION__NAME
+			Typedef: WebIDLPackage.Literals.TYPEDEF__NAME
+		}
+	}
 }
