@@ -76,7 +76,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	private def checkUniqueNames(Definitions definitions, Definition definition) {
 		val String definitionName = definition.definitionToName();
-		val duplicateList = definitions.definitions.map[it.def].filter[it != definition && definitionName.equals(it.definitionToName())];
+		val duplicateList = definitions.definitions.map[it.def].filter[it != definition && definitionName == it.definitionToName()];
 		duplicateList.forEach[
 			val feature = it.definitionToFeature();
 			error('Duplicate definition "' + it.definitionToName() + '"', 
@@ -174,14 +174,14 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	// See 3.2.2. Attributes
 
-//	@Check
-//	def checkAttributeName(Attribute attribute) {
-//		if (attribute.static && "prototype".equals(attribute.name)) {
-//			error('The identifier of a static attribute must not be “prototype”', 
-//					attribute,
-//					WebIDLPackage.Literals.ATTRIBUTE__NAME)
-//		}
-//	}
+	@Check
+	def checkAttributeName(Attribute attribute) {
+		if (attribute.static && attribute.name == "prototype") {
+			error('The identifier of a static attribute must not be “prototype”', 
+					attribute,
+					WebIDLPackage.Literals.ATTRIBUTE__NAME)
+		}
+	}
 
 	@Check
 	def checkAttributeType(Attribute attribute) {
@@ -206,6 +206,28 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 							WebIDLPackage.Literals.ATTRIBUTE__NAME)
 				}
 			}
+		}
+	}
+
+	@Check
+	def checkAttributeInheritGetter(Attribute attribute) {
+		if (attribute.inheritsGetter) {
+			if (attribute.readOnly || attribute.staticAttribute)
+				error('inherit must not appear on a read only attribute or a static attribute', 
+						attribute,
+						WebIDLPackage.Literals.ATTRIBUTE__INHERIT)
+		}
+	}
+
+	@Check
+	def checkAttributeInheritedGetterTyped(Attribute attribute) {
+		if (attribute.inheritsGetter) {
+			val inheritedGetter = attribute.inheritedGetter;
+			// TODO resolve? implement equals?
+			if (attribute.type.typeName != inheritedGetter.type.typeName)
+				error('The attribute whose getter is being inherited must be of the same type as the inheriting attribute', 
+						attribute,
+						WebIDLPackage.Literals.ATTRIBUTE__INHERIT)
 		}
 	}
 
@@ -238,14 +260,14 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-//	@Check
-//	def checkOperationName(Operation operation) {
-//		if (operation.static && "prototype".equals(operation.name)) {
-//			error('The identifier of a static operation must not be “prototype”', 
-//					operation,
-//					WebIDLPackage.Literals.OPERATION__NAME)
-//		}
-//	}
+	@Check
+	def checkOperationName(Operation operation) {
+		if (operation.static && operation.name == "prototype") {
+			error('The identifier of a static operation must not be “prototype”', 
+					operation,
+					WebIDLPackage.Literals.OPERATION__NAME)
+		}
+	}
 
 	def checkArgumentEllipsisFinal(List<Argument> arguments, EObject source, EStructuralFeature feature) {
 		arguments.filter[it.ellipsis].forEach[
@@ -373,7 +395,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //	@Check
 //	def checkIterableInterfaceMembers(Interface iface) {
 //		if (iface.interfaceMembers.exists[it.interfaceMember instanceof Iterable_]) {
-//			iface.interfaceMembers.filter["entries".equals(it.name) || "keys".equals(it.name) || "values".equals(it.name)].forEach[
+//			iface.interfaceMembers.filter[it.name == "entries") || it.name = "keys" || it.name = "values"].forEach[
 //				error('Interfaces with iterable declarations must not have any interface members named “entries”, “keys” or “values”', 
 //						iface,
 //						WebIDLPackage.Literals.INTERFACE__INTERFACE_MEMBERS)
@@ -487,7 +509,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkDeprecatedExtendedAttribute(ExtendedAttribute extendedAttribute) {
-		if (EA_TREAT_NON_CALLABLE_AS_NULL.equals(extendedAttribute.nameRef)) {
+		if (extendedAttribute.nameRef == EA_TREAT_NON_CALLABLE_AS_NULL) {
 			warning('The extended attribute TreatNonCallableAsNull was renamed to TreatNonObjectAsNull', 
 				extendedAttribute,
 				WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)

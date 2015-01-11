@@ -46,6 +46,8 @@ import com.rainerschuster.webidl.webIDL.Special
 import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.Argument
 import com.rainerschuster.webidl.webIDL.Attribute
+import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
+import com.rainerschuster.webidl.webIDL.PartialInterface
 
 class TypeUtil {
 
@@ -127,11 +129,54 @@ class TypeUtil {
 		!attribute.static
 	}
 
+//	/**
+//	 * {@link http://heycam.github.io/webidl/#dfn-read-only}
+//	 */
+//	static def boolean readOnly(Attribute attribute) {
+//		attribute.readOnly
+//	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-inherit-getter}
+	 */
+	static def boolean inheritsGetter(Attribute attribute) {
+		attribute.inherit
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-inherit-getter}
+	 */
+	static def Attribute inheritedGetter(Attribute attribute) {
+		val containerDefinition = attribute.eContainer;
+		if (containerDefinition instanceof ExtendedInterfaceMember) {
+			val outerContainerDefinition = containerDefinition.eContainer;
+			val containerInterface = if (outerContainerDefinition instanceof Interface) {
+				outerContainerDefinition
+			} else if (outerContainerDefinition instanceof PartialInterface) {
+				outerContainerDefinition.interfaceName
+			};
+			for (ancestor : containerInterface.inheritedInterfaces) {
+				// TODO can there exist multiple attributes with the same name?
+				// TODO Are non matching types "ignored" (i.e., are the other available ancestors checked?
+				return ancestor.interfaceMembers.map[it.interfaceMember].filter(Attribute).findFirst[it.name == attribute.name];
+			}
+		}
+	}
+
+	// See 3.2.5. Static attributes and operations
+
 	/**
 	 * {@link http://heycam.github.io/webidl/#dfn-static-attribute}
 	 */
 	static def boolean staticAttribute(Attribute attribute) {
 		attribute.static
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-static-operation}
+	 */
+	static def boolean staticOperation(Operation operation) {
+		operation.static
 	}
 
 	// See 3.5. Enumerations

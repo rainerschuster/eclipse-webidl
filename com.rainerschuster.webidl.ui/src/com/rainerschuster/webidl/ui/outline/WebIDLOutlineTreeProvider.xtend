@@ -3,62 +3,26 @@
 */
 package com.rainerschuster.webidl.ui.outline
 
-import com.rainerschuster.webidl.webIDL.AnyType
-import com.rainerschuster.webidl.webIDL.ArrayBufferType
-import com.rainerschuster.webidl.webIDL.ArrayTypeSuffix
 import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.BooleanType
-import com.rainerschuster.webidl.webIDL.ByteStringType
-import com.rainerschuster.webidl.webIDL.ByteType
 import com.rainerschuster.webidl.webIDL.CallbackFunction
 import com.rainerschuster.webidl.webIDL.Const
-import com.rainerschuster.webidl.webIDL.DOMExceptionType
-import com.rainerschuster.webidl.webIDL.DOMStringType
-import com.rainerschuster.webidl.webIDL.DataViewType
-import com.rainerschuster.webidl.webIDL.DateType
-import com.rainerschuster.webidl.webIDL.Definition
 import com.rainerschuster.webidl.webIDL.Definitions
 import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.DictionaryMember
-import com.rainerschuster.webidl.webIDL.DoubleType
-import com.rainerschuster.webidl.webIDL.Enum
-import com.rainerschuster.webidl.webIDL.Float32ArrayType
-import com.rainerschuster.webidl.webIDL.Float64ArrayType
-import com.rainerschuster.webidl.webIDL.FloatType
 import com.rainerschuster.webidl.webIDL.ImplementsStatement
-import com.rainerschuster.webidl.webIDL.Int16ArrayType
-import com.rainerschuster.webidl.webIDL.Int32ArrayType
-import com.rainerschuster.webidl.webIDL.Int8ArrayType
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.Iterable_
-import com.rainerschuster.webidl.webIDL.LongLongType
-import com.rainerschuster.webidl.webIDL.LongType
 import com.rainerschuster.webidl.webIDL.Maplike
-import com.rainerschuster.webidl.webIDL.NullableTypeSuffix
-import com.rainerschuster.webidl.webIDL.ObjectType
-import com.rainerschuster.webidl.webIDL.OctetType
 import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.PartialDictionary
 import com.rainerschuster.webidl.webIDL.PartialInterface
-import com.rainerschuster.webidl.webIDL.PromiseType
-import com.rainerschuster.webidl.webIDL.RegExpType
-import com.rainerschuster.webidl.webIDL.SequenceType
 import com.rainerschuster.webidl.webIDL.Setlike
-import com.rainerschuster.webidl.webIDL.ShortType
-import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.Typedef
-import com.rainerschuster.webidl.webIDL.USVStringType
-import com.rainerschuster.webidl.webIDL.Uint16ArrayType
-import com.rainerschuster.webidl.webIDL.Uint32ArrayType
-import com.rainerschuster.webidl.webIDL.Uint8ArrayType
-import com.rainerschuster.webidl.webIDL.Uint8ClampedArrayType
-import com.rainerschuster.webidl.webIDL.UnionType
-import com.rainerschuster.webidl.webIDL.VoidType
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode
 import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider
 import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode
-import com.rainerschuster.webidl.webIDL.ReturnType
-import com.rainerschuster.webidl.webIDL.ReferenceType
+
+import static extension com.rainerschuster.webidl.util.NameUtil.*
 
 /**
  * Customization of the default outline structure.
@@ -183,94 +147,5 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	// TODO inherit, readonly etc.
 	def _text(Attribute attribute) {
 		attribute.name + ' : ' + (typeName(attribute.type)?:attribute.type)
-	}
-
-	def String typeName(ReturnType type) {
-		switch (type) {
-			VoidType: 'Void' // TODO void does not have a typeName!
-			Type: typeName(type)
-			default: null
-		}
-	}
-
-	def String typeName(Definition type) {
-		switch (type) {
-			 Interface: type.name
-			 Dictionary: type.name
-			 Enum: type.name
-			 CallbackFunction: type.name
-			 Typedef: type.name // TODO This may not be specified!
-			 default: null
-		}
-	}
-
-	def String typeName(Type type) {
-		typeNameWithoutSuffix(type) + type.typeSuffix.map[
-			switch (it) {
-				NullableTypeSuffix: 'OrNull'
-				ArrayTypeSuffix: 'Array'
-			}
-		].join
-	}
-
-//	def String typeName(ConstType type) {
-//		typeNameWithoutSuffix(type) + type.typeSuffix.map[
-//			switch (it) {
-//				NullableTypeSuffix: 'OrNull'
-//				ArrayTypeSuffix: 'Array'
-//			}
-//		].join
-//	}
-
-//	def String typeNameWithoutSuffix(ConstType type) {
-//		switch (type) {
-////			PrimitiveType: typeNameWithoutSuffix(type as PrimitiveType)
-//			// Reference type
-////			NonAnyType: typeName(type.typeRef)
-//			ReferenceType: typeName(type.typeRef)
-//
-//			default: null
-//		}
-//	}
-
-	private def String typeNameWithoutSuffix(Type type) {
-		switch (type) {
-			AnyType: 'Any'
-			BooleanType: 'Boolean'
-			ByteType: 'Byte'
-			OctetType: 'Octet'
-			ShortType: {if (type.unsigned) 'UnsignedShort' else 'Short'}
-			LongType: {if (type.unsigned) 'UnsignedLong' else 'Long'}
-			LongLongType: {if (type.unsigned) 'UnsignedLongLong' else 'LongLong'}
-			FloatType: {if (type.unrestricted) 'UnrestrictedFloat' else 'Float'}
-			DoubleType: {if (type.unrestricted) 'UnrestrictedDouble' else 'Double'}
-			DOMStringType: 'String'
-			ByteStringType: 'ByteString'
-			USVStringType: 'USVString'
-			ObjectType: 'Object'
-			SequenceType: typeName(type.type as Type) + 'Sequence'
-			PromiseType: typeName(type.type as /*Return*/Type) + 'Promise'
-			UnionType: type.unionMemberTypes.map[typeName(it)].join('Or')
-			DateType: 'Date'
-			RegExpType: 'RegExp'
-			DOMExceptionType: 'DOMException'
-			ArrayBufferType : 'ArrayBuffer'
-			DataViewType : 'DataView'
-			Int8ArrayType : 'Int8Array'
-			Int16ArrayType : 'Int16Array'
-			Int32ArrayType : 'Int32Array'
-			Uint8ArrayType : 'Uint8Array'
-			Uint16ArrayType : 'Uint16Array'
-			Uint32ArrayType : 'Uint32Array'
-			Uint8ClampedArrayType : 'Uint8ClampedArray'
-			Float32ArrayType : 'Float32Array'
-			Float64ArrayType : 'Float64Array'
-
-			// Reference type
-//			NonAnyType: typeName(type.typeRef)
-			ReferenceType: typeName(type.typeRef)
-
-			default: null
-		}
 	}
 }

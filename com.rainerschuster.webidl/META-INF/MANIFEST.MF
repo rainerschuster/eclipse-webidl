@@ -22,14 +22,15 @@ Require-Bundle: org.eclipse.xtext;visibility:=reexport,
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: com.rainerschuster.webidl,
- com.rainerschuster.webidl.services,
- com.rainerschuster.webidl.webIDL,
- com.rainerschuster.webidl.webIDL.impl,
- com.rainerschuster.webidl.webIDL.util,
- com.rainerschuster.webidl.serializer,
+ com.rainerschuster.webidl.formatting,
+ com.rainerschuster.webidl.generator,
  com.rainerschuster.webidl.parser.antlr,
  com.rainerschuster.webidl.parser.antlr.internal,
- com.rainerschuster.webidl.validation,
  com.rainerschuster.webidl.scoping,
- com.rainerschuster.webidl.generator,
- com.rainerschuster.webidl.formatting
+ com.rainerschuster.webidl.serializer,
+ com.rainerschuster.webidl.services,
+ com.rainerschuster.webidl.util,
+ com.rainerschuster.webidl.validation,
+ com.rainerschuster.webidl.webIDL,
+ com.rainerschuster.webidl.webIDL.impl,
+ com.rainerschuster.webidl.webIDL.util
