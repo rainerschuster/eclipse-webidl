@@ -45,7 +45,7 @@ import java.util.Set
 import com.rainerschuster.webidl.webIDL.Special
 import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.Argument
-import com.rainerschuster.webidl.webIDL.impl.InterfaceOrTypedefImpl
+import com.rainerschuster.webidl.webIDL.Attribute
 
 class TypeUtil {
 
@@ -118,7 +118,24 @@ class TypeUtil {
 		}
 	}
 
+	// See 3.2.2. Attributes
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-regular-attribute}
+	 */
+	static def boolean regularAttribute(Attribute attribute) {
+		!attribute.static
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-static-attribute}
+	 */
+	static def boolean staticAttribute(Attribute attribute) {
+		attribute.static
+	}
+
 	// See 3.5. Enumerations
+
 	/**
 	 * {@link http://heycam.github.io/webidl/#dfn-enumeration-value}
 	 */
@@ -127,6 +144,7 @@ class TypeUtil {
 	}
 
 	// See 3.8. Implements statements
+
 	/**
 	 * {@link http://heycam.github.io/webidl/#dfn-consequential-interfaces}
 	 */
