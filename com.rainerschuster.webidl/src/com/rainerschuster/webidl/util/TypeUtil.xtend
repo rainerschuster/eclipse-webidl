@@ -48,6 +48,7 @@ import com.rainerschuster.webidl.webIDL.Argument
 import com.rainerschuster.webidl.webIDL.Attribute
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
 import com.rainerschuster.webidl.webIDL.PartialInterface
+import com.rainerschuster.webidl.webIDL.ExtendedAttributeArgList
 
 class TypeUtil {
 
@@ -172,6 +173,34 @@ class TypeUtil {
 		!operation.name.nullOrEmpty && !operation.static
 	}
 
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
+	 */
+	static def boolean variadic(Operation operation) {
+		operation.arguments.last.ellipsis
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
+	 */
+	static def boolean variadic(ExtendedAttributeArgList eal) {
+		eal.arguments.last.ellipsis
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
+	 */
+	static def boolean variadic(CallbackFunction callback) {
+		callback.arguments.last.ellipsis
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-optional-argument}
+	 */
+	static def boolean optionalArgument(Argument argument) {
+		argument.optional
+	}
+
 	// See 3.2.4. Special operations
 
 	/**
@@ -181,6 +210,62 @@ class TypeUtil {
 		// TODO Is serializer really excluded or just forgotten in the specification?
 //		!operation.specials.filter[it != Special.SERIALIZER].empty
 		!operation.specials.nullOrEmpty
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-named-property-getter}
+	 */
+	static def boolean namedPropertyGetter(Operation operation) {
+		namedProperty(operation, Special.GETTER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-named-property-setter}
+	 */
+	static def boolean namedPropertySetter(Operation operation) {
+		namedProperty(operation, Special.SETTER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-named-property-creator}
+	 */
+	static def boolean namedPropertyCreator(Operation operation) {
+		namedProperty(operation, Special.CREATOR)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-named-property-deleter}
+	 */
+	static def boolean namedPropertyDeleter(Operation operation) {
+		namedProperty(operation, Special.DELETER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-getter}
+	 */
+	static def boolean indexedPropertyGetter(Operation operation) {
+		indexedProperty(operation, Special.GETTER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-setter}
+	 */
+	static def boolean indexedPropertySetter(Operation operation) {
+		indexedProperty(operation, Special.SETTER)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-creator}
+	 */
+	static def boolean indexedPropertyCreator(Operation operation) {
+		indexedProperty(operation, Special.CREATOR)
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-deleter}
+	 */
+	static def boolean indexedPropertyDeleter(Operation operation) {
+		indexedProperty(operation, Special.DELETER)
 	}
 
 	// See 3.2.5. Static attributes and operations
@@ -392,82 +477,6 @@ class TypeUtil {
 //			Float64ArrayType : return "java.lang.Object"
 			default : {/*logger.warn("Unknown type {}!", type);*/ return null}
 		}
-	}
-
-	// TODO Consider moving these to OperationUtil
-
-	// See 3.2.3. Operations
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
-	 */
-	static def boolean variadic(Operation operation) {
-		operation.arguments.last.ellipsis
-	}
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-optional-argument}
-	 */
-	static def boolean optionalArgument(Argument argument) {
-		argument.optional
-	}
-
-	// See 3.2.4. Special operations
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-named-property-getter}
-	 */
-	static def boolean namedPropertyGetter(Operation operation) {
-		namedProperty(operation, Special.GETTER)
-	}
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-named-property-setter}
-	 */
-	static def boolean namedPropertySetter(Operation operation) {
-		namedProperty(operation, Special.SETTER)
-	}
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-named-property-creator}
-	 */
-	static def boolean namedPropertyCreator(Operation operation) {
-		namedProperty(operation, Special.CREATOR)
-	}
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-named-property-deleter}
-	 */
-	static def boolean namedPropertyDeleter(Operation operation) {
-		namedProperty(operation, Special.DELETER)
-	}
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-getter}
-	 */
-	static def boolean indexedPropertyGetter(Operation operation) {
-		indexedProperty(operation, Special.GETTER)
-	}
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-setter}
-	 */
-	static def boolean indexedPropertySetter(Operation operation) {
-		indexedProperty(operation, Special.SETTER)
-	}
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-creator}
-	 */
-	static def boolean indexedPropertyCreator(Operation operation) {
-		indexedProperty(operation, Special.CREATOR)
-	}
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-deleter}
-	 */
-	static def boolean indexedPropertyDeleter(Operation operation) {
-		indexedProperty(operation, Special.DELETER)
 	}
 
 	protected static def boolean namedProperty(Operation operation, Special special) {
