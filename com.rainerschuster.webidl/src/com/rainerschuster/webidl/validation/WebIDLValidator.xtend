@@ -41,6 +41,7 @@ import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.DictionaryMember
 import com.rainerschuster.webidl.webIDL.Maplike
 import com.rainerschuster.webidl.webIDL.Setlike
+import com.rainerschuster.webidl.webIDL.InterfaceMember
 
 /**
  * Custom validation rules. 
@@ -296,6 +297,24 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	}
 
 	@Check
+	def checkFinalArgumentOfVariadicOperationNotOptional(Operation operation) {
+		if (operation.variadic && operation.arguments.last.optional) {
+			error('The final argument in an operation must not explicitly be declared to be optional if the operation is variadic', 
+					operation,
+					WebIDLPackage.Literals.OPERATION__ARGUMENTS)
+		}
+	}
+
+	@Check
+	def checkFinalArgumentOfVariadicOperationNoDefault(Operation operation) {
+		if (operation.variadic && operation.arguments.last.defaultValue != null) {
+			error('The implicitly optional final argument of a variadic operation must not have a default value specified', 
+					operation,
+					WebIDLPackage.Literals.OPERATION__ARGUMENTS)
+		}
+	}
+
+	@Check
 	def checkExtendedAttributeOnOperation(Operation operation) {
 		val allowedExtendedAttributes = #[EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE, EA_UNSCOPEABLE];
 		val containerDefinition = operation.eContainer;
@@ -348,7 +367,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	def checkSpecialOperationsNotVariadicNorOptionalArguments(Operation operation) {
 		// FIXME is this also true for legacy callers?
 		// => Added this exception since HTML specification uses "legacycaller any (any... arguments);"
-		if (!operation.specials.isNullOrEmpty && operation.specials.exists[it != Special.LEGACYCALLER]) {
+		if (operation.specialOperation && operation.specials.exists[it != Special.LEGACYCALLER]) {
 			if (operation.variadic) {
 				error('Special operations declared using operations must not be variadic nor have any optional arguments', 
 						operation,
@@ -358,6 +377,21 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 				error('Special operations declared using operations must not be variadic nor have any optional arguments', 
 						operation,
 						WebIDLPackage.Literals.OPERATION__SPECIALS)
+			}
+		}
+	}
+
+	@Check
+	def checkSpecialNotDeclaredOnCallbackInterface(Operation operation) {
+		if (operation.specialOperation) {
+			val containerInterfaceMember = operation.eContainer as ExtendedInterfaceMember;
+			val containerInterface = containerInterfaceMember.eContainer;
+			if (containerInterface instanceof Interface) {
+				if (containerInterface.callback) {
+					error('Special operations must not be declared on callback interfaces', 
+						operation,
+						WebIDLPackage.Literals.INTERFACE__CALLBACK)
+				}
 			}
 		}
 	}
