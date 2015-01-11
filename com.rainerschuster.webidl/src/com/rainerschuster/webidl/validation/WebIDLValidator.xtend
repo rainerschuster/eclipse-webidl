@@ -231,19 +231,24 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// TODO Refactor this once Attribute is refactored (static inlined etc.)
 	@Check
 	def checkExtendedAttributeOnAttribute(Attribute attribute) {
-//		val allowedExtendedAttributesStatic = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
+		val allowedExtendedAttributesStatic = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
 		val allowedExtendedAttributesRegular = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE, EA_UNSCOPEABLE];
 		val containerDefinition = attribute.eContainer;
 		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
 			for (ExtendedAttribute extendedAttribute : extendedAttributes) {
-				if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributesRegular.contains(extendedAttribute.nameRef)) {
-					error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on attributes', 
-							extendedAttribute,
-							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef)) {
+					if (attribute.staticAttribute && !allowedExtendedAttributesStatic.contains(extendedAttribute.nameRef)) {
+						error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on static attributes', 
+								extendedAttribute,
+								WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+					} else if (!allowedExtendedAttributesRegular.contains(extendedAttribute.nameRef)) {
+						error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on regular attributes', 
+								extendedAttribute,
+								WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+					}
 				}
 			}
 		}
@@ -253,7 +258,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkSpecialOperationNameNotEmpty(Operation operation) {
-		if (operation.name.nullOrEmpty && operation.specials.empty) {
+		if (operation.name.nullOrEmpty && !operation.specialOperation) {
 			error('If an operation has no identifier, then it must be declared to be a special operation using one of the special keywords', 
 					operation,
 					WebIDLPackage.Literals.OPERATION__NAME)

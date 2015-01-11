@@ -163,6 +163,26 @@ class TypeUtil {
 		}
 	}
 
+	// See 3.2.3. Operations
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-regular-operation}
+	 */
+	static def boolean regularOperation(Operation operation) {
+		!operation.name.nullOrEmpty && !operation.static
+	}
+
+	// See 3.2.4. Special operations
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-special-operation}
+	 */
+	static def boolean specialOperation(Operation operation) {
+		// TODO Is serializer really excluded or just forgotten in the specification?
+//		!operation.specials.filter[it != Special.SERIALIZER].empty
+		!operation.specials.nullOrEmpty
+	}
+
 	// See 3.2.5. Static attributes and operations
 
 	/**
