@@ -41,7 +41,6 @@ import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.DictionaryMember
 import com.rainerschuster.webidl.webIDL.Maplike
 import com.rainerschuster.webidl.webIDL.Setlike
-import com.rainerschuster.webidl.webIDL.InterfaceMember
 
 /**
  * Custom validation rules. 
