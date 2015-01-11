@@ -45,8 +45,78 @@ import java.util.Set
 import com.rainerschuster.webidl.webIDL.Special
 import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.Argument
+import com.rainerschuster.webidl.webIDL.impl.InterfaceOrTypedefImpl
 
 class TypeUtil {
+
+	// See 3.2. Interfaces
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-inherited-interfaces}
+	 */
+	static def List<Interface> inheritedInterfaces(Interface iface) {
+		val result = newArrayList();
+		var currentInterface = iface;
+		var currentInherit = currentInterface.inherits;
+		while (currentInherit != null) {
+			if (currentInherit instanceof Typedef) {
+				currentInterface = resolveDefinition(currentInherit) as Interface;
+			} else if (currentInherit instanceof Interface) {
+				currentInterface = currentInherit as Interface;
+			} else {
+				println('Interface inherit of "' + iface.name + '" is neither interface nor typedef!');
+				currentInterface = null;
+				// TODO throw exception!
+//				return null;
+			}
+			if (result.contains(currentInterface)) {
+				println('Interface hierarchy of "' + iface.name + '" has a cycle!');
+				// TODO throw exception!
+				return null;
+			} else {
+				result.add(currentInterface);
+			}
+			currentInherit = currentInterface.inherits;
+		}
+		return result;
+	}
+
+	static def Definition resolveDefinition(Typedef typedef) {
+		val Type type = typedef.type;
+		if (type instanceof ReferenceType) {
+			resolveDefinition(type)
+		} else {
+			println('Typedef resolves to a non-reference type!');
+			return null;
+		}
+	}
+
+	static def Definition resolveDefinition(ReferenceType type) {
+		val typeRef = type.typeRef;
+		if (typeRef instanceof Typedef) {
+			resolveDefinition(typeRef)
+		} else {
+			return typeRef;
+		}
+	}
+
+	static def Type resolveType(Typedef typedef) {
+		val Type type = typedef.type;
+		if (type instanceof ReferenceType) {
+			resolveType(type)
+		} else {
+			type
+		}
+	}
+
+	static def Type resolveType(ReferenceType type) {
+		val typeRef = type.typeRef;
+		if (typeRef instanceof Typedef) {
+			resolveType(typeRef)
+		} else {
+			println('Typedef resolves to a reference type that does not reference a typedef!');
+			return null;
+		}
+	}
 
 	// See 3.5. Enumerations
 	/**

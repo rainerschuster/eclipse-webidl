@@ -86,6 +86,40 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	}
 
 	// See 3.2. Interfaces
+
+	@Check
+	def checkInheritedInterfaceCycle(Interface iface) {
+		val inheritedInterfaces = iface.inheritedInterfaces();
+		if (inheritedInterfaces == null) {
+			error('An interface must not be declared such that its inheritance hierarchy has a cycle', 
+					iface,
+					WebIDLPackage.Literals.INTERFACE__INHERITS)
+		} else if (inheritedInterfaces.contains(iface)) {
+			error('An interface must not inherit from itself', 
+					iface,
+					WebIDLPackage.Literals.INTERFACE__INHERITS)
+		}
+	}
+
+	@Check
+	def checkInheritedInterfacesCallback(Interface iface) {
+		val inheritedInterfaces = iface.inheritedInterfaces();
+		if (!inheritedInterfaces.nullOrEmpty) {
+			val checkInvalid = inheritedInterfaces.exists[it.callback != iface.callback];
+			if (checkInvalid) {
+				if (iface.callback) {
+					error('Callback interfaces must not inherit from any non-callback interfaces', 
+							iface,
+							WebIDLPackage.Literals.INTERFACE__INHERITS)
+				} else {
+					error('Non-callback interfaces must not inherit from any callback interfaces', 
+							iface,
+							WebIDLPackage.Literals.INTERFACE__INHERITS)
+				}
+			}
+		}
+	}
+
 	@Check
 	def checkExtendedAttributeOnInterface(Interface iface) {
 		val allowedExtendedAttributes = #[EA_ARRAY_CLASS, EA_CONSTRUCTOR, EA_EXPOSED, EA_GLOBAL, EA_IMPLICIT_THIS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT, EA_OVERRIDE_BUILTINS, EA_PRIMARY_GLOBAL, EA_UNFORGEABLE];
@@ -100,7 +134,6 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 3.2. Interfaces
 	@Check
 	def checkExtendedAttributeOnPartialInterface(PartialInterface partialInterface) {
 		val forbiddenExtendedAttributes = #[EA_ARRAY_CLASS, EA_CONSTRUCTOR, EA_IMPLICIT_THIS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT];
@@ -121,7 +154,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkConstantName(Const constant) {
-		if ("prototype".equals(constant.name)) {
+		if (constant.name == "prototype") {
 			error('The identifier of a constant must not be “prototype”', 
 					constant,
 					WebIDLPackage.Literals.CONST__NAME)
@@ -132,8 +165,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	def checkConstantType(Const constant) {
 		// TODO What about arrays?
 		val constantType = constant.type;
-		if (!(constantType instanceof PrimitiveType || (constantType instanceof ReferenceType && (constantType as ReferenceType).typeRef instanceof Typedef && ((constantType as ReferenceType).typeRef as Typedef).type instanceof PrimitiveType))) {
-			error('The type of a constant must not be a primitive type or a Typedef with primitive type', 
+		if (!(constantType instanceof PrimitiveType || (constantType instanceof ReferenceType && resolveType(constantType as ReferenceType) instanceof PrimitiveType))) {
+			error('The type of a constant must not be any type other than a primitive type or typedef with primitive type',
 					constant,
 					WebIDLPackage.Literals.CONST__NAME)
 		}
