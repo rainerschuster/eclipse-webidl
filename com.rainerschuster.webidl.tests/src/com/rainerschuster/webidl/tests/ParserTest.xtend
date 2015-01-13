@@ -15,16 +15,18 @@
  */
 package com.rainerschuster.webidl.tests
 
-import org.eclipse.xtext.junit4.XtextRunner
-import org.eclipse.xtext.junit4.InjectWith
-import org.junit.runner.RunWith
 import com.google.inject.Inject
-import org.eclipse.xtext.junit4.util.ParseHelper
 import com.rainerschuster.webidl.WebIDLInjectorProvider
-import org.junit.Test
+import com.rainerschuster.webidl.util.EffectiveOverloadingSetUtil
+import com.rainerschuster.webidl.util.NameUtil
 import com.rainerschuster.webidl.webIDL.Definitions
-
+import com.rainerschuster.webidl.webIDL.Interface
+import org.eclipse.xtext.junit4.InjectWith
+import org.eclipse.xtext.junit4.XtextRunner
+import org.eclipse.xtext.junit4.util.ParseHelper
 import org.eclipse.xtext.junit4.validation.ValidationTestHelper
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @InjectWith(WebIDLInjectorProvider)
 @RunWith(XtextRunner)
@@ -32,6 +34,48 @@ class ParserTest {
 
 	@Inject extension ParseHelper<Definitions> parser
 	@Inject extension ValidationTestHelper
+
+
+
+	@Test
+	def void overloadSample_3_2_6__02() {
+		// Replaced Node and Event since they are not available
+		val definitions = '''
+			interface A {
+			  /* f1 */ void f(DOMString a);
+			  /* f2 */ void f(RegExp a, DOMString b, float... c);
+			  /* f3 */ void f();
+			  /* f4 */ void f(Date a, DOMString b, optional DOMString c, float... d);
+			};
+		'''.parse;
+
+		for (Interface iface : definitions.definitions.map[it.def].filter(typeof(Interface))) {
+			val effectiveOverloadingSet = EffectiveOverloadingSetUtil.computeForRegularOperation(iface, "f", 4)
+			val String output = "{" + effectiveOverloadingSet.map[
+				val StringBuilder sb = new StringBuilder();
+				sb.append("<");
+				sb.append(it.callable.name);
+				sb.append(", ");
+				sb.append("(");
+				sb.append(it.typeList.map[NameUtil.typeName(it)].join(', '));
+				sb.append(")");
+				sb.append(", ");
+				sb.append("(");
+				sb.append(it.optionalityList.map[it.name.toLowerCase].join(', '));
+				sb.append(")");
+				sb.append(">");
+				sb.toString
+			].join(",\n ") + "}";
+//			println(output);
+		}
+	}
+
+//	private def effectiveOverloadingSetToString(List<EffectiveOverloadingSetEntry> effectiveOverloadingSet)
+//	'''
+//	
+//	'''
+
+
 
 
 	// See 3. Interface definition language

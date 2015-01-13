@@ -347,6 +347,13 @@ ReturnType:
 ;
 
 
+// Helper interface mainly for overloading
+Callable:
+	Operation
+	| CallbackFunction
+	| ExtendedAttribute
+;
+
 
 
 // TODO name might not be correct for ExtendedAttributes (e.g., use attribute=...)

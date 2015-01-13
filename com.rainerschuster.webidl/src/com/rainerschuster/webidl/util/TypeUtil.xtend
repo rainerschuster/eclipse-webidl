@@ -64,6 +64,8 @@ import com.rainerschuster.webidl.webIDL.Attribute
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
 import com.rainerschuster.webidl.webIDL.PartialInterface
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeArgList
+import com.rainerschuster.webidl.webIDL.ExtendedAttributeNamedArgList
+import com.rainerschuster.webidl.webIDL.NullableTypeSuffix
 
 class TypeUtil {
 
@@ -188,10 +190,14 @@ class TypeUtil {
 		!operation.name.nullOrEmpty && !operation.static
 	}
 
+	// FIXME Check if nullOrEmpty is ok for these variadic methods!
 	/**
 	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
 	 */
 	static def boolean variadic(Operation operation) {
+		if (operation.arguments.nullOrEmpty) {
+			return false;
+		}
 		operation.arguments.last.ellipsis
 	}
 
@@ -199,13 +205,38 @@ class TypeUtil {
 	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
 	 */
 	static def boolean variadic(ExtendedAttributeArgList eal) {
+		if (eal.arguments.nullOrEmpty) {
+			return false;
+		}
 		eal.arguments.last.ellipsis
 	}
 
 	/**
 	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
 	 */
+	static def boolean variadic(ExtendedAttributeNamedArgList eal) {
+		if (eal.arguments.nullOrEmpty) {
+			return false;
+		}
+		eal.arguments.last.ellipsis
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
+	 */
+	 // Note variadic arguments are implicitly specified
+	 // Precondition: The argument must be the last argument in an argument list
+	static def boolean variadic(Argument argument) {
+		argument.ellipsis
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
+	 */
 	static def boolean variadic(CallbackFunction callback) {
+		if (callback.arguments.nullOrEmpty) {
+			return false;
+		}
 		callback.arguments.last.ellipsis
 	}
 
@@ -213,7 +244,7 @@ class TypeUtil {
 	 * {@link http://heycam.github.io/webidl/#dfn-optional-argument}
 	 */
 	static def boolean optionalArgument(Argument argument) {
-		argument.optional
+		argument.optional || argument.variadic
 	}
 
 	// See 3.2.4. Special operations
@@ -338,12 +369,30 @@ class TypeUtil {
 		];
 	}
 
+	// See 3.10.23. Nullable types — T?
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-nullable-type}
+	 */
+	static def nullableType(Type type) {
+		// FIXME check if this really conforms to the specification (e.g., maybe only first typesuffix is relevant!)
+		!(type.typeSuffix.nullOrEmpty || type.typeSuffix.filter(typeof(NullableTypeSuffix)).empty)
+	}
+
 	// See 3.10.27. Union types
+
+//	/**
+//	 * {@link http://heycam.github.io/webidl/#dfn-union-member-type}
+//	 */
+//	static def unionMemberTypes(UnionType unionType) {
+//		unionType.unionMemberTypes
+//	}
+
 	/**
 	 * {@link http://heycam.github.io/webidl/#dfn-flattened-union-member-types}
 	 */
 	static def Set<Type> flattenedMemberTypes(UnionType unionType) {
-		val Set<Type> s = #{};
+		val Set<Type> s = newLinkedHashSet();
 		for (u : unionType.unionMemberTypes) {
 			if (u instanceof UnionType) {
 				s.addAll(flattenedMemberTypes(u));
@@ -352,6 +401,32 @@ class TypeUtil {
 			}
 		}
 		return s;
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-number-of-nullable-member-types}
+	 */
+	static def int numberOfNullableMemberTypes(UnionType unionType) {
+		var n = 0;
+		for (u : unionType.unionMemberTypes) {
+			if (nullableType(u)) {
+				n = n + 1;
+			}
+			// TODO http://heycam.github.io/webidl/#dfn-union-type
+			if (u instanceof UnionType) {
+				// Let m be the number of nullable member types of U.
+				val m = numberOfNullableMemberTypes(u);
+				n = n + m;
+			}
+		}
+		return n;
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-includes-a-nullable-type}
+	 */
+	static def boolean includesANullableType(Type type) {
+		nullableType(type) || (type instanceof UnionType && numberOfNullableMemberTypes(type as UnionType) == 1)
 	}
 
 

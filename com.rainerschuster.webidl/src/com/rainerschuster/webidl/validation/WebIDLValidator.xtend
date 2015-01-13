@@ -56,6 +56,9 @@ import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.DictionaryMember
 import com.rainerschuster.webidl.webIDL.Maplike
 import com.rainerschuster.webidl.webIDL.Setlike
+import com.rainerschuster.webidl.webIDL.DOMStringType
+import com.rainerschuster.webidl.webIDL.USVStringType
+import com.rainerschuster.webidl.webIDL.AnyType
 
 /**
  * Custom validation rules. 
@@ -424,24 +427,62 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	// See 3.2.4.2. Stringifiers
 
-//	@Check
-//	def checkStringifierAttributeNotString(Attribute attribute) {
-//		val attributeType = attribute.type;
-//		if (attribute.specials.contains(Special.STRINGIFIER) && attributeType instanceof DOMStringType) {
-//			error('The stringifier keyword must not be placed on an attribute unless it is declared to be of type DOMString', 
-//					attribute,
-//					WebIDLPackage.Literals.ATTRIBUTE__TYPE)
-//		}
-//	}
-//
-//	@Check
-//	def checkStringifierAttributeNotStatic(Attribute attribute) {
-//		if (attribute.specials.contains(Special.STRINGIFIER) && attribute.static) {
-//			error('The stringifier keyword must not be placed on a static attribute', 
-//					attribute,
-//					WebIDLPackage.Literals.ATTRIBUTE__STATIC)
-//		}
-//	}
+	@Check
+	def checkStringifierOnOperation(Operation operation) {
+		// Note: The shorthand notation is represented by EmptyStringifier
+		val operationType = operation.type;
+		if (operation.specials.contains(Special.STRINGIFIER)) {
+			if (!(operation.arguments.nullOrEmpty && operationType instanceof DOMStringType))
+			error('Stringifiers declared with operations must be declared to take zero arguments and return a DOMString', 
+					operation,
+					WebIDLPackage.Literals.OPERATION__TYPE)
+		}
+	}
+
+
+	@Check
+	def checkStringifierAttributeNotString(Attribute attribute) {
+		val attributeType = attribute.type;
+		if (attribute.stringifier && !(attributeType instanceof DOMStringType || attributeType instanceof USVStringType)) {
+			error('The stringifier keyword must not be placed on an attribute unless it is declared to be of type DOMString or USVString', 
+					attribute,
+					WebIDLPackage.Literals.ATTRIBUTE__TYPE)
+		}
+	}
+
+	@Check
+	def checkStringifierAttributeNotStatic(Attribute attribute) {
+		if (attribute.stringifier && attribute.static) {
+			error('The stringifier keyword must not be placed on a static attribute', 
+					attribute,
+					WebIDLPackage.Literals.ATTRIBUTE__STATIC)
+		}
+	}
+
+	// See 3.2.4.3. Serializers
+	// TODO 3.2.4.3. ff
+
+	// See 3.2.5. Static attributes and operations
+
+	@Check
+	def checkStaticOnCallbackInterface(Interface iface) {
+		if (iface.callback) {
+			val members = iface.interfaceMembers.map[it.interfaceMember];
+			members.filter(typeof(Attribute)).filter[it.static].forEach[
+				error('Static attributes and operations must not be declared on callback interfaces.', 
+						it,
+						WebIDLPackage.Literals.ATTRIBUTE__STATIC)
+			];
+			members.filter(typeof(Operation)).filter[it.static].forEach[
+				error('Static attributes and operations must not be declared on callback interfaces.', 
+						it,
+						WebIDLPackage.Literals.OPERATION__STATIC)
+			];
+		}
+	}
+
+	// See 3.2.6. Overloading
+	// TODO 3.2.6. Overloading
 
 	// See 3.2.7. Iterable declarations
 
@@ -554,6 +595,33 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 						implementsStatement,
 						WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_B)
 				}
+			}
+		}
+	}
+
+	// See 3.10. Types
+
+	// See 3.10.27. Union types
+
+	@Check
+	def checkDeprecatedExtendedAttribute(UnionType union) {
+		if (!union.unionMemberTypes.filter(typeof(AnyType)).empty) {
+			error('The any type must not be used as a union member type', 
+				union,
+				WebIDLPackage.Literals.UNION_TYPE__UNION_MEMBER_TYPES)
+		}
+	}
+
+	@Check
+	def checkNumberOfNullableTypes(UnionType union) {
+		val numberOfNullableMemberTypes = union.numberOfNullableMemberTypes();
+		if (numberOfNullableMemberTypes > 0) {
+			// TODO Check typedefs!
+			if (numberOfNullableMemberTypes > 1 ||
+				!union.flattenedMemberTypes().filter(typeof(ReferenceType)).map[it.typeRef].filter(typeof(Dictionary)).empty) {
+				error('The number of nullable member types of a union type must be 0 or 1, and if it is 1 then the union type must also not have a dictionary type in its flattened member types.', 
+					union,
+					WebIDLPackage.Literals.UNION_TYPE__UNION_MEMBER_TYPES)
 			}
 		}
 	}
