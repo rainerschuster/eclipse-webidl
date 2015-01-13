@@ -24,8 +24,7 @@ import com.rainerschuster.webidl.webIDL.Callable
 import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeArgList
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeNamedArgList
-
-//import tpdsl.symbol.internal.Constructor
+import com.rainerschuster.webidl.webIDL.ExtendedDefinition
 
 class EffectiveOverloadingSetUtil {
 	// TODO OperationUtil: regularOperation, staticOperation, variadicOperation
@@ -48,17 +47,19 @@ class EffectiveOverloadingSetUtil {
 		return compute(f, argumentCount);
 	}
 
-//	def static List<EffectiveOverloadingSetEntry<Constructor>> computeForConstructor(Interface iface, long argumentCount) {
-//		val f = XtendExtendedAttributeUtil.getConstructorValuesUnchecked(iface.extendedAttributes).filterNull.toList;
-//
-//		return compute(f, argumentCount);
-//	}
-//
-//	def static List<EffectiveOverloadingSetEntry<Constructor>> computeForNamedConstructor(Interface iface, String identifier, long argumentCount) {
-//		val f = XtendExtendedAttributeUtil.getNamedConstructorValuesUnchecked(iface.extendedAttributes).filterNull.filter[identifier == it.name].toList;
-//
-//		return compute(f, argumentCount);
-//	}
+	def static List<EffectiveOverloadingSetEntry<Constructor>> computeForConstructor(Interface iface, long argumentCount) {
+		val definition = iface.eContainer as ExtendedDefinition;
+		val f = ExtendedAttributeUtil.getConstructorValuesUnchecked(definition.eal.extendedAttributes).filterNull.toList;
+
+		return compute(f, argumentCount);
+	}
+
+	def static List<EffectiveOverloadingSetEntry<Constructor>> computeForNamedConstructor(Interface iface, String identifier, long argumentCount) {
+		val definition = iface.eContainer as ExtendedDefinition;
+		val f = ExtendedAttributeUtil.getNamedConstructorValuesUnchecked(definition.eal.extendedAttributes).filterNull.filter[identifier == it.name].toList;
+
+		return compute(f, argumentCount);
+	}
 
 	def static List<EffectiveOverloadingSetEntry<CallbackFunction>> computeForCallbackFunction(CallbackFunction callbackFunction, long argumentCount) {
 		val List<CallbackFunction> f = #[callbackFunction];
@@ -84,6 +85,7 @@ class EffectiveOverloadingSetUtil {
 				CallbackFunction: ff.arguments.size
 				ExtendedAttributeArgList: ff.arguments.size
 				ExtendedAttributeNamedArgList: ff.arguments.size
+				Constructor: ff.arguments.size
 				default: 0
 			};
 			maxarg = Math.max(maxarg, maxargCandidate);
@@ -100,6 +102,7 @@ class EffectiveOverloadingSetUtil {
 				CallbackFunction: x.arguments
 				ExtendedAttributeArgList: x.arguments
 				ExtendedAttributeNamedArgList: x.arguments
+				Constructor: x.arguments
 			};
 
 			// 5.1. Let n be the number of arguments X is declared to take.
@@ -131,6 +134,7 @@ class EffectiveOverloadingSetUtil {
 				CallbackFunction: TypeUtil.variadic(x)
 				ExtendedAttributeArgList: TypeUtil.variadic(x)
 				ExtendedAttributeNamedArgList: TypeUtil.variadic(x)
+				Constructor: TypeUtil.variadic(x)
 			};
 			if (/*n > 0 && */variadic) {
 				// 5.5.1. Add to S the tuple <X, t0..n−2, o0..n−2>.

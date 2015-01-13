@@ -224,6 +224,16 @@ class TypeUtil {
 	/**
 	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
 	 */
+	static def boolean variadic(Constructor constructor) {
+		if (constructor.arguments.nullOrEmpty) {
+			return false;
+		}
+		constructor.arguments.last.ellipsis
+	}
+
+	/**
+	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
+	 */
 	 // Note variadic arguments are implicitly specified
 	 // Precondition: The argument must be the last argument in an argument list
 	static def boolean variadic(Argument argument) {

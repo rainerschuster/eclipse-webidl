@@ -204,8 +204,8 @@ class ExtendedAttributeUtil {
 		var Constructor constructor = null;
 
 		switch (eAttr) {
-			ExtendedAttributeNoArgs: {constructor = new Constructor(); constructor.argumentList = new ArrayList<Argument>();}
-			ExtendedAttributeArgList: {constructor = new Constructor(); constructor.argumentList = eAttr.arguments;}
+			ExtendedAttributeNoArgs: {constructor = new Constructor(); constructor.arguments = new ArrayList<Argument>();}
+			ExtendedAttributeArgList: {constructor = new Constructor(); constructor.arguments = eAttr.arguments;}
 		}
 
 		return constructor;
@@ -227,8 +227,8 @@ class ExtendedAttributeUtil {
 		var Constructor constructor = null;
 
 		switch (eAttr) {
-			ExtendedAttributeIdent: {constructor = new Constructor(); constructor.argumentList = new ArrayList<Argument>(); constructor.name = eAttr.nameRef;}
-			ExtendedAttributeNamedArgList: {constructor = new Constructor(); constructor.argumentList = eAttr.arguments; constructor.name = eAttr.nameRef;}
+			ExtendedAttributeIdent: {constructor = new Constructor(); constructor.arguments = new ArrayList<Argument>(); constructor.name = eAttr.nameRef;}
+			ExtendedAttributeNamedArgList: {constructor = new Constructor(); constructor.arguments = eAttr.arguments; constructor.name = eAttr.nameRef;}
 		}
 
 		return constructor;

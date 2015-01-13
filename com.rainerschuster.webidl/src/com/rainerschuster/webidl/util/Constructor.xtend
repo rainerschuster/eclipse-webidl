@@ -18,10 +18,13 @@ package com.rainerschuster.webidl.util
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import com.rainerschuster.webidl.webIDL.Argument
+import com.rainerschuster.webidl.webIDL.Callable
+import org.eclipse.emf.ecore.impl.MinimalEObjectImpl
 
-class Constructor {
+// TODO reconsider this  extends MinimalEObjectImpl.Container implements Callable!
+class Constructor extends MinimalEObjectImpl.Container implements Callable {
 
 	@Accessors String name;
-	@Accessors List<Argument> argumentList;
+	@Accessors List<Argument> arguments;
 
 }
