@@ -22,8 +22,6 @@ import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.Callable
 import com.rainerschuster.webidl.webIDL.Type
-import com.rainerschuster.webidl.webIDL.ExtendedAttributeArgList
-import com.rainerschuster.webidl.webIDL.ExtendedAttributeNamedArgList
 import com.rainerschuster.webidl.webIDL.ExtendedDefinition
 
 class EffectiveOverloadingSetUtil {
@@ -67,7 +65,7 @@ class EffectiveOverloadingSetUtil {
 	}
 
 	def static <T extends Callable> List<EffectiveOverloadingSetEntry<T>> compute(Iterable<T> f, long argumentCount) {
-		// FIXME Add a check that argumentCount is not greater than the number of available arguments!
+		// TODO Add a check that argumentCount is not greater than the number of available arguments!
 		// Note that S is a set in the specification!
 		// 1. Initialize S to empty set
 		val List<EffectiveOverloadingSetEntry<T>> s = new ArrayList<EffectiveOverloadingSetEntry<T>>();
@@ -79,12 +77,9 @@ class EffectiveOverloadingSetUtil {
 		var long maxarg = 0;
 		for (ff : f) {
 			// TODO Implement Interface HasArguments?
-			// TODO is this switch complete?
 			val int maxargCandidate = switch (ff) {
 				Operation: ff.arguments.size
 				CallbackFunction: ff.arguments.size
-				ExtendedAttributeArgList: ff.arguments.size
-				ExtendedAttributeNamedArgList: ff.arguments.size
 				Constructor: ff.arguments.size
 				default: 0
 			};
@@ -96,12 +91,9 @@ class EffectiveOverloadingSetUtil {
 
 		// 5. For each operation, extended attribute or callback function X in F:
 		for (x : f) {
-			// TODO is this switch complete?
 			val argumentsOfX = switch (x) {
 				Operation: x.arguments
 				CallbackFunction: x.arguments
-				ExtendedAttributeArgList: x.arguments
-				ExtendedAttributeNamedArgList: x.arguments
 				Constructor: x.arguments
 			};
 
@@ -112,9 +104,8 @@ class EffectiveOverloadingSetUtil {
 			val t = argumentsOfX.map[it.type].toList();
 
 			// 5.3. Let o0..n−1 be a list of optionality values, where oi is "variadic" if X's argument at index i is a final, variadic argument, "optional" if the argument is optional, and "required" otherwise.
-			// TODO Use variadic from some utility instead of ellipsis!
 			val o = argumentsOfX.map[
-				if (it.ellipsis) {
+				if (TypeUtil.variadic(it)) {
 					OptionalityValue.VARIADIC
 				} else if (it.optional) {
 					OptionalityValue.OPTIONAL
@@ -128,12 +119,9 @@ class EffectiveOverloadingSetUtil {
 
 			// 5.5. If X is declared to be variadic, then:
 			// TODO TypeUtil.variadic should support polymorphic dispatch or Callable
-			// TODO is this switch complete?
 			val variadic = switch (x) {
 				Operation: TypeUtil.variadic(x)
 				CallbackFunction: TypeUtil.variadic(x)
-				ExtendedAttributeArgList: TypeUtil.variadic(x)
-				ExtendedAttributeNamedArgList: TypeUtil.variadic(x)
 				Constructor: TypeUtil.variadic(x)
 			};
 			if (/*n > 0 && */variadic) {
@@ -143,7 +131,6 @@ class EffectiveOverloadingSetUtil {
 				s.add(new EffectiveOverloadingSetEntry(x, t_1, o_1));
 
 				// 5.5.2. For every integer i, such that n ≤ i ≤ m−1:
-//				for (i : n ..< m as int) {
 				for (var i = n; i <= m - 1; i++) {
 					// 5.5.2.1. Let u0..i be a list of types, where uj = tj (for j < n) and uj = tn−1 (for j ≥ n).
 					// 5.5.2.2. Let p0..i be a list of optionality values, where pj = oj (for j < n) and pj = "variadic" (for j ≥ n).
@@ -158,12 +145,6 @@ class EffectiveOverloadingSetUtil {
 							p.add(OptionalityValue.VARIADIC);
 						}
 					}
-//					u.addAll(t);
-//					p.addAll(o);
-//					for (j : n ..< i+1) {
-//						u.add(t.get(n - 1));
-//						p.add(OptionalityValue.VARIADIC);
-//					}
 					// 5.5.2.3. Add to S the tuple <X, u0..i, p0..i>.
 					s.add(new EffectiveOverloadingSetEntry(x, u, p));
 				}
