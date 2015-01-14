@@ -18,28 +18,33 @@
  */
 package com.rainerschuster.webidl.generator
 
+import com.google.common.collect.ArrayListMultimap
+import com.google.common.collect.ListMultimap
 import com.google.inject.Inject
 import com.rainerschuster.webidl.webIDL.Argument
 import com.rainerschuster.webidl.webIDL.Attribute
 import com.rainerschuster.webidl.webIDL.CallbackFunction
 import com.rainerschuster.webidl.webIDL.Const
+import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeList
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
+import com.rainerschuster.webidl.webIDL.ImplementsStatement
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.InterfaceMember
 import com.rainerschuster.webidl.webIDL.Operation
+import com.rainerschuster.webidl.webIDL.PartialDictionary
+import com.rainerschuster.webidl.webIDL.PartialInterface
 import com.rainerschuster.webidl.webIDL.Special
+import com.rainerschuster.webidl.webIDL.impl.InterfaceImpl
+import java.util.List
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.generator.IFileSystemAccess
 import org.eclipse.xtext.generator.IGenerator
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 
 import static extension com.rainerschuster.webidl.util.NameUtil.*
 import static extension com.rainerschuster.webidl.util.TypeUtil.*
-import com.rainerschuster.webidl.webIDL.ImplementsStatement
-import com.google.common.collect.ArrayListMultimap
-import com.google.common.collect.ListMultimap
-import java.util.List
 
 /**
  * Generates code from your model files on save.
@@ -51,11 +56,21 @@ class WebIDLGenerator implements IGenerator {
 	@Inject extension IQualifiedNameProvider
 
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
+		// Prepare helper structures
 		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
+		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
+		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
 		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
 			val ifaceB = e.ifaceB.resolveDefinition as Interface;
 			implementsMap.put(e.ifaceA, ifaceB);
 		};
+		for (e : resource.allContents.toIterable.filter(typeof(PartialInterface))) {
+			partialInterfaceMap.put(e.interfaceName, e);
+		};
+		for (e : resource.allContents.toIterable.filter(typeof(PartialDictionary))) {
+			partialDictionaryMap.put(e.dictionaryName, e);
+		};
+		// Process Interfaces
 		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
 			val allImplements = newArrayList();
 			if (e.inherits != null) {
@@ -65,8 +80,18 @@ class WebIDLGenerator implements IGenerator {
 			if (implementsMap.containsKey(e)) {
 				allImplements.addAll(implementsMap.get(e));
 			}
+//			val clone = EcoreUtil.copy(e);
+			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
+			myInterface.callback = e.callback;
+			myInterface.name = e.name;
+			myInterface.inherits = e.inherits;
+			myInterface.getInterfaceMembers(); // Call to create list
+			e.interfaceMembers.forEach[
+				myInterface.interfaceMembers.add(it);
+			];
 			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(allImplements));
 		};
+		// Process Callback Functions
 		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
 			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
 		};
