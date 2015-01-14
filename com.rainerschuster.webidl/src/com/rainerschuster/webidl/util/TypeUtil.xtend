@@ -66,6 +66,8 @@ import com.rainerschuster.webidl.webIDL.PartialInterface
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeArgList
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeNamedArgList
 import com.rainerschuster.webidl.webIDL.NullableTypeSuffix
+import com.rainerschuster.webidl.webIDL.InterfaceOrTypedef
+import com.rainerschuster.webidl.webIDL.DictionaryOrTypedef
 
 class TypeUtil {
 
@@ -135,6 +137,20 @@ class TypeUtil {
 		} else {
 			println('Typedef resolves to a reference type that does not reference a typedef!');
 			return null;
+		}
+	}
+
+	static def Definition resolveDefinition(InterfaceOrTypedef iot) {
+		switch (iot) {
+			Interface: iot
+			Typedef: iot.resolveDefinition
+		}
+	}
+
+	static def Definition resolveDefinition(DictionaryOrTypedef dot) {
+		switch (dot) {
+			Dictionary: dot
+			Typedef: dot.resolveDefinition
 		}
 	}
 

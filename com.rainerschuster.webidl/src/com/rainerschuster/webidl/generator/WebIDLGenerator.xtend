@@ -38,7 +38,6 @@ import static extension com.rainerschuster.webidl.util.NameUtil.*
 import static extension com.rainerschuster.webidl.util.TypeUtil.*
 import com.rainerschuster.webidl.webIDL.ImplementsStatement
 import com.google.common.collect.ArrayListMultimap
-import com.rainerschuster.webidl.webIDL.Typedef
 import com.google.common.collect.ListMultimap
 import java.util.List
 
@@ -54,42 +53,32 @@ class WebIDLGenerator implements IGenerator {
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
 		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
-			// TODO resolveInterfaceOrTypedef
-			val ifaceB = switch (e.ifaceB) {
-				Interface: e.ifaceB as Interface
-				Typedef: resolveDefinition(e.ifaceB as Typedef) as Interface
-			};
+			val ifaceB = e.ifaceB.resolveDefinition as Interface;
 			implementsMap.put(e.ifaceA, ifaceB);
 		};
 		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
-			val allExtends = newArrayList();
+			val allImplements = newArrayList();
 			if (e.inherits != null) {
-				// TODO resolveInterfaceOrTypedef
-				val inherits = switch (e.inherits) {
-					Interface: e.inherits as Interface
-					Typedef: resolveDefinition(e.inherits as Typedef) as Interface
-				};
-				allExtends.add(inherits);
+				val inherits = e.inherits.resolveDefinition as Interface;
+				allImplements.add(inherits);
 			}
 			if (implementsMap.containsKey(e)) {
-				allExtends.addAll(implementsMap.get(e));
+				allImplements.addAll(implementsMap.get(e));
 			}
-			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(allExtends));
+			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(allImplements));
 		};
 		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
 			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
 		};
 	}
 
-	// TODO consider eCrossReferences for implementsStatements!
-
-	def binding(Interface iface, List<Interface> allExtends) '''
+	def binding(Interface iface, List<Interface> allImplements) '''
 		«IF iface.eContainer.fullyQualifiedName != null»
 			package «iface.eContainer.fullyQualifiedName»;
 
 		«ENDIF»
 
-		public interface «iface.name»«IF !allExtends.nullOrEmpty» extends «FOR i : allExtends SEPARATOR ', '»«i.fullyQualifiedName»«ENDFOR»«ENDIF» {
+		public interface «iface.name»«IF !allImplements.nullOrEmpty» extends «FOR i : allImplements SEPARATOR ', '»«i.fullyQualifiedName»«ENDFOR»«ENDIF» {
 		«FOR i : iface.interfaceMembers SEPARATOR '\n'»
 			«binding(i)»
 		«ENDFOR»
