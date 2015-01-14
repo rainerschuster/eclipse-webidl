@@ -86,12 +86,22 @@ class WebIDLGenerator implements IGenerator {
 			myInterface.name = e.name;
 			myInterface.inherits = e.inherits;
 			myInterface.getInterfaceMembers(); // Call to create list
+			// TODO Overloaded operations / constructors
 			e.interfaceMembers.forEach[
 				myInterface.interfaceMembers.add(it);
 			];
+			if (partialInterfaceMap.containsKey(e)) {
+				for (pi : partialInterfaceMap.get(e)) {
+					pi.interfaceMembers.forEach[
+						myInterface.interfaceMembers.add(it);
+					];
+				}
+				// TODO Interfaces with [NoInterfaceObject]?
+			}
 			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(allImplements));
 		};
 		// Process Callback Functions
+		// TODO Overloaded Callback Functions
 		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
 			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
 		};
