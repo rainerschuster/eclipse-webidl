@@ -56,51 +56,53 @@ class WebIDLGenerator implements IGenerator {
 	@Inject extension IQualifiedNameProvider
 
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		// Prepare helper structures
-		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
-		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
-		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
-		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
-			val ifaceB = e.ifaceB.resolveDefinition as Interface;
-			implementsMap.put(e.ifaceA, ifaceB);
-		};
-		for (e : resource.allContents.toIterable.filter(typeof(PartialInterface))) {
-			partialInterfaceMap.put(e.interfaceName, e);
-		};
-		for (e : resource.allContents.toIterable.filter(typeof(PartialDictionary))) {
-			partialDictionaryMap.put(e.dictionaryName, e);
-		};
-		// Process Interfaces
-		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
-			val allImplements = newArrayList();
-			if (e.inherits != null) {
-				val inherits = e.inherits.resolveDefinition as Interface;
-				allImplements.add(inherits);
-			}
-			if (implementsMap.containsKey(e)) {
-				allImplements.addAll(implementsMap.get(e));
-			}
-//			val clone = EcoreUtil.copy(e);
-			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
-			myInterface.callback = e.callback;
-			myInterface.name = e.name;
-			myInterface.inherits = e.inherits;
-			myInterface.getInterfaceMembers(); // Call to create list
-			// TODO Overloaded operations / constructors
+//		// Prepare helper structures
+//		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
+//		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
+//		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
+//		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
+//			val ifaceB = e.ifaceB.resolveDefinition as Interface;
+//			implementsMap.put(e.ifaceA, ifaceB);
+//		};
+//		for (e : resource.allContents.toIterable.filter(typeof(PartialInterface))) {
+//			partialInterfaceMap.put(e.interfaceName, e);
+//		};
+//		for (e : resource.allContents.toIterable.filter(typeof(PartialDictionary))) {
+//			partialDictionaryMap.put(e.dictionaryName, e);
+//		};
+//		// Process Interfaces
+//		val interfaces = resource.allContents.toIterable.filter(typeof(Interface)).toList;
+//		for (e : interfaces) {
+//			val allImplements = newArrayList();
+//			if (e.inherits != null) {
+//				val inherits = e.inherits.resolveDefinition as Interface;
+//				allImplements.add(inherits);
+//			}
+//			if (implementsMap.containsKey(e)) {
+//				allImplements.addAll(implementsMap.get(e));
+//			}
+////			val myInterface = EcoreUtil.copy(e);
+//			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
+//			myInterface.callback = e.callback;
+//			myInterface.name = e.name;
+//			myInterface.inherits = e.inherits;
+////			myInterface.getInterfaceMembers(); // Call to create list
+////			myInterface.getInterfaceMembers().clear();
+//			// TODO Overloaded operations / constructors
 //			myInterface.interfaceMembers.addAll(e.interfaceMembers);
-			if (partialInterfaceMap.containsKey(e)) {
-				for (pi : partialInterfaceMap.get(e)) {
+//			if (partialInterfaceMap.containsKey(e)) {
+//				for (pi : partialInterfaceMap.get(e)) {
 //					myInterface.interfaceMembers.addAll(pi.interfaceMembers);
-				}
-				// TODO Interfaces with [NoInterfaceObject]?
-			}
-			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(allImplements));
-		};
-		// Process Callback Functions
-		// TODO Overloaded Callback Functions
-		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
-			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
-		};
+//				}
+//			}
+//			// TODO Interfaces with [NoInterfaceObject]?
+//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", myInterface.binding(allImplements));
+//		};
+//		// Process Callback Functions
+//		// TODO Overloaded Callback Functions
+//		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
+//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
+//		};
 	}
 
 	def binding(Interface iface, List<Interface> allImplements) '''
