@@ -87,14 +87,10 @@ class WebIDLGenerator implements IGenerator {
 			myInterface.inherits = e.inherits;
 			myInterface.getInterfaceMembers(); // Call to create list
 			// TODO Overloaded operations / constructors
-			e.interfaceMembers.forEach[
-				myInterface.interfaceMembers.add(it);
-			];
+//			myInterface.interfaceMembers.addAll(e.interfaceMembers);
 			if (partialInterfaceMap.containsKey(e)) {
 				for (pi : partialInterfaceMap.get(e)) {
-					pi.interfaceMembers.forEach[
-						myInterface.interfaceMembers.add(it);
-					];
+//					myInterface.interfaceMembers.addAll(pi.interfaceMembers);
 				}
 				// TODO Interfaces with [NoInterfaceObject]?
 			}
