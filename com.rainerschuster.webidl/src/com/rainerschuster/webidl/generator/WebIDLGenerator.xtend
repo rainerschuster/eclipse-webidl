@@ -43,8 +43,17 @@ import org.eclipse.xtext.generator.IFileSystemAccess
 import org.eclipse.xtext.generator.IGenerator
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 
+import static extension com.rainerschuster.webidl.util.EffectiveOverloadingSetUtil.*
 import static extension com.rainerschuster.webidl.util.NameUtil.*
 import static extension com.rainerschuster.webidl.util.TypeUtil.*
+import com.rainerschuster.webidl.util.EffectiveOverloadingSetEntry
+import com.rainerschuster.webidl.util.OptionalityValue
+import com.rainerschuster.webidl.webIDL.Type
+import com.rainerschuster.webidl.webIDL.Callable
+import com.rainerschuster.webidl.webIDL.impl.OperationImpl
+import com.rainerschuster.webidl.webIDL.impl.ArgumentImpl
+import com.google.common.collect.ImmutableList
+import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 
 /**
  * Generates code from your model files on save.
@@ -53,61 +62,126 @@ import static extension com.rainerschuster.webidl.util.TypeUtil.*
  */
 class WebIDLGenerator implements IGenerator {
 
+	@Inject extension JvmTypesBuilder
+
 	@Inject extension IQualifiedNameProvider
 
+	private val Object lock = new Object();
+
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-//		// Prepare helper structures
-//		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
-//		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
-//		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
-//		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
-//			val ifaceB = e.ifaceB.resolveDefinition as Interface;
-//			implementsMap.put(e.ifaceA, ifaceB);
-//		};
-//		for (e : resource.allContents.toIterable.filter(typeof(PartialInterface))) {
-//			partialInterfaceMap.put(e.interfaceName, e);
-//		};
-//		for (e : resource.allContents.toIterable.filter(typeof(PartialDictionary))) {
-//			partialDictionaryMap.put(e.dictionaryName, e);
-//		};
-//		// Process Interfaces
-//		val interfaces = resource.allContents.toIterable.filter(typeof(Interface)).toList;
-//		for (e : interfaces) {
-//			val allImplements = newArrayList();
-//			if (e.inherits != null) {
-//				val inherits = e.inherits.resolveDefinition as Interface;
-//				allImplements.add(inherits);
-//			}
-//			if (implementsMap.containsKey(e)) {
-//				allImplements.addAll(implementsMap.get(e));
-//			}
-////			val myInterface = EcoreUtil.copy(e);
-//			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
-//			myInterface.callback = e.callback;
-//			myInterface.name = e.name;
-//			myInterface.inherits = e.inherits;
-////			myInterface.getInterfaceMembers(); // Call to create list
-////			myInterface.getInterfaceMembers().clear();
-//			// TODO Overloaded operations / constructors
-//			myInterface.interfaceMembers.addAll(e.interfaceMembers);
-//			if (partialInterfaceMap.containsKey(e)) {
-//				for (pi : partialInterfaceMap.get(e)) {
-//					myInterface.interfaceMembers.addAll(pi.interfaceMembers);
-//				}
-//			}
-//			// TODO Interfaces with [NoInterfaceObject]?
-//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", myInterface.binding(allImplements));
-//		};
-//		// Process Callback Functions
-//		// TODO Overloaded Callback Functions
-//		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
-//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding);
-//		};
+		synchronized (lock) {
+		// Prepare helper structures
+		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
+		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
+		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
+		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
+			val ifaceB = e.ifaceB.resolveDefinition as Interface;
+			implementsMap.put(e.ifaceA, ifaceB);
+		}
+		for (e : resource.allContents.toIterable.filter(typeof(PartialInterface))) {
+			partialInterfaceMap.put(e.interfaceName, e);
+		}
+		for (e : resource.allContents.toIterable.filter(typeof(PartialDictionary))) {
+			partialDictionaryMap.put(e.dictionaryName, e);
+		}
+		// Process Interfaces
+		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
+			val allImplements = newArrayList();
+			if (e.inherits != null) {
+				val inherits = e.inherits.resolveDefinition as Interface;
+				allImplements += inherits/*.cloneWithProxies*/;
+			}
+			if (implementsMap.containsKey(e)) {
+				allImplements += implementsMap.get(e)/*.map[cloneWithProxies]*/;
+			}
+//			val myInterface = EcoreUtil.copy(e);
+			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
+			myInterface.callback = e.callback;
+			myInterface.name = e.name;
+			myInterface.inherits = e.inherits;
+//			myInterface.getInterfaceMembers().clear();
+			// TODO Overloaded operations / constructors
+//			myInterface.interfaceMembers += e.interfaceMembers;
+					for (extendedMember : e.interfaceMembers) {
+						val member = extendedMember.interfaceMember;
+						if (member instanceof Operation) {
+							val overload = if (member.staticOperation) {
+								computeForStaticOperation(e, member.name, 0)
+							} else {
+								computeForRegularOperation(e, member.name, 0)
+							}
+							for (entry : overload) {
+								val mappedMember = member.mapOperation(entry);
+								val myExtendedMember = EcoreUtil.copy(extendedMember);
+								extendedMember.interfaceMember = mappedMember;
+								myInterface.interfaceMembers += myExtendedMember;
+							}
+						} else {
+							val mappedMember = member;
+							val myExtendedMember = EcoreUtil.copy(extendedMember);
+							extendedMember.interfaceMember = mappedMember;
+							myInterface.interfaceMembers += myExtendedMember;
+						}
+					}
+
+
+			if (partialInterfaceMap.containsKey(e)) {
+				for (pi : partialInterfaceMap.get(e)) {
+					for (member : pi.interfaceMembers) {
+//						if (member instanceof Operation) {
+//							val overload = if (member.staticOperation) {
+//								computeForStaticOperation(pi, member.name, 0)
+//							} else {
+//								computeForRegularOperation(pi, member.name, 0)
+//							}
+//							val mappedMember = member.mapOperation(overload);
+//							myInterface.interfaceMembers += mappedMember;
+//						} else {
+							myInterface.interfaceMembers += member;
+//						}
+					}
+//					myInterface.interfaceMembers += pi.interfaceMembers;
+				}
+			}
+			// TODO Interfaces with [NoInterfaceObject]?
+			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", myInterface.binding(e, allImplements));
+		}
+		// Process Callback Functions
+		// TODO Overloaded Callback Functions
+		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
+			val effectiveOverloadingSet = e.computeForCallbackFunction(0);
+			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(effectiveOverloadingSet));
+		}
+		}
 	}
 
-	def binding(Interface iface, List<Interface> allImplements) '''
-		«IF iface.eContainer.fullyQualifiedName != null»
-			package «iface.eContainer.fullyQualifiedName»;
+	private def Operation mapOperation(Operation original, EffectiveOverloadingSetEntry<Operation> entry) {
+//		val myOperation = EcoreUtil.copy(original);
+		val myOperation = EcoreUtil.create(original.eClass()) as OperationImpl;
+		myOperation.static = original.static;
+		myOperation.specials += original.specials;
+		myOperation.name = original.name;
+		for (Pair<Argument, Pair<Type, OptionalityValue>> i : entry.mapArguments(original.arguments)) {
+			val originalArgument = i.key;
+			val type = i.value.key;
+			val optionalityValue = i.value.value;
+//			val myArgument = EcoreUtil.copy(originalArgument);
+			val myArgument = EcoreUtil.create(originalArgument.eClass()) as ArgumentImpl;
+			myArgument.eal = originalArgument.eal;
+			myArgument.defaultValue = originalArgument.defaultValue;
+			myArgument.optional = originalArgument.optional;
+			myArgument.type = type;
+			myArgument.name = originalArgument.name;
+			myArgument.optional = optionalityValue == OptionalityValue.OPTIONAL;
+			myArgument.ellipsis = optionalityValue == OptionalityValue.VARIADIC;
+			myOperation.arguments += myArgument;
+		}
+		return myOperation;
+	}
+
+	def binding(Interface iface, Interface original, List<Interface> allImplements) '''
+		«IF original.eContainer.fullyQualifiedName != null»
+			package «original.eContainer.fullyQualifiedName»;
 
 		«ENDIF»
 
@@ -118,16 +192,29 @@ class WebIDLGenerator implements IGenerator {
 		}
 	'''
 
-	def binding(CallbackFunction callback) '''
+	def binding(CallbackFunction callback, List<EffectiveOverloadingSetEntry<CallbackFunction>> effectiveOverloadingSet) '''
 		«IF callback.eContainer.fullyQualifiedName != null»
 			package «callback.eContainer.fullyQualifiedName»;
 
 		«ENDIF»
 
 		public interface «callback.name» {
-			«callback.type.toJavaType» call(«FOR i : callback.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»);
+		«FOR entry : effectiveOverloadingSet SEPARATOR '\n'»
+			«entry.callable.type.toJavaType» call(«FOR i : entry.mapArguments(callback.arguments) SEPARATOR ', '»«binding(i.key, i.value)»«ENDFOR»);
+		«ENDFOR»
+«««			«callback.type.toJavaType» call(«FOR i : callback.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»);
 		}
 	'''
+
+	private def <T extends Callable> mapArguments(EffectiveOverloadingSetEntry<T> entry, List<Argument> arguments) {
+		// FIXME is this Math.min really necessary?
+		(0 ..< Math.min(arguments.size, entry.typeList.size())).map[
+			arguments.get(it) -> 
+				(entry.typeList.get(it) 
+					-> entry.optionalityList.get(it)
+				)
+		]
+	}
 
 	def binding(ExtendedInterfaceMember member) {
 		bindingInterfaceMember(member.eal, member.interfaceMember)
@@ -161,5 +248,7 @@ class WebIDLGenerator implements IGenerator {
 
 	def binding(Argument parameter) '''
 		«parameter.type.toJavaType»«IF parameter.ellipsis»...«ENDIF» «parameter.name.getEscapedJavaName»'''
+	def binding(Argument parameter, Pair<Type, OptionalityValue> o) '''
+		«parameter.type.toJavaType»«IF o.value == OptionalityValue.VARIADIC»...«ENDIF» «parameter.name.getEscapedJavaName»'''
 
 }

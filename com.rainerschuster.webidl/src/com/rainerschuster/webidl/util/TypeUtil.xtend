@@ -95,7 +95,7 @@ class TypeUtil {
 				// TODO throw exception!
 				return null;
 			} else {
-				result.add(currentInterface);
+				result += currentInterface;
 			}
 			currentInherit = currentInterface.inherits;
 		}
@@ -383,12 +383,12 @@ class TypeUtil {
 		// FIXME eCrossReferences does not work!
 		val references = iface.eCrossReferences;
 		val bs = references.filter(typeof(ImplementsStatement)).filter[it.ifaceA == iface].map[it.ifaceB].filter(typeof(Interface)).filter[!result.contains(it)];
-		result.addAll(bs);
-		newInterfaces.addAll(bs);
+		result += bs;
+		newInterfaces += bs;
 		// each interface that a consequential interface of A inherits from
 		val inherit = bs.map[it.inherits].filter(typeof(Interface)).filter[!result.contains(it)];
-		result.addAll(inherit);
-		newInterfaces.addAll(inherit);
+		result += inherit;
+		newInterfaces += inherit;
 		// each interface D where the IDL states that C implements D, where C is a consequential interface of A
 		newInterfaces.forEach[
 			it.consequentialInterfaces(result)
@@ -421,9 +421,9 @@ class TypeUtil {
 		val Set<Type> s = newLinkedHashSet();
 		for (u : unionType.unionMemberTypes) {
 			if (u instanceof UnionType) {
-				s.addAll(flattenedMemberTypes(u));
+				s += flattenedMemberTypes(u);
 			} else {
-				s.add(u);
+				s += u;
 			}
 		}
 		return s;

@@ -115,7 +115,7 @@ class EffectiveOverloadingSetUtil {
 			].toList();
 
 			// 5.4. Add to S the tuple <X, t0..n−1, o0..n−1>.
-			s.add(new EffectiveOverloadingSetEntry(x, t, o));
+			s += new EffectiveOverloadingSetEntry(x, t, o);
 
 			// 5.5. If X is declared to be variadic, then:
 			// TODO TypeUtil.variadic should support polymorphic dispatch or Callable
@@ -128,7 +128,7 @@ class EffectiveOverloadingSetUtil {
 				// 5.5.1. Add to S the tuple <X, t0..n−2, o0..n−2>.
 				val t_1 = t.subList(0, n - 1);
 				val o_1 = o.subList(0, n - 1);
-				s.add(new EffectiveOverloadingSetEntry(x, t_1, o_1));
+				s += new EffectiveOverloadingSetEntry(x, t_1, o_1);
 
 				// 5.5.2. For every integer i, such that n ≤ i ≤ m−1:
 				for (var i = n; i <= m - 1; i++) {
@@ -138,15 +138,15 @@ class EffectiveOverloadingSetUtil {
 					val p = new ArrayList<OptionalityValue>(i + 1);
 					for (var j = 0; j <= i; j++) {
 						if (j < n) {
-							u.add(t.get(j));
-							p.add(o.get(j));
+							u += t.get(j);
+							p += o.get(j);
 						} else {
-							u.add(t.get(n - 1));
-							p.add(OptionalityValue.VARIADIC);
+							u +=t.get(n - 1);
+							p +=OptionalityValue.VARIADIC;
 						}
 					}
 					// 5.5.2.3. Add to S the tuple <X, u0..i, p0..i>.
-					s.add(new EffectiveOverloadingSetEntry(x, u, p));
+					s += new EffectiveOverloadingSetEntry(x, u, p);
 				}
 			}
 
@@ -165,7 +165,7 @@ class EffectiveOverloadingSetUtil {
 					// 5.7.2. Otherwise, add to S the tuple <X, t0..i−1, o0..i−1>.
 					val t_i = t.subList(0, i);
 					val o_i = o.subList(0, i);
-					s.add(new EffectiveOverloadingSetEntry(x, t_i, o_i));
+					s += new EffectiveOverloadingSetEntry(x, t_i, o_i);
 					// 5.7.3. Set i to i−1.
 					i = i - 1;
 				}
@@ -173,7 +173,7 @@ class EffectiveOverloadingSetUtil {
 
 			// 5.8 If n > 0 and all arguments of X are optional, then add to S the tuple <X, (), ()> (where "()" represents the empty list).
 			if (n > 0 && argumentsOfX.forall[it.optional]) {
-				s.add(new EffectiveOverloadingSetEntry(x, #[], #[]));
+				s += new EffectiveOverloadingSetEntry(x, #[], #[]);
 			}
 		}
 

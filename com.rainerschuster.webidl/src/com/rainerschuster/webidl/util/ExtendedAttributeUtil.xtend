@@ -240,13 +240,13 @@ class ExtendedAttributeUtil {
 		if (containsNamedConstructor(list)) {
 			// FIXME .filterNull.toList is a bad workaround to omit NPEs after failed parsing
 			val namedConstructors = getNamedConstructorValuesUnchecked(list).filterNull;
-			result.addAll(namedConstructors);
+			result += namedConstructors;
 		}
 
 		if (containsConstructor(list)) {
 			// FIXME .filterNull.toList is a bad workaround to omit NPEs after failed parsing
 			val constructors = getConstructorValuesUnchecked(list).filterNull;
-			result.addAll(constructors);
+			result += constructors;
 		}
 
 		return result;
