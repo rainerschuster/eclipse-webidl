@@ -54,6 +54,8 @@ import com.rainerschuster.webidl.webIDL.impl.OperationImpl
 import com.rainerschuster.webidl.webIDL.impl.ArgumentImpl
 import com.google.common.collect.ImmutableList
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
+import org.eclipse.xtext.EcoreUtil2
+import java.util.Set
 
 /**
  * Generates code from your model files on save.
@@ -66,10 +68,9 @@ class WebIDLGenerator implements IGenerator {
 
 	@Inject extension IQualifiedNameProvider
 
-	private val Object lock = new Object();
+//	private val Object lock = new Object();
 
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		synchronized (lock) {
 		// Prepare helper structures
 		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
 		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
@@ -86,40 +87,44 @@ class WebIDLGenerator implements IGenerator {
 		}
 		// Process Interfaces
 		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
+			val Set<String> processedOperations = newLinkedHashSet();
 			val allImplements = newArrayList();
 			if (e.inherits != null) {
 				val inherits = e.inherits.resolveDefinition as Interface;
-				allImplements += inherits/*.cloneWithProxies*/;
+				allImplements += EcoreUtil2.cloneWithProxies(inherits);
 			}
 			if (implementsMap.containsKey(e)) {
-				allImplements += implementsMap.get(e)/*.map[cloneWithProxies]*/;
+				allImplements += implementsMap.get(e).map[EcoreUtil2.cloneWithProxies(it)];
 			}
 //			val myInterface = EcoreUtil.copy(e);
 			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
 			myInterface.callback = e.callback;
 			myInterface.name = e.name;
-			myInterface.inherits = e.inherits;
+			myInterface.inherits = EcoreUtil2.cloneWithProxies(e.inherits);
 //			myInterface.getInterfaceMembers().clear();
 			// TODO Overloaded operations / constructors
 //			myInterface.interfaceMembers += e.interfaceMembers;
 					for (extendedMember : e.interfaceMembers) {
 						val member = extendedMember.interfaceMember;
 						if (member instanceof Operation) {
-							val overload = if (member.staticOperation) {
-								computeForStaticOperation(e, member.name, 0)
-							} else {
-								computeForRegularOperation(e, member.name, 0)
-							}
-							for (entry : overload) {
-								val mappedMember = member.mapOperation(entry);
-								val myExtendedMember = EcoreUtil.copy(extendedMember);
-								extendedMember.interfaceMember = mappedMember;
-								myInterface.interfaceMembers += myExtendedMember;
+							if (!processedOperations.contains(member.name)) {
+								val overload = if (member.staticOperation) {
+									computeForStaticOperation(e, member.name, 0)
+								} else {
+									computeForRegularOperation(e, member.name, 0)
+								}
+								for (entry : overload) {
+									val mappedMember = member.mapOperation(entry);
+									val myExtendedMember = EcoreUtil2.cloneWithProxies(extendedMember);
+									myExtendedMember.interfaceMember = mappedMember;
+									myInterface.interfaceMembers += myExtendedMember;
+								}
+								processedOperations += member.name;
 							}
 						} else {
 							val mappedMember = member;
-							val myExtendedMember = EcoreUtil.copy(extendedMember);
-							extendedMember.interfaceMember = mappedMember;
+							val myExtendedMember = EcoreUtil2.cloneWithProxies(extendedMember);
+							myExtendedMember.interfaceMember = mappedMember;
 							myInterface.interfaceMembers += myExtendedMember;
 						}
 					}
@@ -137,7 +142,7 @@ class WebIDLGenerator implements IGenerator {
 //							val mappedMember = member.mapOperation(overload);
 //							myInterface.interfaceMembers += mappedMember;
 //						} else {
-							myInterface.interfaceMembers += member;
+							myInterface.interfaceMembers += EcoreUtil2.cloneWithProxies(member);
 //						}
 					}
 //					myInterface.interfaceMembers += pi.interfaceMembers;
@@ -152,26 +157,27 @@ class WebIDLGenerator implements IGenerator {
 			val effectiveOverloadingSet = e.computeForCallbackFunction(0);
 			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(effectiveOverloadingSet));
 		}
-		}
 	}
 
 	private def Operation mapOperation(Operation original, EffectiveOverloadingSetEntry<Operation> entry) {
 //		val myOperation = EcoreUtil.copy(original);
 		val myOperation = EcoreUtil.create(original.eClass()) as OperationImpl;
 		myOperation.static = original.static;
-		myOperation.specials += original.specials;
+		myOperation.specials += original.specials; // FIXME Clone specials?
 		myOperation.name = original.name;
+		myOperation.type = EcoreUtil2.cloneWithProxies(original.type);
 		for (Pair<Argument, Pair<Type, OptionalityValue>> i : entry.mapArguments(original.arguments)) {
 			val originalArgument = i.key;
 			val type = i.value.key;
 			val optionalityValue = i.value.value;
-//			val myArgument = EcoreUtil.copy(originalArgument);
-			val myArgument = EcoreUtil.create(originalArgument.eClass()) as ArgumentImpl;
-			myArgument.eal = originalArgument.eal;
-			myArgument.defaultValue = originalArgument.defaultValue;
-			myArgument.optional = originalArgument.optional;
-			myArgument.type = type;
-			myArgument.name = originalArgument.name;
+			val myArgument = EcoreUtil2.cloneWithProxies(originalArgument);
+////			val myArgument = EcoreUtil.copy(originalArgument);
+//			val myArgument = EcoreUtil.create(originalArgument.eClass()) as ArgumentImpl;
+//			myArgument.eal = originalArgument.eal;
+//			myArgument.defaultValue = originalArgument.defaultValue;
+//			myArgument.optional = originalArgument.optional;
+//			myArgument.type = type;
+//			myArgument.name = originalArgument.name;
 			myArgument.optional = optionalityValue == OptionalityValue.OPTIONAL;
 			myArgument.ellipsis = optionalityValue == OptionalityValue.VARIADIC;
 			myOperation.arguments += myArgument;
@@ -211,8 +217,7 @@ class WebIDLGenerator implements IGenerator {
 		(0 ..< Math.min(arguments.size, entry.typeList.size())).map[
 			arguments.get(it) -> 
 				(entry.typeList.get(it) 
-					-> entry.optionalityList.get(it)
-				)
+					-> entry.optionalityList.get(it))
 		]
 	}
 
