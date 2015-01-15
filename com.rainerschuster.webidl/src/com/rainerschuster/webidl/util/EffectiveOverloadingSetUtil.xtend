@@ -23,6 +23,9 @@ import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.Callable
 import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.ExtendedDefinition
+import org.eclipse.xtext.EcoreUtil2
+import static extension com.rainerschuster.webidl.util.NameUtil.*
+import java.util.Collection
 
 class EffectiveOverloadingSetUtil {
 	// TODO OperationUtil: regularOperation, staticOperation, variadicOperation
@@ -64,6 +67,24 @@ class EffectiveOverloadingSetUtil {
 		return compute(f, argumentCount);
 	}
 
+	private def static <T extends Callable> boolean containsEntry(Iterable<EffectiveOverloadingSetEntry<T>> iterable, EffectiveOverloadingSetEntry<T> entry) {
+		for (e : iterable) {
+			if (equalsEntries(e, entry)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	private def static <T extends Callable> boolean equalsEntries(EffectiveOverloadingSetEntry<T> entryA, EffectiveOverloadingSetEntry<T> entryB) {
+		// FIXME what about callable?
+		if (entryA.typeList.size != entryB.typeList.size || entryA.optionalityList.size != entryB.optionalityList.size) {
+			return false;
+		}
+		val checkTypeLists = (0..<entryA.typeList.size).forall[entryA.typeList.get(it).typeName == entryB.typeList.get(it).typeName];
+		val checkOptionalityLists = (0..<entryA.optionalityList.size).forall[entryA.optionalityList.get(it) == entryB.optionalityList.get(it)];
+		return checkTypeLists && checkOptionalityLists;
+	}
+
 	def static <T extends Callable> List<EffectiveOverloadingSetEntry<T>> compute(Iterable<T> f, long argumentCount) {
 		// TODO Add a check that argumentCount is not greater than the number of available arguments!
 		// Note that S is a set in the specification!
@@ -101,6 +122,7 @@ class EffectiveOverloadingSetUtil {
 			val n = argumentsOfX.size();
 
 			// 5.2. Let t0..n−1 be a list of types, where ti is the type of X's argument at index i.
+			// FIXME Check if EcoreUtil2.cloneWithProxies(it.type) is necessary here!
 			val t = argumentsOfX.map[it.type].toList();
 
 			// 5.3. Let o0..n−1 be a list of optionality values, where oi is "variadic" if X's argument at index i is a final, variadic argument, "optional" if the argument is optional, and "required" otherwise.
@@ -115,7 +137,10 @@ class EffectiveOverloadingSetUtil {
 			].toList();
 
 			// 5.4. Add to S the tuple <X, t0..n−1, o0..n−1>.
-			s += new EffectiveOverloadingSetEntry(x, t, o);
+			val entry54 = new EffectiveOverloadingSetEntry(x, t, o);
+			if (!s.containsEntry(entry54)) {
+				s += entry54;
+			}
 
 			// 5.5. If X is declared to be variadic, then:
 			// TODO TypeUtil.variadic should support polymorphic dispatch or Callable
@@ -128,7 +153,10 @@ class EffectiveOverloadingSetUtil {
 				// 5.5.1. Add to S the tuple <X, t0..n−2, o0..n−2>.
 				val t_1 = t.subList(0, n - 1);
 				val o_1 = o.subList(0, n - 1);
-				s += new EffectiveOverloadingSetEntry(x, t_1, o_1);
+				val entry551 = new EffectiveOverloadingSetEntry(x, t_1, o_1);
+				if (!s.containsEntry(entry551)) {
+					s += entry551;
+				}
 
 				// 5.5.2. For every integer i, such that n ≤ i ≤ m−1:
 				for (var i = n; i <= m - 1; i++) {
@@ -146,13 +174,15 @@ class EffectiveOverloadingSetUtil {
 						}
 					}
 					// 5.5.2.3. Add to S the tuple <X, u0..i, p0..i>.
-					s += new EffectiveOverloadingSetEntry(x, u, p);
+					val entry5523 = new EffectiveOverloadingSetEntry(x, u, p);
+					if (!s.containsEntry(entry5523)) {
+						s += entry5523;
+					}
 				}
 			}
 
 			// 5.6. Initialize i to n−1.
-			// TODO Added this variadic check since entries would occur twice (both from step 5.5. and here)
-			var i = if (variadic) {n - 2} else {n - 1};
+			var i = n - 1;
 			// The variable break is a workaround since Xtend does not support break in while loops
 			var break = false;
 
@@ -165,7 +195,10 @@ class EffectiveOverloadingSetUtil {
 					// 5.7.2. Otherwise, add to S the tuple <X, t0..i−1, o0..i−1>.
 					val t_i = t.subList(0, i);
 					val o_i = o.subList(0, i);
-					s += new EffectiveOverloadingSetEntry(x, t_i, o_i);
+					val entry571 = new EffectiveOverloadingSetEntry(x, t_i, o_i);
+					if (!s.containsEntry(entry571)) {
+						s += entry571;
+					}
 					// 5.7.3. Set i to i−1.
 					i = i - 1;
 				}
@@ -173,7 +206,10 @@ class EffectiveOverloadingSetUtil {
 
 			// 5.8 If n > 0 and all arguments of X are optional, then add to S the tuple <X, (), ()> (where "()" represents the empty list).
 			if (n > 0 && argumentsOfX.forall[it.optional]) {
-				s += new EffectiveOverloadingSetEntry(x, #[], #[]);
+				val entry58 = new EffectiveOverloadingSetEntry(x, #[], #[]);
+				if (!s.containsEntry(entry58)) {
+					s += entry58;
+				}
 			}
 		}
 
