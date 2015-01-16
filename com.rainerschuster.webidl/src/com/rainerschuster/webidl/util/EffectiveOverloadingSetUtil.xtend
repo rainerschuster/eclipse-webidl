@@ -23,9 +23,7 @@ import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.Callable
 import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.ExtendedDefinition
-import org.eclipse.xtext.EcoreUtil2
 import static extension com.rainerschuster.webidl.util.NameUtil.*
-import java.util.Collection
 
 class EffectiveOverloadingSetUtil {
 	// TODO OperationUtil: regularOperation, staticOperation, variadicOperation

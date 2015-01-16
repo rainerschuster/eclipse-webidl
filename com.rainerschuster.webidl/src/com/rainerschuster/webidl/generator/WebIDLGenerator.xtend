@@ -51,8 +51,6 @@ import com.rainerschuster.webidl.util.OptionalityValue
 import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.Callable
 import com.rainerschuster.webidl.webIDL.impl.OperationImpl
-import com.rainerschuster.webidl.webIDL.impl.ArgumentImpl
-import com.google.common.collect.ImmutableList
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.EcoreUtil2
 import java.util.Set
@@ -108,13 +106,13 @@ class WebIDLGenerator implements IGenerator {
 						val member = extendedMember.interfaceMember;
 						if (member instanceof Operation) {
 							if (!processedOperations.contains(member.name)) {
-								val overload = if (member.staticOperation) {
-									computeForStaticOperation(e, member.name, 0)
+								val effectiveOverloadingSet = if (member.staticOperation) {
+									computeForStaticOperation(EcoreUtil2.cloneWithProxies(e), member.name, 0)
 								} else {
-									computeForRegularOperation(e, member.name, 0)
+									computeForRegularOperation(EcoreUtil2.cloneWithProxies(e), member.name, 0)
 								}
-								for (entry : overload) {
-									val mappedMember = member.mapOperation(entry);
+								for (entry : effectiveOverloadingSet) {
+									val mappedMember = entry.callable.mapOperation(entry);
 									val myExtendedMember = EcoreUtil2.cloneWithProxies(extendedMember);
 									myExtendedMember.interfaceMember = mappedMember;
 									myInterface.interfaceMembers += myExtendedMember;
@@ -134,12 +132,12 @@ class WebIDLGenerator implements IGenerator {
 				for (pi : partialInterfaceMap.get(e)) {
 					for (member : pi.interfaceMembers) {
 //						if (member instanceof Operation) {
-//							val overload = if (member.staticOperation) {
+//							val effectiveOverloadingSet = if (member.staticOperation) {
 //								computeForStaticOperation(pi, member.name, 0)
 //							} else {
 //								computeForRegularOperation(pi, member.name, 0)
 //							}
-//							val mappedMember = member.mapOperation(overload);
+//							val mappedMember = member.mapOperation(effectiveOverloadingSet);
 //							myInterface.interfaceMembers += mappedMember;
 //						} else {
 							myInterface.interfaceMembers += EcoreUtil2.cloneWithProxies(member);
@@ -152,7 +150,6 @@ class WebIDLGenerator implements IGenerator {
 			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", myInterface.binding(e, allImplements));
 		}
 		// Process Callback Functions
-		// TODO Overloaded Callback Functions
 		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
 			val effectiveOverloadingSet = e.computeForCallbackFunction(0);
 			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(effectiveOverloadingSet));
@@ -166,7 +163,8 @@ class WebIDLGenerator implements IGenerator {
 		myOperation.specials += original.specials; // FIXME Clone specials?
 		myOperation.name = original.name;
 		myOperation.type = EcoreUtil2.cloneWithProxies(original.type);
-		for (Pair<Argument, Pair<Type, OptionalityValue>> i : entry.mapArguments(original.arguments)) {
+		val argumentsCopy = original.arguments.map[EcoreUtil2.cloneWithProxies(it)];
+		for (Pair<Argument, Pair<Type, OptionalityValue>> i : entry.mapArguments(argumentsCopy)) {
 			val originalArgument = i.key;
 			val type = i.value.key;
 			val optionalityValue = i.value.value;
@@ -215,8 +213,8 @@ class WebIDLGenerator implements IGenerator {
 	private def <T extends Callable> mapArguments(EffectiveOverloadingSetEntry<T> entry, List<Argument> arguments) {
 		// FIXME is this Math.min really necessary?
 		(0 ..< Math.min(arguments.size, entry.typeList.size())).map[
-			arguments.get(it) -> 
-				(entry.typeList.get(it) 
+			EcoreUtil2.cloneWithProxies(arguments.get(it)) -> 
+				(EcoreUtil2.cloneWithProxies(entry.typeList.get(it)) 
 					-> entry.optionalityList.get(it))
 		]
 	}

@@ -26,5 +26,6 @@ import com.rainerschuster.webidl.webIDL.Type
 	List<Type> typeList;
 	List<OptionalityValue> optionalityList;
 
-//	override toString() '''<«callable.name», («typeList.map[NameUtil.typeName(it)].join(', ')»), («optionalityList.map[it.name.toLowerCase].join(', ')»)'''
+//	override toString() '''<«callable/*.name*/», («typeList.map[NameUtil.typeName(it)].join(', ')»), («optionalityList.map[it.name.toLowerCase].join(', ')»)'''
+
 }
