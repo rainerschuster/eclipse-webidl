@@ -66,8 +66,6 @@ class WebIDLGenerator implements IGenerator {
 
 	@Inject extension IQualifiedNameProvider
 
-//	private val Object lock = new Object();
-
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 		// Prepare helper structures
 		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
