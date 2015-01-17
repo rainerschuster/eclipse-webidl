@@ -649,10 +649,10 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 
 	// See 4.3.1. [ArrayClass]
+
 	@Check
 	def checkExtendedAttributeArrayClassInherits(Interface iface) {
-		// FIXME use inherited interfaces instead!
-		if (iface.inherits != null) {
+		if (!iface.inheritedInterfaces.empty) {
 			val containerDefinition = iface.eContainer as ExtendedDefinition;
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
 			if (extendedAttributes.containsExtendedAttribute(EA_ARRAY_CLASS)) {
@@ -666,12 +666,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	}
 
 	@Check
-	def checkExtendedAttributeArrayClassTakesNoArguments(Interface iface) {
-		val containerDefinition = iface.eContainer as ExtendedDefinition;
-		val extendedAttributes = containerDefinition.eal.extendedAttributes;
-		if (extendedAttributes.containsExtendedAttribute(EA_ARRAY_CLASS)) {
-			// TODO can there be more than one?
-			val extendedAttribute = extendedAttributes.getSingleExtendedAttribute(EA_ARRAY_CLASS);
+	def checkExtendedAttributeArrayClassTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_ARRAY_CLASS) {
 			if (!extendedAttribute.takesNoArguments()) {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
 					extendedAttribute,
@@ -679,6 +675,21 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			}
 		}
 	}
+
+	// See 4.3.2. [Clamp]
+
+	@Check
+	def checkExtendedAttributeClampTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_CLAMP) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// Relaxed checks
 
 	@Check
 	def checkPromiseTypeTypeSuffix(PromiseType type) {
