@@ -101,7 +101,7 @@ class ExtendedAttributeUtil {
 	}
 
 	def static getAllExtendedAttributes(Iterable<ExtendedAttribute> input, String name) {
-		input.filter[it.nameRef.equals(name)]
+		input.filter[it.nameRef == name]
 	}
 
 	def static boolean containsArrayClass(Iterable<ExtendedAttribute> input) {

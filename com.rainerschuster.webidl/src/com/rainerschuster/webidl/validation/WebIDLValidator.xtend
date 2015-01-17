@@ -59,6 +59,7 @@ import com.rainerschuster.webidl.webIDL.Setlike
 import com.rainerschuster.webidl.webIDL.DOMStringType
 import com.rainerschuster.webidl.webIDL.USVStringType
 import com.rainerschuster.webidl.webIDL.AnyType
+import com.rainerschuster.webidl.webIDL.ExtendedAttributeIdent
 
 /**
  * Custom validation rules. 
@@ -656,11 +657,11 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			val containerDefinition = iface.eContainer as ExtendedDefinition;
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
 			if (extendedAttributes.containsExtendedAttribute(EA_ARRAY_CLASS)) {
-				// TODO can there be more than one?
-				val extendedAttribute = extendedAttributes.getSingleExtendedAttribute(EA_ARRAY_CLASS);
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on an interface that inherits from another', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				extendedAttributes.getAllExtendedAttributes(EA_ARRAY_CLASS).forEach[
+					error('The extended attribute "' + it.nameRef + '" must not be specified on an interface that inherits from another', 
+						it,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)	
+				]
 			}
 		}
 	}
@@ -681,6 +682,272 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkExtendedAttributeClampTakesNoArguments(ExtendedAttribute extendedAttribute) {
 		if (extendedAttribute.nameRef == EA_CLAMP) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.3. [Constructor]
+
+	@Check
+	def checkExtendedAttributeConstructorTakesNoArgumentsOrTakesAnArgumentList(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_CONSTRUCTOR) {
+			if (!(extendedAttribute.takesNoArguments() || extendedAttribute.takesAnArgumentList())) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take no arguments or take an argument list', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeConstructorNotNoInterfaceObject(Interface iface) {
+		if (iface.callback) {
+			val containerDefinition = iface.eContainer as ExtendedDefinition;
+			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+			if (extendedAttributes.containsExtendedAttribute(EA_CONSTRUCTOR) && extendedAttributes.containsExtendedAttribute(EA_NO_INTERFACE_OBJECT)) {
+				extendedAttributes.getAllExtendedAttributes(EA_NO_INTERFACE_OBJECT).forEach[
+					error('If the "Constructor" extended attribute is specified on an interface, then the "NoInterfaceObject" extended attribute must not also be specified on that interface', 
+						it,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				];
+			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeConstructorNotOnCallbackInterface(Interface iface) {
+		if (iface.callback) {
+			val containerDefinition = iface.eContainer as ExtendedDefinition;
+			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+			if (extendedAttributes.containsExtendedAttribute(EA_CONSTRUCTOR)) {
+				extendedAttributes.getAllExtendedAttributes(EA_CONSTRUCTOR).forEach[
+					error('The extended attribute "' + it.nameRef + '" must not be used on a callback interface', 
+						it,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				]
+			}
+		}
+	}
+
+	// See 4.3.4. [EnforceRange]
+
+	@Check
+	def checkExtendedAttributeEnforceRangeTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_ENFORCE_RANGE) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.5. [Exposed]
+
+	@Check
+	def checkExtendedAttributeExposedTakesAnIdentifierOrTakesAnIdentifierList(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_EXPOSED) {
+			if (!(extendedAttribute.takesAnIdentifier() || extendedAttribute.takesAnIdentifierList())) {
+				error('The "' + extendedAttribute.nameRef + '" extended attribute must either take an identifier or take an identifier list', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.6. [ImplicitThis]
+
+	@Check
+	def checkExtendedAttributeImplicitThisTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_IMPLICIT_THIS) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.7. [Global] and [PrimaryGlobal]
+
+	@Check
+	def checkExtendedAttributeGlobalTakesNoArgumentsOrTakesAnIdentifierList(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_GLOBAL) {
+			if (!(extendedAttribute.takesNoArguments() || extendedAttribute.takesAnIdentifierList())) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take no arguments or take an identifier list', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributePrimaryGlobalTakesNoArgumentsOrTakesAnIdentifierList(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_PRIMARY_GLOBAL) {
+			if (!(extendedAttribute.takesNoArguments() || extendedAttribute.takesAnIdentifierList())) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take no arguments or take an identifier list', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.8. [LenientThis]
+
+	@Check
+	def checkExtendedAttributeLenientThisThisTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_LENIENT_THIS) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.9. [NamedConstructor]
+
+	@Check
+	def checkExtendedAttributeNamedConstructorTakesAnIdentifierOrTakesANamedArgumentList(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_NAMED_CONSTRUCTOR) {
+			if (!(extendedAttribute.takesAnIdentifier() || extendedAttribute.takesANamedArgumentList())) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take an identifier or take a named argument list', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeNamedConstructorNotOnCallbackInterface(Interface iface) {
+		if (iface.callback) {
+			val containerDefinition = iface.eContainer as ExtendedDefinition;
+			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+			if (extendedAttributes.containsExtendedAttribute(EA_NAMED_CONSTRUCTOR)) {
+				extendedAttributes.getAllExtendedAttributes(EA_NAMED_CONSTRUCTOR).forEach[
+					error('The extended attribute "' + it.nameRef + '" must not be used on a callback interface', 
+						it,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				]
+			}
+		}
+	}
+
+	// See 4.3.10. [NewObject]
+
+	@Check
+	def checkExtendedAttributeNewObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_NEW_OBJECT) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.11. [NoInterfaceObject]
+
+	@Check
+	def checkExtendedAttributeNoInterfaceObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_NO_INTERFACE_OBJECT) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.12. [OverrideBuiltins]
+
+	@Check
+	def checkExtendedAttributeOverrideBuiltinsTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_OVERRIDE_BUILTINS) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.13. [PutForwards]
+
+	@Check
+	def checkExtendedAttributePutForwardsTakesAnIdentifier(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_PUT_FORWARDS) {
+			if (!extendedAttribute.takesAnIdentifier()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take an identifier', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.14. [Replaceable]
+
+	@Check
+	def checkExtendedAttributeReplaceableTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_REPLACEABLE) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.15. [SameObject]
+
+	@Check
+	def checkExtendedAttributeSameObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_SAME_OBJECT) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.16. [TreatNonObjectAsNull]
+
+	// See 4.3.17. [TreatNullAs]
+
+	@Check
+	def checkExtendedAttributeTreatNullAsTakesAnIdentifier(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_TREAT_NULL_AS) {
+			if (!extendedAttribute.takesAnIdentifier() || (extendedAttribute as ExtendedAttributeIdent).nameRefB != "EmptyString") {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take the identifier EmptyString', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.18. [Unforgeable]
+
+	@Check
+	def checkExtendedAttributeUnforgeableTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_UNFORGEABLE) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.19. [Unscopeable]
+
+	@Check
+	def checkExtendedAttributeUnscopeableTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_UNSCOPEABLE) {
 			if (!extendedAttribute.takesNoArguments()) {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
 					extendedAttribute,
