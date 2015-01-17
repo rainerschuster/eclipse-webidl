@@ -96,7 +96,7 @@ class EffectiveOverloadingSetUtil {
 		var long maxarg = 0;
 		for (ff : f) {
 			// TODO Implement Interface HasArguments?
-			val int maxargCandidate = switch (ff) {
+			val int maxargCandidate = switch ff {
 				Operation: ff.arguments.size
 				CallbackFunction: ff.arguments.size
 				Constructor: ff.arguments.size
@@ -110,7 +110,7 @@ class EffectiveOverloadingSetUtil {
 
 		// 5. For each operation, extended attribute or callback function X in F:
 		for (x : f) {
-			val argumentsOfX = switch (x) {
+			val argumentsOfX = switch x {
 				Operation: x.arguments
 				CallbackFunction: x.arguments
 				Constructor: x.arguments
@@ -142,7 +142,7 @@ class EffectiveOverloadingSetUtil {
 
 			// 5.5. If X is declared to be variadic, then:
 			// TODO TypeUtil.variadic should support polymorphic dispatch or Callable
-			val variadic = switch (x) {
+			val variadic = switch x {
 				Operation: TypeUtil.variadic(x)
 				CallbackFunction: TypeUtil.variadic(x)
 				Constructor: TypeUtil.variadic(x)

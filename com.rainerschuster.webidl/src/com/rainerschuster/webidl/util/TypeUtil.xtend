@@ -142,14 +142,14 @@ class TypeUtil {
 	}
 
 	static def Definition resolveDefinition(InterfaceOrTypedef iot) {
-		switch (iot) {
+		switch iot {
 			Interface: iot
 			Typedef: iot.resolveDefinition
 		}
 	}
 
 	static def Definition resolveDefinition(DictionaryOrTypedef dot) {
-		switch (dot) {
+		switch dot {
 			Dictionary: dot
 			Typedef: dot.resolveDefinition
 		}
@@ -461,7 +461,7 @@ class TypeUtil {
 	// Java specific methods, see also http://heycam.github.io/webidl/java.html
 
 	def static String toJavaType(ReturnType type) {
-		switch (type) {
+		switch type {
 			VoidType: "void"
 			Type: type.toJavaType
 		}
@@ -470,16 +470,15 @@ class TypeUtil {
 	def static String toJavaType(Type type) {
 		val intermediate = switch type {
 			ReferenceType : {
-//				logger.debug("ReferenceType");
 				var Definition resolved = type.typeRef;
 				if (resolved != null) {
-					switch (resolved) {
-						Interface : {/*logger.debug("InterfaceType");*/ resolved.name}
-						Dictionary : {/*logger.debug("DictionaryType"); */"java.util.HashMap<java.lang.String,java.lang.Object>"}
+					switch resolved {
+						Interface : resolved.name
+						Dictionary : "java.util.HashMap<java.lang.String,java.lang.Object>"
 						Enum : "java.lang.String"
 						// TODO implement CallbackFunctionType!
-						CallbackFunction : {/*logger.debug("CallbackFunctionType");*/ resolved.name}
-						Typedef : {/*logger.debug("Typedef");*/ resolved.type.toJavaType}
+						CallbackFunction : resolved.name
+						Typedef : resolved.type.toJavaType
 					}
 				} else {
 					null
@@ -504,13 +503,12 @@ class TypeUtil {
 			ObjectType : "java.lang.Object"
 			// TODO implement InterfaceType!
 			// TODO Corresponding Java escaped identifier
-//			InterfaceSymbol : {/*logger.debug("InterfaceType");*/ type.name}
-//			DictionarySymbol : {/*logger.debug("DictionaryType"); */"java.util.HashMap<java.lang.String,java.lang.Object>"}
+//			InterfaceSymbol : type.name
+//			DictionarySymbol : "java.util.HashMap<java.lang.String,java.lang.Object>"
 //			EnumerationSymbol : "java.lang.String"
 //			// TODO implement CallbackFunctionType!
-//			CallbackFunctionSymbol : {/*logger.debug("CallbackFunctionType");*/ type.name}
+//			CallbackFunctionSymbol : type.name
 			SequenceType : {
-//				logger.debug("SequenceType");
 				val Type subType = type.type;
 				val String subTypeString = subType.toJavaType;
 				if (subTypeString != null) {
@@ -518,13 +516,12 @@ class TypeUtil {
 				}
 			}
 			PromiseType : {
-//				logger.debug("PromiseType");
 //				val Type subType = type.elementType;
 //				val String subTypeString = toJavaType(subType, resolver);
 				"java.lang.Object"
 			}
-			UnionType : {/*logger.debug("UnionType");*/ "java.lang.Object"}
-			DOMExceptionType : {/*logger.debug("DOMExceptionType");*/ "java.lang.Object"}
+			UnionType : "java.lang.Object"
+			DOMExceptionType : "java.lang.Object"
 			DateType : "java.util.Date"
 			ByteStringType : "String"
 			USVStringType : "String"

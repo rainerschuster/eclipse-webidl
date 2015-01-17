@@ -150,7 +150,7 @@ class NameUtil {
 
 
 	def static definitionToName(Definition definition) {
-		switch(definition) {
+		switch definition {
 			Interface: definition.name
 			Dictionary: definition.name
 			com.rainerschuster.webidl.webIDL.Enum: definition.name
@@ -160,7 +160,7 @@ class NameUtil {
 	}
 
 	def static interfaceMemberToName(InterfaceMember interfaceMember) {
-		switch(interfaceMember) {
+		switch interfaceMember {
 			Const: interfaceMember.name
 			Operation: interfaceMember.name
 //			Serializer: interfaceMember.name
@@ -175,7 +175,7 @@ class NameUtil {
 
 
 	def static String typeName(ReturnType type) {
-		switch (type) {
+		switch type {
 			VoidType: 'Void' // TODO void does not have a typeName!
 			Type: typeName(type)
 			default: null
@@ -183,7 +183,7 @@ class NameUtil {
 	}
 
 	def static String typeName(Definition type) {
-		switch (type) {
+		switch type {
 			 Interface: type.name
 			 Dictionary: type.name
 			 Enum: type.name
@@ -195,7 +195,7 @@ class NameUtil {
 
 	def static String typeName(Type type) {
 		typeNameWithoutSuffix(type) + type.typeSuffix.map[
-			switch (it) {
+			switch it {
 				NullableTypeSuffix: 'OrNull'
 				ArrayTypeSuffix: 'Array'
 			}
@@ -204,7 +204,7 @@ class NameUtil {
 
 //	def static String typeName(ConstType type) {
 //		typeNameWithoutSuffix(type) + type.typeSuffix.map[
-//			switch (it) {
+//			switch it {
 //				NullableTypeSuffix: 'OrNull'
 //				ArrayTypeSuffix: 'Array'
 //			}
@@ -212,7 +212,7 @@ class NameUtil {
 //	}
 
 //	def static String typeNameWithoutSuffix(ConstType type) {
-//		switch (type) {
+//		switch type {
 ////			PrimitiveType: typeNameWithoutSuffix(type as PrimitiveType)
 //			// Reference type
 ////			NonAnyType: typeName(type.typeRef)
@@ -223,7 +223,7 @@ class NameUtil {
 //	}
 
 	private def static String typeNameWithoutSuffix(Type type) {
-		switch (type) {
+		switch type {
 			AnyType: 'Any'
 			BooleanType: 'Boolean'
 			ByteType: 'Byte'

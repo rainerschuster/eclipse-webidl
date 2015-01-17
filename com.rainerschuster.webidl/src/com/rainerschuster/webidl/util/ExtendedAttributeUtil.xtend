@@ -203,7 +203,7 @@ class ExtendedAttributeUtil {
 	def static Constructor getConstructorValue(ExtendedAttribute eAttr) {
 		var Constructor constructor = null;
 
-		switch (eAttr) {
+		switch eAttr {
 			ExtendedAttributeNoArgs: {constructor = new Constructor(); constructor.arguments = new ArrayList<Argument>();}
 			ExtendedAttributeArgList: {constructor = new Constructor(); constructor.arguments = eAttr.arguments;}
 		}
@@ -226,7 +226,7 @@ class ExtendedAttributeUtil {
 	def static Constructor getNamedConstructorValue(ExtendedAttribute eAttr) {
 		var Constructor constructor = null;
 
-		switch (eAttr) {
+		switch eAttr {
 			ExtendedAttributeIdent: {constructor = new Constructor(); constructor.arguments = new ArrayList<Argument>(); constructor.name = eAttr.nameRef;}
 			ExtendedAttributeNamedArgList: {constructor = new Constructor(); constructor.arguments = eAttr.arguments; constructor.name = eAttr.nameRef;}
 		}
