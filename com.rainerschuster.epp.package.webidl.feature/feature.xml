@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="com.rainerschuster.epp.package.webidl.feature"
-      label="WebIDL Language Feature"
+      label="EPP Web IDL Feature"
       version="1.0.0.qualifier"
       provider-name="rainerschuster.com"
       plugin="com.rainerschuster.epp.package.webidl">
