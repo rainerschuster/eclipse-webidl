@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.rainerschuster.epp.package.webidl.feature"
+      label="WebIDL Language Feature"
+      version="1.0.0.qualifier"
+      provider-name="rainerschuster.com"
+      plugin="com.rainerschuster.epp.package.webidl">
+
+   <description url="http://eclipse.org/epp">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <discovery label="Mars" url="http://download.eclipse.org/releases/mars/"/>
+      <discovery label="Eclipse Platform 4.5" url="http://download.eclipse.org/eclipse/updates/4.5"/>
+   </url>
+
+   <requires>
+      <import feature="org.eclipse.egit"/>
+      <import feature="org.eclipse.e4.rcp"/>
+      <import feature="org.eclipse.platform"/>
+      <import feature="org.eclipse.emf.ecore"/>
+      <import feature="org.eclipse.equinox.p2.user.ui"/>
+      <import feature="org.eclipse.ecf.filetransfer.httpclient4.feature"/>
+      <import feature="org.eclipse.help"/>
+      <import feature="org.eclipse.ecf.filetransfer.httpclient4.ssl.feature"/>
+      <import feature="org.eclipse.equinox.p2.extras.feature"/>
+      <import feature="org.eclipse.emf.common"/>
+      <import feature="org.eclipse.rcp"/>
+      <import feature="org.eclipse.equinox.p2.core.feature"/>
+      <import feature="org.eclipse.ecf.core.feature"/>
+      <import feature="org.eclipse.jgit"/>
+      <import feature="org.eclipse.equinox.p2.rcp.feature"/>
+      <import feature="org.eclipse.ecf.filetransfer.feature"/>
+      <import feature="org.eclipse.ecf.core.ssl.feature"/>
+      <import feature="org.eclipse.ecf.filetransfer.ssl.feature"/>
+   </requires>
+
+   <plugin
+         id="com.rainerschuster.webidl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.rainerschuster.webidl.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.rainerschuster.epp.package.webidl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>
