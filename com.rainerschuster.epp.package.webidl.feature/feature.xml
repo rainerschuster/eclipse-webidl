@@ -2,9 +2,12 @@
 <feature
       id="com.rainerschuster.epp.package.webidl.feature"
       label="EPP Web IDL Feature"
-      version="1.0.0.qualifier"
+      version="4.5.0.qualifier"
       provider-name="rainerschuster.com"
-      plugin="com.rainerschuster.epp.package.webidl">
+      plugin="com.rainerschuster.epp.package.webidl"
+      license-feature="org.eclipse.license"
+      license-feature-version="0.0.0">
+
 
    <description url="http://eclipse.org/epp">
       %description
@@ -48,15 +51,13 @@
          id="com.rainerschuster.webidl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.rainerschuster.webidl.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.rainerschuster.epp.package.webidl"
