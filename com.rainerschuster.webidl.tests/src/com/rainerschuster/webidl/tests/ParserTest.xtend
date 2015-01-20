@@ -38,6 +38,38 @@ class ParserTest {
 
 
 	@Test
+	def void asdf() {
+		// Replaced Node and Event since they are not available
+		val definitions = '''
+interface CanvasRenderingContext2D {
+  void fill(optional CanvasFillRule fillRule = "nonzero");
+  void fill(Date path, optional CanvasFillRule fillRule = "nonzero");
+};
+enum CanvasFillRule { "nonzero", "evenodd" };
+		'''.parse;
+
+		for (Interface iface : definitions.definitions.map[it.def].filter(typeof(Interface))) {
+			println("Interface: " + iface.name);
+			val effectiveOverloadingSet = EffectiveOverloadingSetUtil.computeForRegularOperation(iface, "fill", 0)
+			val String output = "{" + effectiveOverloadingSet.map[
+				val StringBuilder sb = new StringBuilder();
+				sb.append("<");
+				sb.append(it.callable.name);
+				sb.append(", ");
+				sb.append("(");
+				sb.append(it.typeList.map[NameUtil.typeName(it)].join(', '));
+				sb.append(")");
+				sb.append(", ");
+				sb.append("(");
+				sb.append(it.optionalityList.map[it.name.toLowerCase].join(', '));
+				sb.append(")");
+				sb.append(">");
+				sb.toString
+			].join(",\n ") + "}";
+			println(output);
+		}
+	}
+	@Test
 	def void overloadSample_3_2_6__02() {
 		// Replaced Node and Event since they are not available
 		val definitions = '''
