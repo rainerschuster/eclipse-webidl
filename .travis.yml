@@ -1,5 +1,5 @@
 language: java
-script: cd com.rainerschuster.webidl.releng/ && mvn clean install && cd ..
+script: cd com.rainerschuster.webidl.releng/ && mvn clean install -Pepp.package.webidl && cd ..
 deploy:
   provider: releases
   api_key:

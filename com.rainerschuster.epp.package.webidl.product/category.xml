@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/com.rainerschuster.webidl.sdk_0.0.0.jar" id="com.rainerschuster.webidl.sdk" version="0.0.0">
+      <category name="com.rainerschuster.webidl"/>
+   </feature>
+   <category-def name="com.rainerschuster.webidl" label="Web IDL Language"/>
+</site>
