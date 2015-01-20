@@ -43,12 +43,16 @@ convert icon_16x16_8bit.bmp icon_16x16_32bit.bmp icon_32x32_8bit.bmp icon_32x32_
 
 
 
-cp icon.xpm ../com.rainerschuster.webidl.product/icons/
-#cp Eclipse.icns ../com.rainerschuster.webidl.product/icons/
-#cp Eclipse.*.pm ../com.rainerschuster.webidl.product/icons/
-#cp eclipse.ico ../com.rainerschuster.webidl.product/icons/
-cp icon_*.bmp ../com.rainerschuster.webidl.product/icons/
-cp eclipse*.gif ../com.rainerschuster.webidl.rcp/icons/
-cp eclipse*.png ../com.rainerschuster.webidl.rcp/icons/
+cp icon.xpm ../com.rainerschuster.epp.package.webidl.product/icons/
+#cp Eclipse.icns ../com.rainerschuster.epp.package.webidl.product/icons/
+#cp Eclipse.*.pm ../com.rainerschuster.epp.package.webidl.product/icons/
+#cp eclipse.ico ../com.rainerschuster.epp.package.webidl.product/icons/
+cp icon_*.bmp ../com.rainerschuster.epp.package.webidl.product/icons/
+cp eclipse*.gif ../com.rainerschuster.epp.package.webidl/icons/
+cp eclipse*.png ../com.rainerschuster.epp.package.webidl/icons/
+cp eclipse16.png ../com.rainerschuster.epp.package.webidl/eclipse16.png
+cp eclipse32.png ../com.rainerschuster.epp.package.webidl/eclipse32.png
+cp eclipse48.png ../com.rainerschuster.epp.package.webidl/eclipse48.png
+cp eclipse256.png ../com.rainerschuster.epp.package.webidl/eclipse256.png
 cp eclipse32.png ../com.rainerschuster.webidl.ui/icons/logo.png
 
