@@ -3,13 +3,18 @@
 
    <extension
          id="product"
+         name="Web IDL IDE"
          point="org.eclipse.core.runtime.products">
       <product
-            name="WebIDL Language"
+            name="Eclipse IDE for Web IDL Developers"
             application="org.eclipse.ui.ide.workbench">
          <property
                name="appName"
-               value="WebIDL Language">
+               value="Eclipse IDE for Web IDL Developers">
+         </property>
+         <property
+               name="aboutText"
+               value="Xtext based IDE for Web IDL.&#x0A;For more information please refer to https://github.com/rainerschuster/webidl-eclipse/wiki">
          </property>
          <property
                name="windowImages"

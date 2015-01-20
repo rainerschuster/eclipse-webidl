@@ -12,8 +12,6 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>com.rainerschuster.webidl.rcp</artifactId>
+  <artifactId>com.rainerschuster.epp.package.webidl</artifactId>
   <packaging>eclipse-plugin</packaging>
-
-  <name>Web IDL Language RCP plugin</name>
 </project>

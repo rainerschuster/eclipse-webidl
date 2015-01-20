@@ -12,8 +12,6 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>com.rainerschuster.webidl.feature</artifactId>
+  <artifactId>com.rainerschuster.epp.package.webidl.feature</artifactId>
   <packaging>eclipse-feature</packaging>
-
-  <name>Web IDL Language Feature</name>
 </project>
