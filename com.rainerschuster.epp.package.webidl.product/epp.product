@@ -20,8 +20,12 @@ For more information please refer to https://github.com/rainerschuster/webidl-ec
       </vmArgsMac>
    </launcherArgs>
 
-   <windowImages i16="/icons/eclipse16.gif" i32="/icons/eclipse32.gif" i48="/icons/eclipse48.gif" i64="/icons/eclipse64.png" i128="/icons/eclipse128.png" i256="/icons/eclipse256.png"/>
+   <windowImages i16="/com.rainerschuster.epp.package.webidl/eclipse16.png" i32="/com.rainerschuster.epp.package.webidl/eclipse32.png" i48="/com.rainerschuster.epp.package.webidl/eclipse48.png" i256="/com.rainerschuster.epp.package.webidl/eclipse256.png"/>
 
+   <splash
+      startupProgressRect="2,290,448,10"
+      startupMessageRect="7,265,320,20"
+      startupForegroundColor="9c9696" />
 
    <launcher name="webidl">
       <linux icon="/icons/icon.xpm"/>
