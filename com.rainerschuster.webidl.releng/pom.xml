@@ -13,272 +13,42 @@
 		<module>../com.rainerschuster.webidl.ui</module>
 		<module>../com.rainerschuster.webidl.tests</module>
 		<module>../com.rainerschuster.webidl.sdk</module>
-		<!--<module>../com.rainerschuster.webidl.updatesite</module>-->
-		<!--<module>../com.rainerschuster.epp.package.webidl</module>
-		<module>../com.rainerschuster.epp.package.webidl.feature</module>
-		<module>../com.rainerschuster.epp.package.webidl.product</module>-->
+		<module>../com.rainerschuster.webidl.updatesite</module>
+		<!-- <module>../com.rainerschuster.webidl.rcp</module>
+		<module>../com.rainerschuster.webidl.feature</module>
+		<module>../com.rainerschuster.webidl.product</module> -->
 		<module>../com.rainerschuster.webidl.scraper</module>
+
+		<module>../com.rainerschuster.epp.package.webidl</module>
+		<module>../com.rainerschuster.epp.package.webidl.feature</module>
+		<module>../com.rainerschuster.epp.package.webidl.product</module>
 	</modules>
 
-  <properties>
-    <xtext.version>2.7.3</xtext.version>
-    <tycho.version>0.22.0</tycho.version>
-    <tycho.extras.version>${tycho.version}</tycho.extras.version>
-    <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/epp/org.eclipse.epp.packages.git</tycho.scmUrl>
-    <cbi.version>1.1.1</cbi.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.resources.version>2.6</maven.resources.version>
-    <build>${maven.build.timestamp}</build>
-    <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
-    <!-- The location that is used to assemble the single EPP configuration p2 repository -->
-    <eclipse.epp.archiveDirectory>${basedir}/../../archive/</eclipse.epp.archiveDirectory>
-    <!-- The location that is used to assemble the single EPP configuration p2 repository -->
-    <eclipse.epp.targetRepository>${eclipse.epp.archiveDirectory}/repository/</eclipse.epp.targetRepository>
-    <!-- ID used to generate the filename of the packages -->
-    <eclipse.simultaneous.release.id>mars-M5</eclipse.simultaneous.release.id>
-    <!-- Timestamp used in various places, e.g. the about dialog (see about.mappings) -->
-    <eclipse.simultaneous.release.build>${maven.build.timestamp}</eclipse.simultaneous.release.build>
-    <!-- Human readable name of the release, e.g. used in the about dialog (see about.mappings) -->
-    <eclipse.simultaneous.release.name>Mars Milestone 4 (4.5.0M5)</eclipse.simultaneous.release.name>
-    <!-- Upstream p2 repository, used as a source for pre-compiled build artifacts -->
-    <eclipse.simultaneous.release.repository>http://download.eclipse.org/releases/staging/</eclipse.simultaneous.release.repository>
-  </properties>
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
 
-  <prerequisites>
-    <maven>3.0</maven>
-  </prerequisites>
+	<properties>
+		<tycho.version>0.22.0</tycho.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<xtext.version>2.7.3</xtext.version>
+	</properties>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>eclipse-tycho</id>
-      <url>https://oss.sonatype.org/content/repositories/public/</url>
-    </pluginRepository>
-    <pluginRepository>
-      <id>eclipse-cbi</id>
-      <url>https://repo.eclipse.org/content/repositories/releases/</url>
-    </pluginRepository>
-   <pluginRepository>
-     <id>tycho-snapshots</id>
-     <url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
-   </pluginRepository>
-  </pluginRepositories>
-
-  <repositories>
-    <repository>
-      <id>eclipse</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/luna</url>
-    </repository>
-    <!--<repository>
-      <id>eclipse-simultaneous-release</id>
-      <layout>p2</layout>
-      <url>${eclipse.simultaneous.release.repository}</url>
-    </repository>-->
-    <repository>
-      <id>license-feature</id>
-      <url>http://download.eclipse.org/cbi/updates/license/</url>
-      <layout>p2</layout>
-    </repository>
-    <repository>
-      <id>Xtext Update Site</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/modeling/tmf/xtext/updates/releases/maintenance/</url>
-    </repository>
-  </repositories>
-
+	<repositories>
+		<repository>
+			<id>eclipse</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/luna</url>
+		</repository>
+		<repository>
+			<id>Xtext Update Site</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/modeling/tmf/xtext/updates/releases/maintenance/</url>
+		</repository>
+	</repositories>
 	<build>
-
-    <plugins>
-
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>${tycho.version}</version>
-        <extensions>true</extensions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>target-platform-configuration</artifactId>
-        <version>${tycho.version}</version>
-        <configuration>
-          <includePackedArtifacts>true</includePackedArtifacts>
-          <!-- The Parallel Package feature.xml includes a number of other
-               features that are marked as optional, and unfortunately they
-               seem to be missing in Mars. Ignoring these options features
-               for now.
-          <dependency-resolution>
-            <optionalDependencies>ignore</optionalDependencies>
-          </dependency-resolution>
-            -->
-          <environments>
-            <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
-              <arch>x86</arch>
-            </environment>
-            <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
-              <arch>x86_64</arch>
-            </environment>
-            <environment>
-              <os>win32</os>
-              <ws>win32</ws>
-              <arch>x86</arch>
-            </environment>
-            <environment>
-              <os>win32</os>
-              <ws>win32</ws>
-              <arch>x86_64</arch>
-            </environment>
-            <environment>
-              <os>macosx</os>
-              <ws>cocoa</ws>
-              <arch>x86_64</arch>
-            </environment>
-          </environments>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-packaging-plugin</artifactId>
-        <version>${tycho.version}</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.eclipse.tycho.extras</groupId>
-            <artifactId>tycho-buildtimestamp-jgit</artifactId>
-            <version>${tycho.extras.version}</version>
-          </dependency>
-          <dependency> 
-            <groupId>org.eclipse.tycho.extras</groupId> 
-            <artifactId>tycho-sourceref-jgit</artifactId> 
-            <version>${tycho.extras.version}</version> 
-          </dependency> 
-        </dependencies>
-        <configuration>
-          <timestampProvider>jgit</timestampProvider>
-          <jgit.dirtyWorkingTree>ignore</jgit.dirtyWorkingTree>
-          <format>yyyyMMdd-HHmm</format>
-          <sourceReferences> 
-            <generate>true</generate> 
-          </sourceReferences> 
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-p2-repository-plugin</artifactId>
-        <version>${tycho.version}</version>
-        <configuration>
-          <includeAllDependencies>true</includeAllDependencies>
-          <compress>true</compress>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-source-plugin</artifactId>
-        <version>${tycho.version}</version>
-        <executions>
-          <execution>
-            <id>plugin-source</id>
-            <goals>
-              <goal>plugin-source</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <id>regex-property</id>
-            <goals>
-              <goal>regex-property</goal>
-            </goals>
-            <configuration>
-              <name>eclipse.epp.id</name>
-              <value>${project.artifactId}</value>
-              <regex>epp\.package\.(\d*)</regex>
-              <replacement>$1</replacement>
-              <failIfNoMatch>false</failIfNoMatch>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.8</version>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>target-platform-configuration</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-compiler-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-packaging-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-surefire-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-source-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>tycho-p2-extras-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-p2-director-plugin</artifactId>
-          <version>${tycho.version}</version>
-          <executions>
-            <execution>
-              <id>materialize-products</id>
-              <goals>
-                <goal>materialize-products</goal>
-                <goal>archive-products</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <formats>
-              <linux>tar.gz</linux>
-              <macosx>tar.gz</macosx>
-              <win32>zip</win32>
-            </formats>
-            <products>
-              <product>
-                <id>${project.artifactId}</id>
-                <rootFolder>eclipse</rootFolder>
-                <archiveFileName>eclipse-${eclipse.epp.id}</archiveFileName>
-              </product>
-            </products>
-            <profile>${project.artifactId}</profile>
-          </configuration>
-        </plugin>
+		<pluginManagement>
+			<plugins>
 				<!-- xtend-maven-plugin is in pluginManagement instead of in plugins 
 					so that it doesn't run before the exec-maven-plugin's *.mwe2 gen; this way 
 					we can list it after. -->
@@ -329,49 +99,59 @@
 						</execution>
 					</executions>
 				</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											build-helper-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.8,)
-										</versionRange>
-										<goals>
-											<goal>regex-property</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-      </plugins>
+			</plugins>
 		</pluginManagement>
-	</build>
 
-  <profiles>
-    <profile>
-      <id>epp.package.webidl</id>
-      <modules>
-        <module>../com.rainerschuster.epp.package.webidl</module>
-		<module>../com.rainerschuster.epp.package.webidl.feature</module>
-		<module>../com.rainerschuster.epp.package.webidl.product</module>
-      </modules>
-    </profile>
-  </profiles>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<extensions>true</extensions>
+			</plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>target-platform-configuration</artifactId>
+                <version>${tycho.version}</version>
+
+                <configuration>
+                    <!-- This defines the target definition file -->
+                    <!-- <target>
+                        <artifact>
+                            <groupId>com.rainerschuster.webidl</groupId>
+                            <artifactId>com.rainerschuster.webidl.targetdefinition</artifactId>
+                            <version>1.0.0-SNAPSHOT</version>
+                        </artifact>
+                    </target> -->
+                    <environments>
+                        <environment>
+                            <os>linux</os>
+                            <ws>gtk</ws>
+                            <arch>x86</arch>
+                        </environment>
+                        <environment>
+                            <os>linux</os>
+                            <ws>gtk</ws>
+                            <arch>x86_64</arch>
+                        </environment>
+                        <environment>
+                            <os>win32</os>
+                            <ws>win32</ws>
+                            <arch>x86</arch>
+                        </environment>
+                        <environment>
+                            <os>win32</os>
+                            <ws>win32</ws>
+                            <arch>x86_64</arch>
+                        </environment>
+                        <environment>
+                            <os>macosx</os>
+                            <ws>cocoa</ws>
+                            <arch>x86_64</arch>
+                        </environment>
+                    </environments>
+                </configuration>
+            </plugin>
+		</plugins>
+	</build>
 </project>
