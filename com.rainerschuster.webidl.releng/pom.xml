@@ -14,14 +14,7 @@
 		<module>../com.rainerschuster.webidl.tests</module>
 		<module>../com.rainerschuster.webidl.sdk</module>
 		<module>../com.rainerschuster.webidl.updatesite</module>
-		<!-- <module>../com.rainerschuster.webidl.rcp</module>
-		<module>../com.rainerschuster.webidl.feature</module>
-		<module>../com.rainerschuster.webidl.product</module> -->
 		<module>../com.rainerschuster.webidl.scraper</module>
-
-		<module>../com.rainerschuster.epp.package.webidl</module>
-		<module>../com.rainerschuster.epp.package.webidl.feature</module>
-		<module>../com.rainerschuster.epp.package.webidl.product</module>
 	</modules>
 
 	<prerequisites>
@@ -154,4 +147,15 @@
             </plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>epp.package.webidl</id>
+			<modules>
+				<module>../com.rainerschuster.epp.package.webidl</module>
+				<module>../com.rainerschuster.epp.package.webidl.feature</module>
+				<module>../com.rainerschuster.epp.package.webidl.product</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>
