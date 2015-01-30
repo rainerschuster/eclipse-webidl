@@ -67,91 +67,91 @@ class WebIDLGenerator implements IGenerator {
 	@Inject extension IQualifiedNameProvider
 
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		// Prepare helper structures
-		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
-		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
-		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
-		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
-			val ifaceB = e.ifaceB.resolveDefinition as Interface;
-			implementsMap.put(e.ifaceA, ifaceB);
-		}
-		for (e : resource.allContents.toIterable.filter(typeof(PartialInterface))) {
-			partialInterfaceMap.put(e.interfaceName, e);
-		}
-		for (e : resource.allContents.toIterable.filter(typeof(PartialDictionary))) {
-			partialDictionaryMap.put(e.dictionaryName, e);
-		}
-		// Process Interfaces
-		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
-			val Set<String> processedOperations = newLinkedHashSet();
-			val allImplements = newArrayList();
-			if (e.inherits != null) {
-				val inherits = e.inherits.resolveDefinition as Interface;
-				allImplements += EcoreUtil2.cloneWithProxies(inherits);
-			}
-			if (implementsMap.containsKey(e)) {
-				allImplements += implementsMap.get(e).map[EcoreUtil2.cloneWithProxies(it)];
-			}
-//			val myInterface = EcoreUtil.copy(e);
-			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
-			myInterface.callback = e.callback;
-			myInterface.name = e.name;
-			myInterface.inherits = EcoreUtil2.cloneWithProxies(e.inherits);
-//			myInterface.getInterfaceMembers().clear();
-			// TODO Overloaded operations / constructors
-//			myInterface.interfaceMembers += e.interfaceMembers;
-					for (extendedMember : e.interfaceMembers) {
-						val member = extendedMember.interfaceMember;
-						if (member instanceof Operation) {
-							if (!processedOperations.contains(member.name)) {
-								val effectiveOverloadingSet = if (member.staticOperation) {
-									computeForStaticOperation(EcoreUtil2.cloneWithProxies(e), member.name, 0)
-								} else {
-									computeForRegularOperation(EcoreUtil2.cloneWithProxies(e), member.name, 0)
-								}
-								for (entry : effectiveOverloadingSet) {
-									val mappedMember = entry.callable.mapOperation(entry);
-									val myExtendedMember = EcoreUtil2.cloneWithProxies(extendedMember);
-									myExtendedMember.interfaceMember = mappedMember;
-									myInterface.interfaceMembers += myExtendedMember;
-								}
-								processedOperations += member.name;
-							}
-						} else {
-							val mappedMember = member;
-							val myExtendedMember = EcoreUtil2.cloneWithProxies(extendedMember);
-							myExtendedMember.interfaceMember = mappedMember;
-							myInterface.interfaceMembers += myExtendedMember;
-						}
-					}
-
-
-			if (partialInterfaceMap.containsKey(e)) {
-				for (pi : partialInterfaceMap.get(e)) {
-					for (member : pi.interfaceMembers) {
+//		// Prepare helper structures
+//		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
+//		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
+//		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
+//		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
+//			val ifaceB = e.ifaceB.resolveDefinition as Interface;
+//			implementsMap.put(e.ifaceA, ifaceB);
+//		}
+//		for (e : resource.allContents.toIterable.filter(typeof(PartialInterface))) {
+//			partialInterfaceMap.put(e.interfaceName, e);
+//		}
+//		for (e : resource.allContents.toIterable.filter(typeof(PartialDictionary))) {
+//			partialDictionaryMap.put(e.dictionaryName, e);
+//		}
+//		// Process Interfaces
+//		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
+//			val Set<String> processedOperations = newLinkedHashSet();
+//			val allImplements = newArrayList();
+//			if (e.inherits != null) {
+//				val inherits = e.inherits.resolveDefinition as Interface;
+//				allImplements += EcoreUtil2.cloneWithProxies(inherits);
+//			}
+//			if (implementsMap.containsKey(e)) {
+//				allImplements += implementsMap.get(e).map[EcoreUtil2.cloneWithProxies(it)];
+//			}
+////			val myInterface = EcoreUtil.copy(e);
+//			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
+//			myInterface.callback = e.callback;
+//			myInterface.name = e.name;
+//			myInterface.inherits = EcoreUtil2.cloneWithProxies(e.inherits);
+////			myInterface.getInterfaceMembers().clear();
+//			// TODO Overloaded operations / constructors
+////			myInterface.interfaceMembers += e.interfaceMembers;
+//					for (extendedMember : e.interfaceMembers) {
+//						val member = extendedMember.interfaceMember;
 //						if (member instanceof Operation) {
-//							val effectiveOverloadingSet = if (member.staticOperation) {
-//								computeForStaticOperation(pi, member.name, 0)
-//							} else {
-//								computeForRegularOperation(pi, member.name, 0)
+//							if (!processedOperations.contains(member.name)) {
+//								val effectiveOverloadingSet = if (member.staticOperation) {
+//									computeForStaticOperation(EcoreUtil2.cloneWithProxies(e), member.name, 0)
+//								} else {
+//									computeForRegularOperation(EcoreUtil2.cloneWithProxies(e), member.name, 0)
+//								}
+//								for (entry : effectiveOverloadingSet) {
+//									val mappedMember = entry.callable.mapOperation(entry);
+//									val myExtendedMember = EcoreUtil2.cloneWithProxies(extendedMember);
+//									myExtendedMember.interfaceMember = mappedMember;
+//									myInterface.interfaceMembers += myExtendedMember;
+//								}
+//								processedOperations += member.name;
 //							}
-//							val mappedMember = member.mapOperation(effectiveOverloadingSet);
-//							myInterface.interfaceMembers += mappedMember;
 //						} else {
-							myInterface.interfaceMembers += EcoreUtil2.cloneWithProxies(member);
+//							val mappedMember = member;
+//							val myExtendedMember = EcoreUtil2.cloneWithProxies(extendedMember);
+//							myExtendedMember.interfaceMember = mappedMember;
+//							myInterface.interfaceMembers += myExtendedMember;
 //						}
-					}
-//					myInterface.interfaceMembers += pi.interfaceMembers;
-				}
-			}
-			// TODO Interfaces with [NoInterfaceObject]?
-			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", myInterface.binding(e, allImplements));
-		}
-		// Process Callback Functions
-		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
-			val effectiveOverloadingSet = e.computeForCallbackFunction(0);
-			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(effectiveOverloadingSet));
-		}
+//					}
+//
+//
+//			if (partialInterfaceMap.containsKey(e)) {
+//				for (pi : partialInterfaceMap.get(e)) {
+//					for (member : pi.interfaceMembers) {
+////						if (member instanceof Operation) {
+////							val effectiveOverloadingSet = if (member.staticOperation) {
+////								computeForStaticOperation(pi, member.name, 0)
+////							} else {
+////								computeForRegularOperation(pi, member.name, 0)
+////							}
+////							val mappedMember = member.mapOperation(effectiveOverloadingSet);
+////							myInterface.interfaceMembers += mappedMember;
+////						} else {
+//							myInterface.interfaceMembers += EcoreUtil2.cloneWithProxies(member);
+////						}
+//					}
+////					myInterface.interfaceMembers += pi.interfaceMembers;
+//				}
+//			}
+//			// TODO Interfaces with [NoInterfaceObject]?
+//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", myInterface.binding(e, allImplements));
+//		}
+//		// Process Callback Functions
+//		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
+//			val effectiveOverloadingSet = e.computeForCallbackFunction(0);
+//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(effectiveOverloadingSet));
+//		}
 	}
 
 	private def Operation mapOperation(Operation original, EffectiveOverloadingSetEntry<Operation> entry) {
