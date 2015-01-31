@@ -34,15 +34,25 @@
 						<id>materialize-products</id>
 						<goals>
 							<goal>materialize-products</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>archive-products</id>
-						<goals>
 							<goal>archive-products</goal>
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<formats>
+						<linux>tar.gz</linux>
+						<macosx>tar.gz</macosx>
+						<win32>zip</win32>
+					</formats>
+					<products>
+						<product>
+							<id>${project.artifactId}</id>
+							<rootFolder>eclipse</rootFolder>
+							<archiveFileName>eclipse-webidl</archiveFileName>
+						</product>
+					</products>
+					<!-- <profile>${project.artifactId}</profile> -->
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
