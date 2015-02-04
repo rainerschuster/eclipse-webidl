@@ -6,7 +6,7 @@
    <aboutInfo>
       <text>
          Xtext based IDE for Web IDL.
-For more information please refer to https://github.com/rainerschuster/webidl-eclipse/wiki
+For more information please refer to https://github.com/rainerschuster/eclipse-webidl/wiki
       </text>
    </aboutInfo>
 
@@ -187,7 +187,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
    </configurations>
 
    <repositories>
-      <repository location="http://rainerschuster.github.io/webidl-eclipse/updatesite/repository/" enabled="true" />
+      <repository location="http://rainerschuster.github.io/eclipse-webidl/updatesite/repository/" enabled="true" />
    </repositories>
 
 </product>

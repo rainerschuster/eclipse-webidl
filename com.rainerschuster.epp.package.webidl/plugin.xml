@@ -14,7 +14,7 @@
          </property>
          <property
                name="aboutText"
-               value="Xtext based IDE for Web IDL.&#x0A;For more information please refer to https://github.com/rainerschuster/webidl-eclipse/wiki">
+               value="Xtext based IDE for Web IDL.&#x0A;For more information please refer to https://github.com/rainerschuster/eclipse-webidl/wiki">
          </property>
          <property
                name="startupForegroundColor"
