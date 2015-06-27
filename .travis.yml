@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - oraclejdk8
 script: cd com.rainerschuster.webidl.releng/ && mvn clean install -Pepp.package.webidl && cd ..
 deploy:
   provider: releases
