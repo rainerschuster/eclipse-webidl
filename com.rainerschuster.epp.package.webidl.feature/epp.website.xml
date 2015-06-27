@@ -22,7 +22,7 @@
   </packageMetaData>
   <MoreInfo>
   <NewAndNoteworthy
-    url="http://download.eclipse.org/eclipse/downloads/drops4/R-4.4-201406061215/news/"
+    url="https://www.eclipse.org/eclipse/news/4.5/"
     project="Eclipse Platform" />
   </MoreInfo>
 
@@ -31,6 +31,6 @@
   <rcp version="4.5.0" />
 
   <!-- name, the name of the product, used in naming the created files. -->
-  <product name="eclipse-webidl-mars-M5" />
+  <product name="eclipse-webidl-mars-R" />
 
 </configuration>

@@ -18,6 +18,13 @@
       %license
    </license>
 
+   <url>
+      <discovery label="Mars" url="http://download.eclipse.org/releases/mars/"/>
+      <discovery label="Eclipse Platform 4.5" url="http://download.eclipse.org/eclipse/updates/4.5"/>
+   </url>
+
+   <!-- see p2.inf file for optionally imported Linux Tools features -->
+
    <requires>
       <import feature="org.eclipse.egit"/>
       <import feature="org.eclipse.e4.rcp"/>
