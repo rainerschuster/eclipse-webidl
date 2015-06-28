@@ -1,7 +1,14 @@
 language: java
 jdk:
   - oraclejdk8
-script: cd com.rainerschuster.webidl.releng/ && mvn clean install -Pepp.package.webidl && cd ..
+script:
+  - sudo rm /etc/mavenrc
+  - cd com.rainerschuster.webidl.releng/
+  - mvn clean install -Pepp.package.webidl
+  - cd ..
+env:
+ global:
+   - "MAVEN_OPTS=-Xmx3072m -XX:MaxPermSize=512m"
 deploy:
   provider: releases
   api_key:
