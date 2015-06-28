@@ -1,6 +1,5 @@
+sudo: false
 language: java
-jdk:
-  - oraclejdk8
 script:
   - sudo rm /etc/mavenrc
   - export MAVEN_OPTS="-Xmx2048m -XX:MaxPermSize=512m"
