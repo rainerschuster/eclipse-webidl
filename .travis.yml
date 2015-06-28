@@ -1,8 +1,8 @@
 sudo: false
 language: java
 script:
-  - sudo rm /etc/mavenrc
-  - export MAVEN_OPTS="-Xmx2048m -XX:MaxPermSize=512m"
+#  - sudo rm /etc/mavenrc
+#  - export MAVEN_OPTS="-Xmx2048m -XX:MaxPermSize=512m"
   - cd com.rainerschuster.webidl.releng/
   - mvn clean install -Pepp.package.webidl -DskipTests=true
   - cd ..
