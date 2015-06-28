@@ -3,12 +3,10 @@ jdk:
   - oraclejdk8
 script:
   - sudo rm /etc/mavenrc
+  - export MAVEN_OPTS="-Xmx2048m -XX:MaxPermSize=512m"
   - cd com.rainerschuster.webidl.releng/
-  - mvn clean install -Pepp.package.webidl
+  - mvn clean install -Pepp.package.webidl -DskipTests=true
   - cd ..
-env:
- global:
-   - "MAVEN_OPTS=-Xmx3072m -XX:MaxPermSize=512m"
 deploy:
   provider: releases
   api_key:
