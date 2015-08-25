@@ -75,9 +75,9 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 		val definitions = '''
 			interface A {
 			  /* f1 */ void f(DOMString a);
-			  /* f2 */ void f(RegExp a, DOMString b, float... c);
+			  /* f2 */ void f(RegExp a, DOMString b, double... c);
 			  /* f3 */ void f();
-			  /* f4 */ void f(Date a, DOMString b, optional DOMString c, float... d);
+			  /* f4 */ void f(Date a, DOMString b, optional DOMString c, double... d);
 			};
 		'''.parse;
 
@@ -118,9 +118,9 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			interface Paint { };
 			
 			interface SolidColor : Paint {
-			  attribute float red;
-			  attribute float green;
-			  attribute float blue;
+			  attribute double red;
+			  attribute double green;
+			  attribute double blue;
 			};
 			
 			interface Pattern : Paint {
@@ -134,9 +134,9 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			
 			  attribute Paint currentPaint;
 			
-			  void drawRectangle(float x, float y, float width, float height);
+			  void drawRectangle(double x, double y, double width, double height);
 			
-			  void drawText(float x, float y, DOMString text);
+			  void drawText(double x, double y, DOMString text);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -147,13 +147,13 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 	def void parseSample_3_1__01() {
 		'''
 			interface B : A {
-			  void f(ArrayOfLongs x);
+			  void f(SequenceOfLongs x);
 			};
 			
 			interface A {
 			};
 			
-			typedef long[] ArrayOfLongs;
+			typedef sequence<long> SequenceOfLongs;
 		'''.parse.assertNoErrors
 	}
 
@@ -161,7 +161,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 	def void parseSample_3_1__02() {
 		'''
 			// Typedef identifier: "number"
-			typedef float number;
+			typedef double number;
 			
 			// Interface identifier: "System"
 			interface System {
@@ -171,7 +171,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			  object createObject(DOMString _interface);
 			
 			  // Operation argument identifier: "interface"
-			  object[] createObjectArray(DOMString interface);
+			  sequence<object> getObjects(DOMString interface);
 			
 			  // Operation has no identifier; it declares a getter.
 			  getter DOMString (DOMString keyName);
@@ -287,7 +287,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			  const boolean DEBUG = false;
 			  const octet LF = 10;
 			  const unsigned long BIT_MASK = 0x0000fc00;
-			  const float AVOGADRO = 6.022e23;
+			  const double AVOGADRO = 6.022e23;
 			};
 		'''.parse.assertNoErrors
 	}
@@ -353,7 +353,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 	def void parseSample_3_2_3__03() {
 		'''
 			interface ColorCreator {
-			  object createColor(float v1, float v2, float v3, optional float alpha);
+			  object createColor(double v1, double v2, double v3, optional double alpha);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -362,8 +362,8 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 	def void parseSample_3_2_3__04() {
 		'''
 			interface ColorCreator {
-			  object createColor(float v1, float v2, float v3);
-			  object createColor(float v1, float v2, float v3, float alpha);
+			  object createColor(double v1, double v2, double v3);
+			  object createColor(double v1, double v2, double v3, double alpha);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -376,8 +376,8 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			interface Dictionary {
 			  readonly attribute unsigned long propertyCount;
 			
-			  getter float (DOMString propertyName);
-			  setter void (DOMString propertyName, float propertyValue);
+			  getter double (DOMString propertyName);
+			  setter void (DOMString propertyName, double propertyValue);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -388,8 +388,8 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			interface Dictionary {
 			  readonly attribute unsigned long propertyCount;
 			
-			  getter float getProperty(DOMString propertyName);
-			  setter void setProperty(DOMString propertyName, float propertyValue);
+			  getter double getProperty(DOMString propertyName);
+			  setter void setProperty(DOMString propertyName, double propertyValue);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -400,11 +400,11 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			interface Dictionary {
 			  readonly attribute unsigned long propertyCount;
 			
-			  float getProperty(DOMString propertyName);
-			  void setProperty(DOMString propertyName, float propertyValue);
+			  double getProperty(DOMString propertyName);
+			  void setProperty(DOMString propertyName, double propertyValue);
 			
-			  getter float (DOMString propertyName);
-			  setter void (DOMString propertyName, float propertyValue);
+			  getter double (DOMString propertyName);
+			  setter void (DOMString propertyName, double propertyValue);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -416,7 +416,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 		'''
 			interface NumberQuadrupler {
 			  // This operation simply returns four times the given number x.
-			  legacycaller float compute(float x);
+			  legacycaller double compute(double x);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -475,7 +475,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 //			interface Transaction {
 //			  readonly attribute Account from;
 //			  readonly attribute Account to;
-//			  readonly attribute float amount;
+//			  readonly attribute double amount;
 //			  readonly attribute DOMString description;
 //			  readonly attribute unsigned long number;
 //			
@@ -496,7 +496,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 //			interface Transaction {
 //			  readonly attribute Account from;
 //			  readonly attribute Account to;
-//			  readonly attribute float amount;
+//			  readonly attribute double amount;
 //			  readonly attribute DOMString description;
 //			  readonly attribute unsigned long number;
 //			
@@ -531,11 +531,9 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			
 			  getter any getByIndex(unsigned long index);
 			  setter void setByIndex(unsigned long index, any value);
-			  deleter void removeByIndex(unsigned long index);
 			
 			  getter any get(DOMString name);
-			  setter creator void set(DOMString name, any value);
-			  deleter void remove(DOMString name);
+			  setter void set(DOMString name, any value);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -548,9 +546,9 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			interface Point { /* ... */ };
 			
 			interface Circle {
-			  attribute float cx;
-			  attribute float cy;
-			  attribute float radius;
+			  attribute double cx;
+			  attribute double cy;
+			  attribute double radius;
 			
 			  static readonly attribute long triangulationCount;
 			  static Point triangulate(Circle c1, Circle c2, Circle c3);
@@ -568,7 +566,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			};
 			
 			partial interface A {
-			  void f(float x);
+			  void f(double x);
 			  void g();
 			};
 			
@@ -584,9 +582,9 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 //		'''
 //			interface A {
 //			  /* f1 */ void f(DOMString a);
-//			  /* f2 */ void f(Node a, DOMString b, float... c);
+//			  /* f2 */ void f(Node a, DOMString b, double... c);
 //			  /* f3 */ void f();
-//			  /* f4 */ void f(Event a, DOMString b, optional DOMString c, float... d);
+//			  /* f4 */ void f(Event a, DOMString b, optional DOMString c, double... d);
 //			};
 //		'''.parse.assertNoErrors
 //	}
@@ -597,7 +595,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 //		'''
 //			interface B {
 //			  void f(DOMString x);
-//			  void f(float x);
+//			  void f(double x);
 //			};
 //		'''.parse.assertNoErrors
 //	}
@@ -608,8 +606,8 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 //		'''
 //			interface B {
 //			  /* f1 */ void f(DOMString w);
-//			  /* f2 */ void f(long w, float x, Node y, Node z);
-//			  /* f3 */ void f(float w, float x, DOMString y, Node z);
+//			  /* f2 */ void f(long w, double x, Node y, Node z);
+//			  /* f3 */ void f(double w, double x, DOMString y, Node z);
 //			};
 //		'''.parse.assertNoErrors
 //	}
@@ -698,8 +696,8 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 		'''
 			[Constructor]
 			interface Point {
-			  attribute float x;
-			  attribute float y;
+			  attribute double x;
+			  attribute double y;
 			};
 			
 			dictionary PaintOptions {
@@ -709,7 +707,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			};
 			
 			interface GraphicsContext {
-			  void drawRectangle(float width, float height, optional PaintOptions options);
+			  void drawRectangle(double width, double height, optional PaintOptions options);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -723,9 +721,9 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			
 			interface Meal {
 			  attribute MealType type;
-			  attribute float size;     // in grams
+			  attribute double size;     // in grams
 			
-			  void initialize(MealType type, float size);
+			  void initialize(MealType type, double size);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -749,8 +747,8 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 	def void parseSample_3_7__01() {
 		'''
 			interface Point {
-			  attribute float x;
-			  attribute float y;
+			  attribute double x;
+			  attribute double y;
 			};
 			
 			typedef sequence<Point> Points;
@@ -874,61 +872,18 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			
 			  sequence<DOMString> getSupportedImageCodecs();
 			
-			  void drawPolygon(sequence<float> coordinates);
-			  sequence<float> getLastDrawnPolygon();
+			  void drawPolygon(sequence<double> coordinates);
+			  sequence<double> getLastDrawnPolygon();
 			
 			  // ...
 			};
 		'''.parse.assertNoErrors
 	}
 
-	// See 4.2.26. Arrays — T[]
-
-	@Test
-	def void parseSample_4_2_26__01() {
-		'''
-			[Constructor]
-			interface LotteryResults {
-			  readonly attribute unsigned short[] numbers;
-			};
-		'''.parse.assertNoErrors
-	}
-
-	@Test
-	def void parseSample_4_2_26__02() {
-		'''
-			[Constructor]
-			interface LotteryResults {
-			  attribute unsigned short[] numbers;
-			};
-		'''.parse.assertNoErrors
-	}
-
-	// See 4.3.1. [ArrayClass]
+	// See 4.3.1. [Clamp]
 
 	@Test
 	def void parseSample_4_3_1__01() {
-		'''
-			[ArrayClass]
-			interface ItemList {
-			  attribute unsigned long length;
-			  getter object getItem(unsigned long index);
-			  creator setter object setItem(unsigned long index, object item);
-			  deleter void removeItem(unsigned long index);
-			};
-			
-			[ArrayClass]
-			interface ImmutableItemList {
-			  readonly attribute unsigned long length;
-			  getter object getItem(unsigned long index);
-			};
-		'''.parse.assertNoErrors
-	}
-
-	// See 4.3.2. [Clamp]
-
-	@Test
-	def void parseSample_4_3_2__01() {
 		'''
 			interface GraphicsContext {
 			  void setColor(octet red, octet green, octet blue);
@@ -937,11 +892,11 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 		'''.parse.assertNoErrors
 	}
 
-	// See 4.3.3. [Constructor]
+	// See 4.3.2. [Constructor]
 
 	// Disabled because Node is not available
 //	@Test
-//	def void parseSample_4_3_3__01() {
+//	def void parseSample_4_3_2__01() {
 //		'''
 //			interface NodeList {
 //			  Node item(unsigned long index);
@@ -949,18 +904,18 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 //			};
 //			
 //			[Constructor,
-//			 Constructor(float radius)]
+//			 Constructor(double radius)]
 //			interface Circle {
-//			  attribute float r;
-//			  attribute float cx;
-//			  attribute float cy;
-//			  readonly attribute float circumference;
+//			  attribute double r;
+//			  attribute double cx;
+//			  attribute double cy;
+//			  readonly attribute double circumference;
 //			};
 //		'''.parse.assertNoErrors
 //	}
 
 	@Test
-	def void parseSample_4_3_3__02() {
+	def void parseSample_4_3_2__02() {
 		'''
 			[Constructor(unsigned long patties, unsigned long cheeseSlices)]
 			dictionary BurgerOrder {
@@ -970,10 +925,10 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 		'''.parse.assertNoErrors
 	}
 
-	// See 4.3.4. [EnforceRange]
+	// See 4.3.3. [EnforceRange]
 
 	@Test
-	def void parseSample_4_3_4__01() {
+	def void parseSample_4_3_3__01() {
 		'''
 			interface GraphicsContext {
 			  void setColor(octet red, octet green, octet blue);
@@ -982,11 +937,11 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 		'''.parse.assertNoErrors
 	}
 
-	// See 4.3.5. [Exposed]
+	// See 4.3.4. [Exposed]
 
 	// Disabled because WorkerGlobalScope is not available
 //	@Test
-//	def void parseSample_4_3_5__01() {
+//	def void parseSample_4_3_4__01() {
 //		'''
 //			[PrimaryGlobal]
 //			interface Window {
@@ -1028,10 +983,10 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 //		'''.parse.assertNoErrors
 //	}
 
-	// See 4.3.6. [ImplicitThis]
+	// See 4.3.5. [ImplicitThis]
 
 	@Test
-	def void parseSample_4_3_6__01() {
+	def void parseSample_4_3_5__01() {
 		'''
 			[ImplicitThis]
 			interface Window {
@@ -1042,16 +997,36 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 		'''.parse.assertNoErrors
 	}
 
-	// See 4.3.7. [Global] and [PrimaryGlobal]
+	// See 4.3.6. [Global] and [PrimaryGlobal]
 
 	@Test
-	def void parseSample_4_3_7__01() {
+	def void parseSample_4_3_6__01() {
 		'''
 			[PrimaryGlobal]
 			interface Window {
 			  getter any (DOMString name);
 			  attribute DOMString name;
 			  // ...
+			};
+		'''.parse.assertNoErrors
+	}
+
+	// See 4.3.7. [LegacyArrayClass]
+
+	@Test
+	def void parseSample_4_3_7__01() {
+		'''
+			[LegacyArrayClass]
+			interface ItemList {
+			  attribute unsigned long length;
+			  getter object getItem(unsigned long index);
+			  setter object setItem(unsigned long index, object item);
+			};
+			
+			[LegacyArrayClass]
+			interface ImmutableItemList {
+			  readonly attribute unsigned long length;
+			  getter object getItem(unsigned long index);
 			};
 		'''.parse.assertNoErrors
 	}
@@ -1319,7 +1294,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			  /**
 			   * Calls computeSquareRoot on m, passing x as its argument.
 			   */
-			  float doComputation(MathUtils m, float x);
+			  double doComputation(MathUtils m, double x);
 			};
 			
 			interface MathUtils {
@@ -1327,7 +1302,7 @@ enum CanvasFillRule { "nonzero", "evenodd" };
 			   * If x is negative, throws a NotSupportedError.  Otherwise, returns
 			   * the square root of x.
 			   */
-			  float computeSquareRoot(float x);
+			  double computeSquareRoot(double x);
 			};
 		'''.parse.assertNoErrors
 	}
