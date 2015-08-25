@@ -121,8 +121,7 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		c.setNoSpace().before(argumentAccess.ellipsisFullStopFullStopFullStopKeyword_1_1_1_0);
 
 		// Type
-//		c.setNoSpace().before(arrayTypeSuffixAccess.leftSquareBracketKeyword_1);
-		c.setNoSpace().before(nullableTypeSuffixAccess.questionMarkKeyword_1);
+		c.setNoSpace().before(nullableAccess.questionMarkKeyword_1);
 
 		// Comments 
 		c.setLinewrap(0, 1, 2).before(SL_COMMENTRule);

@@ -65,10 +65,9 @@ import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
 import com.rainerschuster.webidl.webIDL.PartialInterface
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeArgList
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeNamedArgList
-import com.rainerschuster.webidl.webIDL.NullableTypeSuffix
 import com.rainerschuster.webidl.webIDL.InterfaceOrTypedef
 import com.rainerschuster.webidl.webIDL.DictionaryOrTypedef
-import com.rainerschuster.webidl.webIDL.ArrayTypeSuffix
+import com.rainerschuster.webidl.webIDL.FrozenArrayType
 
 class TypeUtil {
 
@@ -300,13 +299,6 @@ class TypeUtil {
 	}
 
 	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-named-property-creator}
-	 */
-	static def boolean namedPropertyCreator(Operation operation) {
-		namedProperty(operation, Special.CREATOR)
-	}
-
-	/**
 	 * {@link http://heycam.github.io/webidl/#dfn-named-property-deleter}
 	 */
 	static def boolean namedPropertyDeleter(Operation operation) {
@@ -325,13 +317,6 @@ class TypeUtil {
 	 */
 	static def boolean indexedPropertySetter(Operation operation) {
 		indexedProperty(operation, Special.SETTER)
-	}
-
-	/**
-	 * {@link http://heycam.github.io/webidl/#dfn-indexed-property-creator}
-	 */
-	static def boolean indexedPropertyCreator(Operation operation) {
-		indexedProperty(operation, Special.CREATOR)
 	}
 
 	/**
@@ -402,8 +387,8 @@ class TypeUtil {
 	 * {@link http://heycam.github.io/webidl/#dfn-nullable-type}
 	 */
 	static def nullableType(Type type) {
-		// FIXME check if this really conforms to the specification (e.g., maybe only first typesuffix is relevant!)
-		!(type.typeSuffix.nullOrEmpty || type.typeSuffix.filter(typeof(NullableTypeSuffix)).empty)
+		// TODO check if this really conforms to the specification
+		type.nullable
 	}
 
 	// See 3.10.27. Union types
@@ -547,11 +532,16 @@ class TypeUtil {
 //			Uint8ClampedArrayType : "java.lang.Object"
 //			Float32ArrayType : "java.lang.Object"
 //			Float64ArrayType : "java.lang.Object"
+			FrozenArrayType : {
+				val Type subType = type.type;
+				val String subTypeString = subType.toJavaType;
+				if (subTypeString != null) {
+					subTypeString + "Array";
+				}
+			}
 			default : {/*logger.warn("Unknown type {}!", type);*/ null}
 		};
-		if (intermediate != null) {
-			intermediate + type.typeSuffix.filter(ArrayTypeSuffix).map["[]"].join("")
-		}
+		intermediate
 	}
 
 	protected static def boolean namedProperty(Operation operation, Special special) {

@@ -29,7 +29,7 @@ import com.rainerschuster.webidl.webIDL.ExtendedAttributeIdentList
 class ExtendedAttributeUtil {
 //	static val Logger logger = LoggerFactory.getLogger(typeof(XtendExtendedAttributeUtil));
 
-	public static val String EA_ARRAY_CLASS = "ArrayClass";
+//	public static val String EA_ARRAY_CLASS = "ArrayClass";
 	public static val String EA_CLAMP = "Clamp";
 	public static val String EA_CONSTRUCTOR = "Constructor";
 	public static val String EA_ENFORCE_RANGE = "EnforceRange";
@@ -37,6 +37,7 @@ class ExtendedAttributeUtil {
 	public static val String EA_IMPLICIT_THIS = "ImplicitThis";
 	public static val String EA_GLOBAL = "Global";
 	public static val String EA_PRIMARY_GLOBAL = "PrimaryGlobal";
+	public static val String EA_LEGACY_ARRAY_CLASS = "LegacyArrayClass";
 	public static val String EA_LENIENT_THIS = "LenientThis";
 	public static val String EA_NAMED_CONSTRUCTOR = "NamedConstructor";
 	public static val String EA_NEW_OBJECT = "NewObject";
@@ -53,7 +54,7 @@ class ExtendedAttributeUtil {
 	public static val String EA_UNSCOPEABLE = "Unscopeable";
 
 	public static val KNOWN_EXTENDED_ATTRIBUTES = #[
-		EA_ARRAY_CLASS,
+//		EA_ARRAY_CLASS,
 		EA_CLAMP,
 		EA_CONSTRUCTOR,
 		EA_ENFORCE_RANGE,
@@ -61,6 +62,7 @@ class ExtendedAttributeUtil {
 		EA_IMPLICIT_THIS,
 		EA_GLOBAL,
 		EA_PRIMARY_GLOBAL,
+		EA_LEGACY_ARRAY_CLASS,
 		EA_LENIENT_THIS,
 		EA_NAMED_CONSTRUCTOR,
 		EA_NEW_OBJECT,
@@ -104,10 +106,6 @@ class ExtendedAttributeUtil {
 		input.filter[it.nameRef == name]
 	}
 
-	def static boolean containsArrayClass(Iterable<ExtendedAttribute> input) {
-		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_ARRAY_CLASS)
-	}
-
 	def static boolean containsClamp(Iterable<ExtendedAttribute> input) {
 		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_CLAMP)
 	}
@@ -134,6 +132,10 @@ class ExtendedAttributeUtil {
 
 	def static boolean containsPrimaryGlobal(Iterable<ExtendedAttribute> input) {
 		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_PRIMARY_GLOBAL)
+	}
+
+	def static boolean containsLegacyArrayClass(Iterable<ExtendedAttribute> input) {
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LEGACY_ARRAY_CLASS)
 	}
 
 	def static boolean containsLenientThis(Iterable<ExtendedAttribute> input) {

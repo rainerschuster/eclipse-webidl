@@ -18,7 +18,6 @@ package com.rainerschuster.webidl.util
 
 import com.rainerschuster.webidl.webIDL.AnyType
 import com.rainerschuster.webidl.webIDL.ArrayBufferType
-import com.rainerschuster.webidl.webIDL.ArrayTypeSuffix
 import com.rainerschuster.webidl.webIDL.Attribute
 import com.rainerschuster.webidl.webIDL.BooleanType
 import com.rainerschuster.webidl.webIDL.ByteStringType
@@ -42,7 +41,6 @@ import com.rainerschuster.webidl.webIDL.Int8ArrayType
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.LongLongType
 import com.rainerschuster.webidl.webIDL.LongType
-import com.rainerschuster.webidl.webIDL.NullableTypeSuffix
 import com.rainerschuster.webidl.webIDL.ObjectType
 import com.rainerschuster.webidl.webIDL.OctetType
 import com.rainerschuster.webidl.webIDL.Operation
@@ -194,12 +192,11 @@ class NameUtil {
 	}
 
 	def static String typeName(Type type) {
-		typeNameWithoutSuffix(type) + type.typeSuffix.map[
-			switch it {
-				NullableTypeSuffix: 'OrNull'
-				ArrayTypeSuffix: 'Array'
-			}
-		].join
+		typeNameWithoutSuffix(type) + if (type.nullable) {
+			'OrNull'
+		} else {
+			''
+		}
 	}
 
 //	def static String typeName(ConstType type) {

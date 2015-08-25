@@ -190,7 +190,6 @@ Operation
 enum Special:
 	GETTER='getter'
 	| SETTER='setter'
-	| CREATOR='creator'
 	| DELETER='deleter'
 	| LEGACYCALLER='legacycaller'
 	| STRINGIFIER='stringifier'
@@ -233,60 +232,61 @@ ExtendedAttribute:
 ;
 
 ArgumentNameKeyword:
-	'attribute' 
-	| 'callback' 
-	| 'const' 
-	| 'creator' 
-	| 'deleter' 
-	| 'dictionary' 
-	| 'enum' 
-	| 'getter' 
-	| 'implements' 
-	| 'inherit' 
-	| 'interface' 
+	'attribute'
+	| 'callback'
+	| 'const'
+	| 'deleter'
+	| 'dictionary'
+	| 'enum'
+	| 'getter'
+	| 'implements'
+	| 'inherit'
+	| 'interface'
 	| 'iterable'
 	| 'legacycaller'
 	| 'legacyiterable'
 	| 'maplike'
-	| 'partial' 
+	| 'partial'
 	| 'required'
 	| 'serializer'
 	| 'setlike'
-	| 'setter' 
-	| 'static' 
-	| 'stringifier' 
-	| 'typedef' 
+	| 'setter'
+	| 'static'
+	| 'stringifier'
+	| 'typedef'
 	| 'unrestricted'
 ;
 
 Type:
-	SingleType
-	| UnionType typeSuffix+=TypeSuffix*
+	SingleType nullable?=Nullable?
+	| UnionType nullable?=Nullable?
 ;
 
 SingleType:
 	NonAnyType
-	| {AnyType} 'any' typeSuffix+=TypeSuffix* // TODO Must start with Array!
+	| {AnyType} 'any' // TODO any is not nullable!
 ;
 
+// TODO any is not allowed as union member type
 UnionType:
 	'(' unionMemberTypes+=Type ('or' unionMemberTypes+=Type)+ ')'
 ;
 
 NonAnyType:
-	PrimitiveType typeSuffix+=TypeSuffix*
-	| {PromiseType} 'Promise' '<' type=ReturnType '>' typeSuffix+=TypeSuffix? // nullable?=Nullable?
-	| {ByteStringType} 'ByteString' typeSuffix+=TypeSuffix*
-	| {DOMStringType} 'DOMString' typeSuffix+=TypeSuffix*
-	| {USVStringType} 'USVString' typeSuffix+=TypeSuffix*
-	| {ReferenceType} typeRef=[Definition|IDENTIFIER_WEBIDL] typeSuffix+=TypeSuffix*
-	| {SequenceType} 'sequence' '<' type=Type '>' typeSuffix+=TypeSuffix? // nullable?=Nullable?
-	| {ObjectType} 'object' typeSuffix+=TypeSuffix*
-	| {DateType} 'Date' typeSuffix+=TypeSuffix*
-	| {RegExpType} 'RegExp' typeSuffix+=TypeSuffix*
-	| {ErrorType} 'Error' typeSuffix+=TypeSuffix*
-	| {DOMExceptionType} 'DOMException' typeSuffix+=TypeSuffix*
-//	| BufferRelatedType typeSuffix+=TypeSuffix* // TODO enable - disabled on purpose to support typedarray.idl
+	PrimitiveType
+	| {PromiseType} 'Promise' '<' type=ReturnType '>'
+	| {ByteStringType} 'ByteString'
+	| {DOMStringType} 'DOMString'
+	| {USVStringType} 'USVString'
+	| {ReferenceType} typeRef=[Definition|IDENTIFIER_WEBIDL]
+	| {SequenceType} 'sequence' '<' type=Type '>'
+	| {ObjectType} 'object'
+	| {DateType} 'Date'
+	| {RegExpType} 'RegExp'
+	| {ErrorType} 'Error'
+	| {DOMExceptionType} 'DOMException'
+//	| BufferRelatedType // TODO enable - disabled on purpose to support typedarray.idl
+	| {FrozenArrayType} 'FrozenArray' '<' type=Type '>'
 ;
 
 BufferRelatedType
@@ -305,8 +305,8 @@ BufferRelatedType
 
 // TODO Get rid of ConstType (replace by NonAnyType?)
 ConstType returns NonAnyType:
-	PrimitiveType typeSuffix+=TypeSuffix? // nullable?=Nullable?
-	| {ReferenceType} typeRef=[Definition|IDENTIFIER_WEBIDL] typeSuffix+=TypeSuffix? // nullable?=Nullable?
+	PrimitiveType nullable?=Nullable?
+	| {ReferenceType} typeRef=[Definition|IDENTIFIER_WEBIDL] nullable?=Nullable?
 ;
 
 PrimitiveType:
@@ -328,17 +328,8 @@ AbstractIntegerType:
 	| {LongLongType} unsigned?='unsigned'? 'long' 'long'
 ;
 
-TypeSuffix:
-	ArrayTypeSuffix
-	| NullableTypeSuffix
-;
-
-ArrayTypeSuffix:
-	{ArrayTypeSuffix} '[' ']' //typeSuffix=TypeSuffix?
-;
-// TODO After NullableTypeSuffix only an ArrayTypeSuffix is allowed!
-NullableTypeSuffix:
-	{NullableTypeSuffix} '?' //typeSuffix=ArrayTypeSuffix?
+Nullable:
+	{Nullable} '?'
 ;
 
 ReturnType:

@@ -51,7 +51,6 @@ import org.eclipse.xtext.validation.Check
 import static extension com.rainerschuster.webidl.util.NameUtil.*
 import static extension com.rainerschuster.webidl.util.ExtendedAttributeUtil.*
 import static extension com.rainerschuster.webidl.util.TypeUtil.*
-import com.rainerschuster.webidl.webIDL.NullableTypeSuffix
 import com.rainerschuster.webidl.webIDL.Type
 import com.rainerschuster.webidl.webIDL.DictionaryMember
 import com.rainerschuster.webidl.webIDL.Maplike
@@ -141,7 +140,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnInterface(Interface iface) {
-		val allowedExtendedAttributes = #[EA_ARRAY_CLASS, EA_CONSTRUCTOR, EA_EXPOSED, EA_GLOBAL, EA_IMPLICIT_THIS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT, EA_OVERRIDE_BUILTINS, EA_PRIMARY_GLOBAL, EA_UNFORGEABLE];
+		val allowedExtendedAttributes = #[EA_CONSTRUCTOR, EA_EXPOSED, EA_GLOBAL, EA_IMPLICIT_THIS, EA_LEGACY_ARRAY_CLASS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT, EA_OVERRIDE_BUILTINS, EA_PRIMARY_GLOBAL, EA_UNFORGEABLE];
 		val containerDefinition = iface.eContainer as ExtendedDefinition;
 		val extendedAttributes = containerDefinition.eal.extendedAttributes;
 		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
@@ -155,7 +154,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnPartialInterface(PartialInterface partialInterface) {
-		val forbiddenExtendedAttributes = #[EA_ARRAY_CLASS, EA_CONSTRUCTOR, EA_IMPLICIT_THIS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT];
+		val forbiddenExtendedAttributes = #[EA_CONSTRUCTOR, EA_IMPLICIT_THIS, EA_LEGACY_ARRAY_CLASS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT];
 		val containerDefinition = partialInterface.eContainer as ExtendedDefinition;
 		val extendedAttributes = containerDefinition.eal.extendedAttributes;
 		for (String extendedAttribute : forbiddenExtendedAttributes) {
@@ -649,15 +648,15 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 
 
-	// See 4.3.1. [ArrayClass]
+	// See 4.3.7. [LegacyArrayClass]
 
 	@Check
 	def checkExtendedAttributeArrayClassInherits(Interface iface) {
 		if (!iface.inheritedInterfaces.empty) {
 			val containerDefinition = iface.eContainer as ExtendedDefinition;
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
-			if (extendedAttributes.containsExtendedAttribute(EA_ARRAY_CLASS)) {
-				extendedAttributes.getAllExtendedAttributes(EA_ARRAY_CLASS).forEach[
+			if (extendedAttributes.containsExtendedAttribute(EA_LEGACY_ARRAY_CLASS)) {
+				extendedAttributes.getAllExtendedAttributes(EA_LEGACY_ARRAY_CLASS).forEach[
 					error('The extended attribute "' + it.nameRef + '" must not be specified on an interface that inherits from another', 
 						it,
 						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)	
@@ -668,7 +667,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeArrayClassTakesNoArguments(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_ARRAY_CLASS) {
+		if (extendedAttribute.nameRef == EA_LEGACY_ARRAY_CLASS) {
 			if (!extendedAttribute.takesNoArguments()) {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
 					extendedAttribute,
@@ -955,33 +954,6 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			}
 		}
 	}
-
-	// Relaxed checks
-
-	@Check
-	def checkPromiseTypeTypeSuffix(PromiseType type) {
-		if (!type.typeSuffix.nullOrEmpty) {
-			val firstTypeSuffix = type.typeSuffix.get(0);
-			if (!(firstTypeSuffix instanceof NullableTypeSuffix) || type.typeSuffix.size > 1) {
-				error('Promise types only support the type suffix "?"',
-					type,
-					WebIDLPackage.Literals.TYPE__TYPE_SUFFIX)
-			}
-		}
-	}
-
-	@Check
-	def checkSequenceTypeTypeSuffix(SequenceType type) {
-		if (!type.typeSuffix.nullOrEmpty) {
-			val firstTypeSuffix = type.typeSuffix.get(0);
-			if (!(firstTypeSuffix instanceof NullableTypeSuffix) || type.typeSuffix.size > 1) {
-				error('Sequence types only support the type suffix "?"',
-					type,
-					WebIDLPackage.Literals.TYPE__TYPE_SUFFIX)
-			}
-		}
-	}
-
 
 	private def EStructuralFeature typeToFeature(Type type) {
 		val containerDefinition = type.eContainer;
