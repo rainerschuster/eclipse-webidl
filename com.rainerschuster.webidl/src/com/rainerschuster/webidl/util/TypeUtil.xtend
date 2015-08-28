@@ -544,6 +544,103 @@ class TypeUtil {
 		intermediate
 	}
 
+
+
+	// TypeScript specific methods
+
+	def static String toTypeScriptType(ReturnType type) {
+		switch type {
+			VoidType: "void"
+			Type: type.toTypeScriptType
+		}
+	}
+
+	def static String toTypeScriptType(Type type) {
+		switch type {
+			ReferenceType : {
+				var Definition resolved = type.typeRef;
+				if (resolved != null) {
+					switch resolved {
+						Interface : resolved.name
+						Dictionary : "any" // TODO Dictionary
+						Enum : "string" // TODO is this correct?
+						// TODO implement CallbackFunctionType!
+						CallbackFunction : "any"  // TODO CallbackFunction // resolved.name
+						Typedef : resolved.type.toTypeScriptType
+					}
+				} else {
+					null
+				}
+			} // type.name
+			AnyType: "any"
+			VoidType : "void"
+			BooleanType : "boolean"
+			ByteType : "number"
+			OctetType : "number"
+			ShortType : "number"
+//			UnsignedShortType : "number"
+			LongType : "number"
+//			UnsignedLongType : "number"
+			LongLongType : "number"
+//			UnsignedLongLongType : "number"
+			FloatType : "number"
+//			UnrestrictedFloatType : "number"
+			DoubleType : "number"
+//			UnrestrictedDoubleType : "number"
+			DOMStringType : "string"
+			ObjectType : "any"
+			// TODO implement InterfaceType!
+			// TODO Corresponding Java escaped identifier
+//			InterfaceSymbol : type.name
+//			DictionarySymbol : "java.util.HashMap<java.lang.String,java.lang.Object>"
+//			EnumerationSymbol : "java.lang.String"
+//			// TODO implement CallbackFunctionType!
+//			CallbackFunctionSymbol : type.name
+			SequenceType : {
+				val Type subType = type.type;
+				val String subTypeString = subType.toTypeScriptType;
+				if (subTypeString != null) {
+					"Array<" + subTypeString + ">";
+//					subTypeString + "[]";
+				}
+			}
+			PromiseType : {
+				val ReturnType subType = type.type;
+				val String subTypeString = subType.toTypeScriptType;
+				"any"
+				// TODO Promise!
+//				if (subTypeString != null) {
+//					"Promise<" + subTypeString + ">";
+//				}
+			}
+			UnionType : "any" // TODO union
+			DOMExceptionType : "any"
+			DateType : "Date"
+			ByteStringType : "string"
+			USVStringType : "string"
+			ArrayBufferType : "ArrayBuffer"
+			DataViewType : "DataView"
+			Int8ArrayType : "Int8Array"
+			Int16ArrayType : "Int16Array"
+			Int32ArrayType : "Int32Array"
+			Uint8ArrayType : "Uint8Array"
+			Uint16ArrayType : "Uint16Array"
+			Uint32ArrayType : "Uint32Array"
+			Uint8ClampedArrayType : "Uint8ClampedArray"
+			Float32ArrayType : "Float32Array"
+			Float64ArrayType : "Float64Array"
+			FrozenArrayType : { // TODO What?
+				val Type subType = type.type;
+				val String subTypeString = subType.toTypeScriptType;
+				if (subTypeString != null) {
+					"Array<" + subTypeString + ">";
+//					subTypeString + "[]";
+				}
+			}
+			default : {/*logger.warn("Unknown type {}!", type);*/ null}
+		}
+	}
+
 	protected static def boolean namedProperty(Operation operation, Special special) {
 		val operationType = operation.type;
 		// TODO What about typedefs?

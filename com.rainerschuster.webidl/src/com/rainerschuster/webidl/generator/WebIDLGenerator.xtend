@@ -67,41 +67,45 @@ class WebIDLGenerator implements IGenerator {
 	@Inject extension IQualifiedNameProvider
 
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-//		// Prepare helper structures
-//		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
-//		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
-//		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
-//		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
-//			val ifaceB = e.ifaceB.resolveDefinition as Interface;
-//			implementsMap.put(e.ifaceA, ifaceB);
-//		}
-//		for (e : resource.allContents.toIterable.filter(typeof(PartialInterface))) {
-//			partialInterfaceMap.put(e.interfaceName, e);
-//		}
-//		for (e : resource.allContents.toIterable.filter(typeof(PartialDictionary))) {
-//			partialDictionaryMap.put(e.dictionaryName, e);
-//		}
-//		// Process Interfaces
-//		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
-//			val Set<String> processedOperations = newLinkedHashSet();
-//			val allImplements = newArrayList();
-//			if (e.inherits != null) {
-//				val inherits = e.inherits.resolveDefinition as Interface;
-//				allImplements += EcoreUtil2.cloneWithProxies(inherits);
-//			}
-//			if (implementsMap.containsKey(e)) {
-//				allImplements += implementsMap.get(e).map[EcoreUtil2.cloneWithProxies(it)];
-//			}
-////			val myInterface = EcoreUtil.copy(e);
-//			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
-//			myInterface.callback = e.callback;
-//			myInterface.name = e.name;
-//			myInterface.inherits = EcoreUtil2.cloneWithProxies(e.inherits);
-////			myInterface.getInterfaceMembers().clear();
-//			// TODO Overloaded operations / constructors
-////			myInterface.interfaceMembers += e.interfaceMembers;
-//					for (extendedMember : e.interfaceMembers) {
-//						val member = extendedMember.interfaceMember;
+		println("Starting Generator for TypeScript!");
+		println("URI: " + resource.URI);
+		val StringBuffer sb = new StringBuffer();
+		// Prepare helper structures
+		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
+		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
+		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
+		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
+			val ifaceB = e.ifaceB.resolveDefinition as Interface;
+			implementsMap.put(e.ifaceA, ifaceB);
+		}
+		for (e : resource.allContents.toIterable.filter(typeof(PartialInterface))) {
+			partialInterfaceMap.put(e.interfaceName, e);
+		}
+		for (e : resource.allContents.toIterable.filter(typeof(PartialDictionary))) {
+			partialDictionaryMap.put(e.dictionaryName, e);
+		}
+		// Process Interfaces
+		for (e : resource.allContents.toIterable.filter(typeof(Interface))) {
+			println("Interface: " + e.name);
+			val Set<String> processedOperations = newLinkedHashSet();
+			val allImplements = newArrayList();
+			if (e.inherits != null) {
+				val inherits = e.inherits.resolveDefinition as Interface;
+				allImplements += EcoreUtil2.cloneWithProxies(inherits);
+			}
+			if (implementsMap.containsKey(e)) {
+				allImplements += implementsMap.get(e).map[EcoreUtil2.cloneWithProxies(it)];
+			}
+//			val myInterface = EcoreUtil.copy(e);
+			val myInterface = EcoreUtil.create(e.eClass()) as InterfaceImpl;
+			myInterface.callback = e.callback;
+			myInterface.name = e.name;
+			myInterface.inherits = EcoreUtil2.cloneWithProxies(e.inherits);
+//			myInterface.getInterfaceMembers().clear();
+			// TODO Overloaded operations / constructors
+//			myInterface.interfaceMembers += e.interfaceMembers;
+					for (extendedMember : e.interfaceMembers) {
+						val member = extendedMember.interfaceMember;
 //						if (member instanceof Operation) {
 //							if (!processedOperations.contains(member.name)) {
 //								val effectiveOverloadingSet = if (member.staticOperation) {
@@ -118,93 +122,60 @@ class WebIDLGenerator implements IGenerator {
 //								processedOperations += member.name;
 //							}
 //						} else {
-//							val mappedMember = member;
-//							val myExtendedMember = EcoreUtil2.cloneWithProxies(extendedMember);
-//							myExtendedMember.interfaceMember = mappedMember;
-//							myInterface.interfaceMembers += myExtendedMember;
+							val mappedMember = member;
+							val myExtendedMember = EcoreUtil2.cloneWithProxies(extendedMember);
+							myExtendedMember.interfaceMember = mappedMember;
+							myInterface.interfaceMembers += myExtendedMember;
 //						}
-//					}
-//
-//
-//			if (partialInterfaceMap.containsKey(e)) {
-//				for (pi : partialInterfaceMap.get(e)) {
-//					for (member : pi.interfaceMembers) {
-////						if (member instanceof Operation) {
-////							val effectiveOverloadingSet = if (member.staticOperation) {
-////								computeForStaticOperation(pi, member.name, 0)
-////							} else {
-////								computeForRegularOperation(pi, member.name, 0)
-////							}
-////							val mappedMember = member.mapOperation(effectiveOverloadingSet);
-////							myInterface.interfaceMembers += mappedMember;
-////						} else {
-//							myInterface.interfaceMembers += EcoreUtil2.cloneWithProxies(member);
-////						}
-//					}
-////					myInterface.interfaceMembers += pi.interfaceMembers;
-//				}
-//			}
-//			// TODO Interfaces with [NoInterfaceObject]?
+					}
+
+
+			if (partialInterfaceMap.containsKey(e)) {
+				for (pi : partialInterfaceMap.get(e)) {
+					for (member : pi.interfaceMembers) {
+//						if (member instanceof Operation) {
+//							val effectiveOverloadingSet = if (member.staticOperation) {
+//								computeForStaticOperation(pi, member.name, 0)
+//							} else {
+//								computeForRegularOperation(pi, member.name, 0)
+//							}
+//							val mappedMember = member.mapOperation(effectiveOverloadingSet);
+//							myInterface.interfaceMembers += mappedMember;
+//						} else {
+							myInterface.interfaceMembers += EcoreUtil2.cloneWithProxies(member);
+//						}
+					}
+//					myInterface.interfaceMembers += pi.interfaceMembers;
+				}
+			}
+			// TODO Interfaces with [NoInterfaceObject]?
 //			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", myInterface.binding(e, allImplements));
-//		}
+			sb.append(myInterface.binding(e, allImplements));
+			sb.append("\n");
+		}
 //		// Process Callback Functions
 //		for (e : resource.allContents.toIterable.filter(typeof(CallbackFunction))) {
 //			val effectiveOverloadingSet = e.computeForCallbackFunction(0);
 //			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.binding(effectiveOverloadingSet));
 //		}
-	}
 
-	private def Operation mapOperation(Operation original, EffectiveOverloadingSetEntry<Operation> entry) {
-//		val myOperation = EcoreUtil.copy(original);
-		val myOperation = EcoreUtil.create(original.eClass()) as OperationImpl;
-		myOperation.static = original.static;
-		myOperation.specials += original.specials; // FIXME Clone specials?
-		myOperation.name = original.name;
-		myOperation.type = EcoreUtil2.cloneWithProxies(original.type);
-		val argumentsCopy = original.arguments.map[EcoreUtil2.cloneWithProxies(it)];
-		for (Pair<Argument, Pair<Type, OptionalityValue>> i : entry.mapArguments(argumentsCopy)) {
-			val originalArgument = i.key;
-			val type = i.value.key;
-			val optionalityValue = i.value.value;
-			val myArgument = EcoreUtil2.cloneWithProxies(originalArgument);
-////			val myArgument = EcoreUtil.copy(originalArgument);
-//			val myArgument = EcoreUtil.create(originalArgument.eClass()) as ArgumentImpl;
-//			myArgument.eal = originalArgument.eal;
-//			myArgument.defaultValue = originalArgument.defaultValue;
-//			myArgument.optional = originalArgument.optional;
-//			myArgument.type = type;
-//			myArgument.name = originalArgument.name;
-			myArgument.optional = optionalityValue == OptionalityValue.OPTIONAL;
-			myArgument.ellipsis = optionalityValue == OptionalityValue.VARIADIC;
-			myOperation.arguments += myArgument;
-		}
-		return myOperation;
+		fsa.generateFile(resource.URI.trimFileExtension.segment(resource.URI.segmentCount - 1) + ".d.ts", sb.toString());
 	}
 
 	def binding(Interface iface, Interface original, List<Interface> allImplements) '''
-		«IF original.eContainer.fullyQualifiedName != null»
-			package «original.eContainer.fullyQualifiedName»;
-
-		«ENDIF»
-
-		public interface «iface.name»«IF !allImplements.nullOrEmpty» extends «FOR i : allImplements SEPARATOR ', '»«i.fullyQualifiedName»«ENDFOR»«ENDIF» {
-		«FOR i : iface.interfaceMembers SEPARATOR '\n'»
+		interface «iface.name»«IF !allImplements.nullOrEmpty» extends «FOR i : allImplements SEPARATOR ', '»«i.fullyQualifiedName»«ENDFOR»«ENDIF» {
+		«FOR i : iface.interfaceMembers SEPARATOR ''»
 			«binding(i)»
 		«ENDFOR»
 		}
 	'''
 
 	def binding(CallbackFunction callback, List<EffectiveOverloadingSetEntry<CallbackFunction>> effectiveOverloadingSet) '''
-		«IF callback.eContainer.fullyQualifiedName != null»
-			package «callback.eContainer.fullyQualifiedName»;
-
-		«ENDIF»
-
-		public interface «callback.name» {
+		interface «callback.name» {
 		«FOR entry : effectiveOverloadingSet SEPARATOR '\n'»
-			«entry.callable.type.toJavaType» call(«FOR i : entry.mapArguments(callback.arguments) SEPARATOR ', '»«binding(i.key, i.value)»«ENDFOR»);
+			«entry.callable.type.toTypeScriptType» call(«FOR i : entry.mapArguments(callback.arguments) SEPARATOR ', '»«binding(i.key, i.value)»«ENDFOR»);
 		«ENDFOR»
-«««			«callback.type.toJavaType» call(«FOR i : callback.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»);
+«««			«callback.type.toTypeScriptType» call(«FOR i : callback.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»);
 		}
 	'''
 
@@ -227,29 +198,23 @@ class WebIDLGenerator implements IGenerator {
 
 	/* TODO NON-SPEC: Added "public static final " */
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, Const constant) '''
-		«constant.type.toJavaType» «constant.name.getEscapedJavaName» = «constant.constValue»;
+		«constant.name.getEscapedJavaName»: «constant.type.toTypeScriptType» = «constant.constValue»;
 
 	'''
 
 	// TODO is... for boolean! (non-nullable?!)
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, Attribute attribute) '''
-		«IF !attribute.inherit»
-			«attribute.type.toJavaType» get«attribute.name.toFirstUpper»();
-		«ENDIF»
-		«IF !attribute.readOnly»
-			void set«attribute.name.toFirstUpper»(«attribute.type.toJavaType» «attribute.name.getEscapedJavaName»);
-		«ENDIF»
-
+		«attribute.name»: «attribute.type.toTypeScriptType»;
 	'''
 
 	// FIXME What if more than one specials occur, e.g.: setter creator void (unsigned long index, HTMLOptionElement? option);
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, Operation operation) '''
-		«operation.type.toJavaType» «IF operation.name.nullOrEmpty»«IF operation.specials.contains(Special.GETTER)»_get«ELSEIF operation.specials.contains(Special.SETTER)»_set«ELSEIF operation.specials.contains(Special.DELETER)»_delete«ELSEIF operation.specials.contains(Special.LEGACYCALLER)»_call«ENDIF»«ELSE»«operation.name.getEscapedJavaName»«ENDIF»(«FOR i : operation.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»);
+		«IF operation.name.nullOrEmpty»«IF operation.specials.contains(Special.GETTER)»_get«ELSEIF operation.specials.contains(Special.SETTER)»_set«ELSEIF operation.specials.contains(Special.DELETER)»_delete«ELSEIF operation.specials.contains(Special.LEGACYCALLER)»_call«ENDIF»«ELSE»«operation.name.getEscapedJavaName»«ENDIF»(«FOR i : operation.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»): «operation.type.toTypeScriptType»;
 	'''
 
 	def binding(Argument parameter) '''
-		«parameter.type.toJavaType»«IF parameter.ellipsis»...«ENDIF» «parameter.name.getEscapedJavaName»'''
+		«IF parameter.ellipsis»...«ENDIF»«parameter.name.getEscapedJavaName»«IF parameter.optional»?«ENDIF»: «parameter.type.toTypeScriptType»'''
 	def binding(Argument parameter, Pair<Type, OptionalityValue> o) '''
-		«parameter.type.toJavaType»«IF o.value == OptionalityValue.VARIADIC»...«ENDIF» «parameter.name.getEscapedJavaName»'''
+		«IF o.value == OptionalityValue.VARIADIC»...«ENDIF»«parameter.name.getEscapedJavaName»«IF o.value == OptionalityValue.OPTIONAL»?«ENDIF»: «parameter.type.toTypeScriptType»'''
 
 }
