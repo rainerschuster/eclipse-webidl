@@ -1,5 +1,8 @@
 sudo: false
 language: java
+cache:
+  directories:
+    - $HOME/.m2
 script:
 #  - sudo rm /etc/mavenrc
 #  - export MAVEN_OPTS="-Xmx2048m -XX:MaxPermSize=512m"
