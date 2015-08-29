@@ -189,7 +189,7 @@ class WebIDLGenerator implements IGenerator {
 	}
 
 	def binding(ExtendedInterfaceMember member) {
-		bindingInterfaceMember(member.eal, member.interfaceMember)
+		'\t' + bindingInterfaceMember(member.eal, member.interfaceMember)
 	}
 
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, InterfaceMember interfaceMember) {

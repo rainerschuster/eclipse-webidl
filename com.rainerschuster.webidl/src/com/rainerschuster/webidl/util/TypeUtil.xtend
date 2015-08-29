@@ -68,6 +68,7 @@ import com.rainerschuster.webidl.webIDL.ExtendedAttributeNamedArgList
 import com.rainerschuster.webidl.webIDL.InterfaceOrTypedef
 import com.rainerschuster.webidl.webIDL.DictionaryOrTypedef
 import com.rainerschuster.webidl.webIDL.FrozenArrayType
+import static extension com.rainerschuster.webidl.util.NameUtil.*
 
 class TypeUtil {
 
@@ -555,6 +556,12 @@ class TypeUtil {
 		}
 	}
 
+	// FIXME This is copied from WebIDLGenerator!
+	def static binding(Argument parameter) '''
+		«IF parameter.ellipsis»...«ENDIF»«parameter.name.getEscapedJavaName»«IF parameter.optional»?«ENDIF»: «parameter.type.toTypeScriptType»'''
+	def static binding(Argument parameter, Pair<Type, OptionalityValue> o) '''
+		«IF o.value == OptionalityValue.VARIADIC»...«ENDIF»«parameter.name.getEscapedJavaName»«IF o.value == OptionalityValue.OPTIONAL»?«ENDIF»: «parameter.type.toTypeScriptType»'''
+
 	def static String toTypeScriptType(Type type) {
 		switch type {
 			ReferenceType : {
@@ -565,7 +572,7 @@ class TypeUtil {
 						Dictionary : "any" // TODO Dictionary
 						Enum : "string" // TODO is this correct?
 						// TODO implement CallbackFunctionType!
-						CallbackFunction : "any"  // TODO CallbackFunction // resolved.name
+						CallbackFunction : "(" + resolved.arguments.map[binding(it)].join(", ") + ")" + " => " + toTypeScriptType(resolved.type) // "any"  // TODO CallbackFunction // resolved.name
 						Typedef : resolved.type.toTypeScriptType
 					}
 				} else {
