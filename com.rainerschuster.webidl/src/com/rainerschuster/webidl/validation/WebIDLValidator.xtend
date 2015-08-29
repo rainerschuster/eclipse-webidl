@@ -172,8 +172,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkConstantName(Const constant) {
-		if (constant.name == "prototype") {
-			error('The identifier of a constant must not be “prototype”', 
+		if (constant.name == "length" || constant.name == "name" || constant.name == "prototype") {
+			error('The identifier of a constant must not be “length”, “name” or “prototype”', 
 					constant,
 					WebIDLPackage.Literals.CONST__NAME)
 		}
