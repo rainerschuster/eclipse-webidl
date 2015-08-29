@@ -54,10 +54,10 @@ class Scraper {
 			scraper.options.parseOptions(args);
 
 			if (scraper.options.commandLine.args.empty) {
-				System.out.println("No URL specified!");
+				println("No URL specified!");
 				scraper.options.printUsage();
 			} else if (scraper.options.commandLine.args.size > 1) {
-				System.out.println("Unexpected arguments: Exactly one URL is required!");
+				println("Unexpected arguments: Exactly one URL is required!");
 				scraper.options.printUsage();
 			} else {
 				// Main code
@@ -72,6 +72,8 @@ class Scraper {
 					scraper.refQueue.add("navigation timing");
 					scraper.refToHref.put("mediasource", "http://w3c.github.io/media-source/");
 					scraper.refQueue.add("mediasource");
+					scraper.refToHref.put("geometry", "https://drafts.fxtf.org/geometry/");
+					scraper.refQueue.add("geometry");
 //					scraper.refToHref.put("customelements", "http://w3c.github.io/webcomponents/spec/custom/");
 //					scraper.refQueue.add("customelements");
 					scraper.refToHref.put("shadowdom", "http://w3c.github.io/webcomponents/spec/shadow/");
@@ -93,14 +95,14 @@ class Scraper {
 				}
 			}
 		} catch (ParseException pe) {
-			System.out.println(pe.message);
+			println(pe.message);
 			scraper.options.printUsage();
 		}
 	}
 
 	def void processQueue() {
 		while (!refQueue.empty) {
-			System.out.println("Queue iteration");
+			println("Queue iteration");
 			val String next = refQueue.poll();
 			val href = refToHref.get(next);
 			outputFilenameBase = next;
@@ -114,7 +116,15 @@ class Scraper {
 	}
 	// see http://stackoverflow.com/questions/9022140/using-xpath-contains-against-html-in-java
 	def scrapeUrl(String urlString, boolean preCodeMode) {
-		System.out.println("Scraping " + urlString);
+		println("Scraping " + urlString);
+		if (urlString.endsWith(".pdf")) {
+			println("Omitting PDF document.");
+			return;
+		}
+		if (urlString.endsWith(".txt")) {
+			println("Omitting TXT document.");
+			return;
+		}
 		var out = System.out;
 		var outRefs = System.out;
 		try {
@@ -135,7 +145,7 @@ class Scraper {
 					doc = Jsoup.parse(response, StandardCharsets.UTF_8.name);
 				}
 
-//				System.out.println("Old scraping:");
+//				println("Old scraping:");
 				var scrapeCount = 0;
 				// Needed for https://dvcs.w3.org/hg/innerhtml/raw-file/tip/index.html
 				scrapeCount += printNodeContent(out, doc, "pre.extraidl");
@@ -145,7 +155,7 @@ class Scraper {
 				if (preCodeMode) {
 					scrapeCount += printNodeContent(out, doc, "pre code");
 				}
-//				System.out.println("New scraping:");
+//				println("New scraping:");
 				scrapeCount += printNodeContentSpecial(out, doc);
 
 				if (scrapeCount > 0) {
@@ -154,7 +164,7 @@ class Scraper {
 					referenceCount += scrapeReferences(outRefs, doc, "div#anolis-references dl", scrapeCount);
 					referenceCount += scrapeReferences(outRefs, doc, "section#normative-references dl.bibliography", scrapeCount);
 					referenceCount += scrapeReferences(outRefs, doc, "section#informative-references dl.bibliography", scrapeCount);
-					System.out.println("Scrape count: " + scrapeCount + ", reference count: " + referenceCount);
+					println("Scrape count: " + scrapeCount + ", reference count: " + referenceCount);
 					if (referenceCount == 0) {
 						System.err.println("Found IDL fragments, but no references!");
 					}
@@ -229,7 +239,7 @@ class Scraper {
 		val Elements elements = doc.select(query);
 		for (Element element : elements) {
 			if (element.classNames.contains("extract")) {
-				System.out.println("Ignoring node since it is only an extract.");
+				println("Ignoring node since it is only an extract.");
 			} else {
 				sb.append(element.text() + "\n\n");
 			}
@@ -239,7 +249,7 @@ class Scraper {
 		val String secondHalf = trimmed.substring(trimmed.length/2, trimmed.length).trim();
 		if (!trimmed.empty) {
 			if (firstHalf.equals(secondHalf)) {
-				System.out.println("Ignoring half");
+				println("Ignoring half");
 				out.println(firstHalf);
 			} else {
 				out.println(trimmed);
@@ -252,7 +262,7 @@ class Scraper {
 		val Elements elements = doc.select("dl.idl");
 		for (Element element : elements) {
 			if (element.classNames.contains("extract")) {
-				System.out.println("Ignoring node since it is only an extract.");
+				println("Ignoring node since it is only an extract.");
 			} else {
 				val definitionList = definitionList(element);
 				val String title = element.attr("title");
