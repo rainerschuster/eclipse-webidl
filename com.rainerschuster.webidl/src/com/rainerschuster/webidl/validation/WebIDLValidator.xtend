@@ -140,7 +140,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnInterface(Interface iface) {
-		val allowedExtendedAttributes = #[EA_CONSTRUCTOR, EA_EXPOSED, EA_GLOBAL, EA_IMPLICIT_THIS, EA_LEGACY_ARRAY_CLASS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT, EA_OVERRIDE_BUILTINS, EA_PRIMARY_GLOBAL, EA_UNFORGEABLE];
+		val allowedExtendedAttributes = #[EA_CONSTRUCTOR, EA_EXPOSED, EA_GLOBAL, EA_IMPLICIT_THIS, EA_LEGACY_ARRAY_CLASS, EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT, EA_OVERRIDE_BUILTINS, EA_PRIMARY_GLOBAL, EA_UNFORGEABLE];
 		val containerDefinition = iface.eContainer as ExtendedDefinition;
 		val extendedAttributes = containerDefinition.eal.extendedAttributes;
 		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
@@ -251,8 +251,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnAttribute(Attribute attribute) {
-		val allowedExtendedAttributesStatic = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
-		val allowedExtendedAttributesRegular = #[EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE, EA_UNSCOPABLE];
+		val allowedExtendedAttributesStatic = #[EA_CE_REACTIONS, EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
+		val allowedExtendedAttributesRegular = #[EA_CE_REACTIONS, EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE, EA_UNSCOPABLE];
 		val containerDefinition = attribute.eContainer;
 		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
@@ -333,7 +333,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnOperation(Operation operation) {
-		val allowedExtendedAttributes = #[EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE, EA_UNSCOPABLE];
+		val allowedExtendedAttributes = #[EA_CE_REACTIONS, EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE, EA_UNSCOPABLE];
 		val containerDefinition = operation.eContainer;
 		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;

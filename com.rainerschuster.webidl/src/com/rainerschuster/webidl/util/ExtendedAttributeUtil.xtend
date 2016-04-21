@@ -30,6 +30,9 @@ class ExtendedAttributeUtil {
 //	static val Logger logger = LoggerFactory.getLogger(typeof(XtendExtendedAttributeUtil));
 
 //	public static val String EA_ARRAY_CLASS = "ArrayClass";
+	// TODO https://html.spec.whatwg.org/#cereactions
+	// TODO https://html.spec.whatwg.org/#concept-custom-element-reaction
+	public static val String EA_CE_REACTIONS = "CEReactions";
 	public static val String EA_CLAMP = "Clamp";
 	public static val String EA_CONSTRUCTOR = "Constructor";
 	public static val String EA_ENFORCE_RANGE = "EnforceRange";
@@ -38,6 +41,7 @@ class ExtendedAttributeUtil {
 	public static val String EA_GLOBAL = "Global";
 	public static val String EA_PRIMARY_GLOBAL = "PrimaryGlobal";
 	public static val String EA_LEGACY_ARRAY_CLASS = "LegacyArrayClass";
+	public static val String EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES = "LegacyUnenumerableNamedProperties";
 	public static val String EA_LENIENT_THIS = "LenientThis";
 	public static val String EA_NAMED_CONSTRUCTOR = "NamedConstructor";
 	public static val String EA_NEW_OBJECT = "NewObject";
@@ -47,14 +51,16 @@ class ExtendedAttributeUtil {
 //	public static val String EA_REPLACEABLE_NAMED_PROPERTIES = "ReplaceableNamedProperties";
 	public static val String EA_REPLACEABLE = "Replaceable";
 	public static val String EA_SAME_OBJECT = "SameObject";
+	public static val String EA_SECURE_CONTEXT = "SecureContext";
 	public static val String EA_TREAT_NON_CALLABLE_AS_NULL = "TreatNonCallableAsNull";
 	public static val String EA_TREAT_NON_OBJECT_AS_NULL = "TreatNonObjectAsNull";
 	public static val String EA_TREAT_NULL_AS = "TreatNullAs";
 	public static val String EA_UNFORGEABLE = "Unforgeable";
-	public static val String EA_UNSCOPEABLE = "Unscopeable";
+	public static val String EA_UNSCOPABLE = "Unscopable";
 
 	public static val KNOWN_EXTENDED_ATTRIBUTES = #[
 //		EA_ARRAY_CLASS,
+		EA_CE_REACTIONS,
 		EA_CLAMP,
 		EA_CONSTRUCTOR,
 		EA_ENFORCE_RANGE,
@@ -63,6 +69,7 @@ class ExtendedAttributeUtil {
 		EA_GLOBAL,
 		EA_PRIMARY_GLOBAL,
 		EA_LEGACY_ARRAY_CLASS,
+		EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES,
 		EA_LENIENT_THIS,
 		EA_NAMED_CONSTRUCTOR,
 		EA_NEW_OBJECT,
@@ -72,11 +79,12 @@ class ExtendedAttributeUtil {
 //		EA_REPLACEABLE_NAMED_PROPERTIES,
 		EA_REPLACEABLE,
 		EA_SAME_OBJECT,
+		EA_SECURE_CONTEXT,
 		EA_TREAT_NON_CALLABLE_AS_NULL,
 		EA_TREAT_NON_OBJECT_AS_NULL,
 		EA_TREAT_NULL_AS,
 		EA_UNFORGEABLE,
-		EA_UNSCOPEABLE
+		EA_UNSCOPABLE
 	];
 
 	def static boolean containsExtendedAttribute(Iterable<ExtendedAttribute> input, String name) {
@@ -186,8 +194,8 @@ class ExtendedAttributeUtil {
 		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_UNFORGEABLE)
 	}
 
-	def static boolean containsUnscopeable(Iterable<ExtendedAttribute> input) {
-		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_UNSCOPEABLE)
+	def static boolean containsUnscopable(Iterable<ExtendedAttribute> input) {
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_UNSCOPABLE)
 	}
 
 	def static List<Constructor> getConstructorValues(Iterable<ExtendedAttribute> input) {
