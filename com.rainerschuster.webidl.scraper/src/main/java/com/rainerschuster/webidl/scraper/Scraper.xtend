@@ -35,6 +35,8 @@ import java.util.Map
 import com.google.common.collect.Maps
 import java.util.Queue
 import com.google.common.collect.Queues
+import org.jsoup.nodes.Node
+import org.jsoup.nodes.TextNode
 
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
 class Scraper {
@@ -233,6 +235,22 @@ class Scraper {
 		}
 		return definitionList.size();
 	}
+	
+	private def void recursivePrint(StringBuilder sb, Node node) {
+		// if(!ignore.contains(element.className()))
+		if (node instanceof TextNode) {
+			sb.append(node.wholeText);
+		} else if (node instanceof Element) {
+			val Element element = node as Element;
+			if (element.classNames.contains("dfn-panel")) {
+				println("Ignoring node since it is only a dfn-panel.");
+			} else {
+				for (Node child : element.childNodes()) {
+					recursivePrint(sb, child);
+				}
+			}
+		}
+	}
 
 	private def int printNodeContent(PrintStream out, Document doc, String query) {
 		val StringBuilder sb = new StringBuilder();
@@ -241,7 +259,8 @@ class Scraper {
 			if (element.classNames.contains("extract")) {
 				println("Ignoring node since it is only an extract.");
 			} else {
-				sb.append(element.text() + "\n\n");
+				recursivePrint(sb, element);
+				sb.append("\n");
 			}
 		}
 		val String trimmed = sb.toString().trim();
