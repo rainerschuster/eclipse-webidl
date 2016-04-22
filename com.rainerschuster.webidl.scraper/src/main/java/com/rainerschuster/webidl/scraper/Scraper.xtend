@@ -82,6 +82,8 @@ class Scraper {
 					scraper.refQueue.add("shadowdom");
 //					scraper.refToHref.put("htmlimports", "http://w3c.github.io/webcomponents/spec/imports/");
 //					scraper.refQueue.add("htmlimports");
+//					scraper.refToHref.put("cssomview", "https://drafts.csswg.org/cssom-view/");
+//					scraper.refQueue.add("cssomview");
 					scraper.processQueue();
 				} else {
 					if (scraper.options.commandLine.hasOption("o")) {
@@ -162,6 +164,7 @@ class Scraper {
 
 				if (scrapeCount > 0) {
 					var referenceCount = 0;
+					referenceCount += scrapeReferences(outRefs, doc, "h3#normative + dl", scrapeCount);
 					referenceCount += scrapeReferences(outRefs, doc, "dl#ref-list", scrapeCount);
 					referenceCount += scrapeReferences(outRefs, doc, "div#anolis-references dl", scrapeCount);
 					referenceCount += scrapeReferences(outRefs, doc, "section#normative-references dl.bibliography", scrapeCount);
@@ -223,9 +226,10 @@ class Scraper {
 				for (Element ref : refs) {
 					if (refToHref.containsKey(refName)) {
 						if (idlCount > 0 && !ref.attr("href").equals(refToHref.get(refName))) {
-							System.err.println("Same name but different href: " + ref.attr("href") + " vs. " + refToHref.get(refName));
+							System.err.println("Same name but different href: " + ref.attr("href") + " vs. " + refToHref.get(refName) + " for ref name " + refName);
 						}
 					} else {
+						println("Adding ref " + refName + " with href " + ref.attr("href"));
 						refToHref.put(refName, ref.attr("href"));
 						refQueue.add(refName);
 					}
