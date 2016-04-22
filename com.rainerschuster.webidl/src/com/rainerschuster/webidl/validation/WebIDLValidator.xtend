@@ -347,7 +347,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnOperation(Operation operation) {
-		val allowedExtendedAttributes = #[EA_CE_REACTIONS, EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE, EA_UNSCOPABLE];
+		val allowedExtendedAttributes = #[EA_CE_REACTIONS, EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE, EA_UNSCOPABLE, EA_WEB_GL_HANDLES_CONTEXT_LOSS];
 		val containerDefinition = operation.eContainer;
 		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;

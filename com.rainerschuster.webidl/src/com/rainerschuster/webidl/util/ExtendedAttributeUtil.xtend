@@ -57,6 +57,7 @@ class ExtendedAttributeUtil {
 	public static val String EA_TREAT_NULL_AS = "TreatNullAs";
 	public static val String EA_UNFORGEABLE = "Unforgeable";
 	public static val String EA_UNSCOPABLE = "Unscopable";
+	public static val String EA_WEB_GL_HANDLES_CONTEXT_LOSS= "WebGLHandlesContextLoss";
 
 	public static val KNOWN_EXTENDED_ATTRIBUTES = #[
 //		EA_ARRAY_CLASS,
@@ -84,7 +85,8 @@ class ExtendedAttributeUtil {
 		EA_TREAT_NON_OBJECT_AS_NULL,
 		EA_TREAT_NULL_AS,
 		EA_UNFORGEABLE,
-		EA_UNSCOPABLE
+		EA_UNSCOPABLE,
+		EA_WEB_GL_HANDLES_CONTEXT_LOSS
 	];
 
 	def static boolean containsExtendedAttribute(Iterable<ExtendedAttribute> input, String name) {
