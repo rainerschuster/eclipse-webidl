@@ -228,6 +228,11 @@ class Scraper {
 						if (idlCount > 0 && !ref.attr("href").equals(refToHref.get(refName))) {
 							System.err.println("Same name but different href: " + ref.attr("href") + " vs. " + refToHref.get(refName) + " for ref name " + refName);
 						}
+					} else if (refToHref.containsValue(ref.attr("href"))) {
+						System.err.println("Same href but different name: " + refName);
+//						if (/*idlCount > 0 && */!refName.equals(refToHref.getValue(ref.attr("href")))) {
+//							System.err.println("Same href but different name: " + refName + " vs. " + refToHref.getValue(ref.attr("href")) + " for ref name " + refName);
+//						}
 					} else {
 						println("Adding ref " + refName + " with href " + ref.attr("href"));
 						refToHref.put(refName, ref.attr("href"));
