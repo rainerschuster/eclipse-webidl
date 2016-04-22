@@ -140,7 +140,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnInterface(Interface iface) {
-		val allowedExtendedAttributes = #[EA_CONSTRUCTOR, EA_EXPOSED, EA_GLOBAL, EA_IMPLICIT_THIS, EA_LEGACY_ARRAY_CLASS, EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT, EA_OVERRIDE_BUILTINS, EA_PRIMARY_GLOBAL, EA_UNFORGEABLE];
+		val allowedExtendedAttributes = #[EA_CONSTRUCTOR, EA_EXPOSED, EA_GLOBAL, EA_IMPLICIT_THIS, EA_LEGACY_ARRAY_CLASS, EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT, EA_OVERRIDE_BUILTINS, EA_PRIMARY_GLOBAL, EA_SECURE_CONTEXT, EA_UNFORGEABLE];
 		val containerDefinition = iface.eContainer as ExtendedDefinition;
 		val extendedAttributes = containerDefinition.eal.extendedAttributes;
 		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
@@ -187,6 +187,20 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			error('The type of a constant must not be any type other than a primitive type or typedef with primitive type',
 					constant,
 					WebIDLPackage.Literals.CONST__NAME)
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeOnConstant(Const constant) {
+		val allowedExtendedAttributes = #[EA_EXPOSED, EA_SECURE_CONTEXT];
+		val containerDefinition = constant.eContainer as ExtendedInterfaceMember;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+			if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on constant definitions', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
 		}
 	}
 
@@ -251,8 +265,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnAttribute(Attribute attribute) {
-		val allowedExtendedAttributesStatic = #[EA_CE_REACTIONS, EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS];
-		val allowedExtendedAttributesRegular = #[EA_CE_REACTIONS, EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE, EA_UNSCOPABLE];
+		val allowedExtendedAttributesStatic = #[EA_CE_REACTIONS, EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_SECURE_CONTEXT, EA_TREAT_NULL_AS];
+		val allowedExtendedAttributesRegular = #[EA_CE_REACTIONS, EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_SECURE_CONTEXT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE, EA_UNSCOPABLE];
 		val containerDefinition = attribute.eContainer;
 		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
@@ -507,6 +521,52 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
+	@Check
+	def checkExtendedAttributeOnIterable(Iterable_ iterable) {
+		val allowedExtendedAttributes = #[EA_EXPOSED, EA_SECURE_CONTEXT];
+		val containerDefinition = iterable.eContainer as ExtendedInterfaceMember;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+			if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on iterable definitions', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.2.8. Maplike declarations
+
+	@Check
+	def checkExtendedAttributeOnMaplike(Maplike maplike) {
+		val allowedExtendedAttributes = #[];
+		val containerDefinition = maplike.eContainer as ExtendedInterfaceMember;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+			if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on maplike definitions', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.2.9. Setlike declarations
+
+	@Check
+	def checkExtendedAttributeOnSetlike(Setlike setlike) {
+		val allowedExtendedAttributes = #[];
+		val containerDefinition = setlike.eContainer as ExtendedInterfaceMember;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+			if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on setlike definitions', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+// TODO Dictionary
 	// See 3.5. Enumerations
 	/**
 	 * The list of enumeration values must not include duplicates.
@@ -522,6 +582,20 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
+	@Check
+	def checkExtendedAttributeOnEnumeration(Enum enumeration) {
+		val allowedExtendedAttributes = #[];
+		val containerDefinition = enumeration.eContainer as ExtendedDefinition;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+			if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on enumerations', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
 	// See 3.6. Callback functions
 	/**
 	 * Callback functions must not be used as the type of a constant.
@@ -534,6 +608,36 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 				error('Callback functions must not be used as the type of a constant', 
 						constant,
 						WebIDLPackage.Literals.CONST__TYPE)
+			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeOnCallbackFunction(CallbackFunction callbackFunction) {
+		val allowedExtendedAttributes = #[EA_TREAT_NON_OBJECT_AS_NULL];
+		val containerDefinition = callbackFunction.eContainer as ExtendedDefinition;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+			if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on callback functions', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.7. Typedefs
+
+	@Check
+	def checkExtendedAttributeOnTypedef(Typedef typedef) {
+		val allowedExtendedAttributes = #[];
+		val containerDefinition = typedef.eContainer as ExtendedDefinition;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+			if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on typedefs', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 			}
 		}
 	}
@@ -595,6 +699,20 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 						implementsStatement,
 						WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_B)
 				}
+			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeOnImplementsStatement(ImplementsStatement implementsStatement) {
+		val allowedExtendedAttributes = #[];
+		val containerDefinition = implementsStatement.eContainer as ExtendedDefinition;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		for (ExtendedAttribute extendedAttribute : extendedAttributes) {
+			if (KNOWN_EXTENDED_ATTRIBUTES.contains(extendedAttribute.nameRef) && !allowedExtendedAttributes.contains(extendedAttribute.nameRef)) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must not be specified on implements statements', 
+						extendedAttribute,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 			}
 		}
 	}
@@ -795,7 +913,20 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.8. [LenientThis]
+	// See 4.3.8. [LegacyUnenumerableNamedProperties]
+
+	@Check
+	def checkExtendedAttributeLegacyUnenumerableNamedPropertiesTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.9. [LenientThis]
 
 	@Check
 	def checkExtendedAttributeLenientThisThisTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -808,7 +939,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.9. [NamedConstructor]
+	// See 4.3.10. [NamedConstructor]
 
 	@Check
 	def checkExtendedAttributeNamedConstructorTakesAnIdentifierOrTakesANamedArgumentList(ExtendedAttribute extendedAttribute) {
@@ -836,7 +967,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.10. [NewObject]
+	// See 4.3.11. [NewObject]
 
 	@Check
 	def checkExtendedAttributeNewObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -849,7 +980,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.11. [NoInterfaceObject]
+	// See 4.3.12. [NoInterfaceObject]
 
 	@Check
 	def checkExtendedAttributeNoInterfaceObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -862,7 +993,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.12. [OverrideBuiltins]
+	// See 4.3.13. [OverrideBuiltins]
 
 	@Check
 	def checkExtendedAttributeOverrideBuiltinsTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -875,7 +1006,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.13. [PutForwards]
+	// See 4.3.14. [PutForwards]
 
 	@Check
 	def checkExtendedAttributePutForwardsTakesAnIdentifier(ExtendedAttribute extendedAttribute) {
@@ -888,7 +1019,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.14. [Replaceable]
+	// See 4.3.15. [Replaceable]
 
 	@Check
 	def checkExtendedAttributeReplaceableTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -901,7 +1032,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.15. [SameObject]
+	// See 4.3.16. [SameObject]
 
 	@Check
 	def checkExtendedAttributeSameObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -914,9 +1045,22 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.16. [TreatNonObjectAsNull]
+	// See 4.3.17. [SecureContext]
 
-	// See 4.3.17. [TreatNullAs]
+	@Check
+	def checkExtendedAttributeSecureContextTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_SECURE_CONTEXT) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.18. [TreatNonObjectAsNull]
+
+	// See 4.3.19. [TreatNullAs]
 
 	@Check
 	def checkExtendedAttributeTreatNullAsTakesAnIdentifier(ExtendedAttribute extendedAttribute) {
@@ -929,7 +1073,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.18. [Unforgeable]
+	// See 4.3.20. [Unforgeable]
 
 	@Check
 	def checkExtendedAttributeUnforgeableTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -942,10 +1086,10 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.19. [Unscopeable]
+	// See 4.3.21. [Unscopable]
 
 	@Check
-	def checkExtendedAttributeUnscopeableTakesNoArguments(ExtendedAttribute extendedAttribute) {
+	def checkExtendedAttributeUnscopableTakesNoArguments(ExtendedAttribute extendedAttribute) {
 		if (extendedAttribute.nameRef == EA_UNSCOPABLE) {
 			if (!extendedAttribute.takesNoArguments()) {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
