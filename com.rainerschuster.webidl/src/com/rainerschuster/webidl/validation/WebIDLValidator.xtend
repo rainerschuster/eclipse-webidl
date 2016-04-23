@@ -60,6 +60,7 @@ import com.rainerschuster.webidl.webIDL.USVStringType
 import com.rainerschuster.webidl.webIDL.AnyType
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeIdent
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeList
+import com.rainerschuster.webidl.webIDL.ObjectType
 
 /**
  * Custom validation rules. 
@@ -979,6 +980,21 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 					extendedAttribute,
 					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeSameObjectArgumentReadonlyType(Attribute attribute) {
+		if (!attribute.readOnly || !(attribute.type instanceof ObjectType || attribute.type instanceof ReferenceType)) {
+			val containerDefinition = attribute.eContainer as ExtendedInterfaceMember;
+			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+			extendedAttributes
+				.filter[it.nameRef == EA_SAME_OBJECT]
+				.forEach[
+					error('The extended attribute "' + it.nameRef + '" must not be used on anything other than a read only attribute whose type is an interface type or object', 
+						it,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				];
 		}
 	}
 
