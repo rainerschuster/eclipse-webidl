@@ -690,37 +690,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-
-
-	// See 4.3.7. [LegacyArrayClass]
-
-	@Check
-	def checkExtendedAttributeArrayClassInherits(Interface iface) {
-		if (!iface.inheritedInterfaces.empty) {
-			val containerDefinition = iface.eContainer as ExtendedDefinition;
-			val extendedAttributes = containerDefinition.eal.extendedAttributes;
-			if (extendedAttributes.containsExtendedAttribute(EA_LEGACY_ARRAY_CLASS)) {
-				extendedAttributes.getAllExtendedAttributes(EA_LEGACY_ARRAY_CLASS).forEach[
-					error('The extended attribute "' + it.nameRef + '" must not be specified on an interface that inherits from another', 
-						it,
-						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)	
-				]
-			}
-		}
-	}
-
-	@Check
-	def checkExtendedAttributeArrayClassTakesNoArguments(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_LEGACY_ARRAY_CLASS) {
-			if (!extendedAttribute.takesNoArguments()) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	// See 4.3.2. [Clamp]
+	// See 4.3.1. [Clamp]
 
 	@Check
 	def checkExtendedAttributeClampTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -733,7 +703,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.3. [Constructor]
+	// See 4.3.2. [Constructor]
 
 	@Check
 	def checkExtendedAttributeConstructorTakesNoArgumentsOrTakesAnArgumentList(ExtendedAttribute extendedAttribute) {
@@ -776,7 +746,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.4. [EnforceRange]
+	// See 4.3.3. [EnforceRange]
 
 	@Check
 	def checkExtendedAttributeEnforceRangeTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -815,7 +785,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.6. [ImplicitThis]
+	// See 4.3.5. [ImplicitThis]
 
 	@Check
 	def checkExtendedAttributeImplicitThisTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -828,7 +798,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.7. [Global] and [PrimaryGlobal]
+	// See 4.3.6. [Global] and [PrimaryGlobal]
 
 	@Check
 	def checkExtendedAttributeGlobalTakesNoArgumentsOrTakesAnIdentifierList(ExtendedAttribute extendedAttribute) {
@@ -848,6 +818,34 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take no arguments or take an identifier list', 
 					extendedAttribute,
 					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 4.3.7. [LegacyArrayClass]
+
+	@Check
+	def checkExtendedAttributeLegacyArrayClassTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_LEGACY_ARRAY_CLASS) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeLegacyArrayClassNotOnInterfaceThatInherits(Interface iface) {
+		if (!iface.inheritedInterfaces.isEmpty()) {
+			val containerDefinition = iface.eContainer as ExtendedDefinition;
+			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+			if (extendedAttributes.containsExtendedAttribute(EA_LEGACY_ARRAY_CLASS)) {
+				extendedAttributes.getAllExtendedAttributes(EA_LEGACY_ARRAY_CLASS).forEach[
+					error('The extended attribute "' + it.nameRef + '" must not be used on an interface that has any inherited interfaces', 
+						it,
+						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+				]
 			}
 		}
 	}
