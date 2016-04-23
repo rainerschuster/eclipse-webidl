@@ -789,7 +789,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.5. [Exposed]
+	// See 4.3.4. [Exposed]
 
 	@Check
 	def checkExtendedAttributeExposedTakesAnIdentifierOrTakesAnIdentifierList(ExtendedAttribute extendedAttribute) {
@@ -799,6 +799,19 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 					extendedAttribute,
 					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 			}
+		}
+	}
+
+	@Check
+	def checkExtendedAttributeExposedRequiresConstructorOnDictionary(Dictionary dictionary) {
+		val containerDefinition = dictionary.eContainer as ExtendedDefinition;
+		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+		if (extendedAttributes.containsExtendedAttribute(EA_EXPOSED) && !extendedAttributes.containsExtendedAttribute(EA_CONSTRUCTOR)) {
+			extendedAttributes.getAllExtendedAttributes(EA_EXPOSED).forEach[
+				error('The "Exposed" extended attribute must not be specified on a dictionary that does not also have a "Constructor" extended attribute', 
+					it,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			];
 		}
 	}
 
