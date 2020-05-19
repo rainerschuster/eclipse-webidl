@@ -55,17 +55,17 @@ class Scraper {
 		try {
 			scraper.options.parseOptions(args);
 
-			if (scraper.options.commandLine.args.empty) {
+			if (scraper.options.commandLine.args.empty && args.length == 0) {
 				println("No URL specified!");
 				scraper.options.printUsage();
-			} else if (scraper.options.commandLine.args.size > 1) {
+			} else if (scraper.options.commandLine.args.size > 1 || args.length > 1) {
 				println("Unexpected arguments: Exactly one URL is required!");
 				scraper.options.printUsage();
 			} else {
 				// Main code
 				SslUtil.disableCertificateValidation();
 
-				if (scraper.options.commandLine.hasOption("r")) {
+				if (scraper.options.commandLine.hasOption("r") || args.get(0) == "-r") {
 					scraper.refToHref.put("html", "https://html.spec.whatwg.org/");
 					scraper.refQueue.add("html");
 					scraper.refToHref.put("svg2", "https://svgwg.org/svg2-draft/single-page.html");
