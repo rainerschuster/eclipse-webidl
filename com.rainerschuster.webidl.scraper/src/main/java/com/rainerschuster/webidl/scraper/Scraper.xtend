@@ -38,6 +38,7 @@ import com.google.common.collect.Queues
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 
+// TODO List of specs that use Web IDL https://www.w3.org/wiki/Web_IDL#Dependent_Specifications
 // TODO http://stackoverflow.com/questions/19517538/ignoring-ssl-certificate-in-apache-httpclient-4-3
 class Scraper {
 
