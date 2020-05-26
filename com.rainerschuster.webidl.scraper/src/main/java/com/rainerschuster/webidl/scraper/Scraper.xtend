@@ -77,14 +77,24 @@ class Scraper {
 					scraper.refQueue.add("mediasource");
 					scraper.refToHref.put("geometry", "https://drafts.fxtf.org/geometry/");
 					scraper.refQueue.add("geometry");
-//					scraper.refToHref.put("customelements", "http://w3c.github.io/webcomponents/spec/custom/");
+//					scraper.refToHref.put("customelements", "https://w3c.github.io/webcomponents/spec/custom/");
 //					scraper.refQueue.add("customelements");
-					scraper.refToHref.put("shadowdom", "http://w3c.github.io/webcomponents/spec/shadow/");
+					scraper.refToHref.put("shadowdom", "https://w3c.github.io/webcomponents/spec/shadow/");
 					scraper.refQueue.add("shadowdom");
-//					scraper.refToHref.put("htmlimports", "http://w3c.github.io/webcomponents/spec/imports/");
+//					scraper.refToHref.put("htmlimports", "https://w3c.github.io/webcomponents/spec/imports/");
 //					scraper.refQueue.add("htmlimports");
 //					scraper.refToHref.put("cssomview", "https://drafts.csswg.org/cssom-view/");
 //					scraper.refQueue.add("cssomview");
+					scraper.refToHref.put("sensors", "https://w3c.github.io/sensors/");
+					scraper.refQueue.add("sensors");
+					scraper.refToHref.put("proximity", "https://w3c.github.io/proximity/");
+					scraper.refQueue.add("proximity");
+					scraper.refToHref.put("encrypted-media", "https://w3c.github.io/encrypted-media/");
+					scraper.refQueue.add("encrypted-media");
+					scraper.refToHref.put("webcrypto", "https://w3c.github.io/webcrypto/");
+					scraper.refQueue.add("webcrypto");
+					scraper.refToHref.put("mediacapture-main", "https://w3c.github.io/mediacapture-main/getusermedia.html");
+					scraper.refQueue.add("mediacapture-main");
 					scraper.processQueue();
 				} else {
 					if (scraper.options.commandLine.hasOption("o")) {
@@ -155,6 +165,7 @@ class Scraper {
 				// Needed for https://dvcs.w3.org/hg/innerhtml/raw-file/tip/index.html
 				scrapeCount += printNodeContent(out, doc, "pre.extraidl");
 				scrapeCount += printNodeContent(out, doc, "pre.idl");
+				scrapeCount += printNodeContent(out, doc, "code.idl");
 				scrapeCount += printNodeContent(out, doc, "code.idl-code");
 //				// Needed for http://www.w3.org/TR/service-workers/
 				if (preCodeMode) {
@@ -183,10 +194,10 @@ class Scraper {
 				e.printStackTrace();
 			}
 		} finally {
-			if (out != null) {
+			if (out !== null) {
 				out.close();
 			}
-//			if (outRefs != null) {
+//			if (outRefs !== null) {
 //				outRefs.close();
 //			}
 		}
