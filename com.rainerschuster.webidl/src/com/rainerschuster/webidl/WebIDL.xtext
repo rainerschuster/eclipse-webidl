@@ -19,6 +19,31 @@ import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
 generate webIDL "http://www.rainerschuster.com/webidl/WebIDL"
 
+// ImplementsStatement -> IncludesStatement
+// CallbackFunction -> Callback
+// + Mixin
+// + Namespace
+
+// + Constructor
+
+// AbstractIntegerType -> UnrestrictedIntegerType
+// AbstractFloatType -> UnrestrictedFloatType
+
+// NonAnyType -> DistinguishableType
+// - DateType
+// - RegExpType
+// - ErrorType
+// - DOMExceptionType
+// + SymbolType
+// + ObservableArrayType
+// + RecordType
+
+// - Serializer ?
+// + StaticMember
+// + AsyncIterable
+// + ReadOnlyMember
+// + 
+
 Definitions:
 	definitions+=ExtendedDefinition*
 ;
@@ -28,13 +53,15 @@ ExtendedDefinition:
 ;
 
 Definition:
-	CallbackFunction
+	Callback
 	| Interface
+//	| Mixin
+	| Namespace
 	| Partial
 	| Dictionary
 	| Enum
 	| Typedef
-	| ImplementsStatement
+	| IncludesStatement
 ;
 
 InterfaceOrTypedef:
@@ -47,8 +74,12 @@ DictionaryOrTypedef:
 	| Typedef
 ;
 
+Callback:
+	callback?='callback' name=IDENTIFIER_WEBIDL '=' type=ReturnType '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
+;
+
 Interface:
-	callback?='callback'? 'interface' name=IDENTIFIER_WEBIDL (':' inherits=[InterfaceOrTypedef|IDENTIFIER_WEBIDL])? '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
+	callback?='callback'? 'interface' mixin?='mixin'? name=IDENTIFIER_WEBIDL (':' inherits=[InterfaceOrTypedef|IDENTIFIER_WEBIDL])? '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
 ;
 
 Partial:
@@ -58,10 +89,11 @@ Partial:
 PartialDefinition:
 	PartialInterface
 	| PartialDictionary
+	| Namespace
 ;
 
 PartialInterface:
-	'interface' interfaceName=[Interface|IDENTIFIER_WEBIDL] '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
+	'interface' mixin?='mixin'? interfaceName=[Interface|IDENTIFIER_WEBIDL] '{' interfaceMembers+=ExtendedInterfaceMember* '}' ';'
 ;
 
 ExtendedInterfaceMember:
@@ -69,14 +101,36 @@ ExtendedInterfaceMember:
 ;
 
 InterfaceMember:
+	PartialInterfaceMember
+	| Constructor
+;
+
+PartialInterfaceMember:
 	Const
 	| Operation
-	| Serializer // Only variant with SerializationPattern
+//	| Serializer // Only variant with SerializationPattern
 	| Stringifier // Only EmptyStringifier
+//	| StaticMember
 	| Iterable_
+//	| AsyncIterable
+//	| ReadOnlyMember
 	| Attribute
-	| Maplike
-	| Setlike
+//	| ReadWriteAttribute
+	| Maplike // ReadWriteMaplike
+	| Setlike // ReadWriteSetlike
+//	| InheritAttribute
+;
+
+Namespace:
+	'namespace' name=IDENTIFIER_WEBIDL '{' namespaceMembers+=ExtendedNamespaceMember* '}' ';'
+;
+
+ExtendedNamespaceMember:
+	eal=ExtendedAttributeList? namespaceMember=NamespaceMember
+;
+
+NamespaceMember:
+	Operation // TODO check this again!
 ;
 
 Dictionary:
@@ -88,7 +142,8 @@ ExtendedDictionaryMember:
 ;
 
 DictionaryMember:
-	required?='required'? type=Type name=IDENTIFIER_WEBIDL defaultValue=Default? ';'
+	required?='required' type=ExtendedType name=IDENTIFIER_WEBIDL ';'
+	| type=Type name=IDENTIFIER_WEBIDL defaultValue=Default? ';'
 ;
 
 PartialDictionary:
@@ -103,22 +158,22 @@ DefaultValue:
 	value=ConstValue
 	| value=STRING
 	| {DefaultValue} '[' ']'
+	| {DefaultValue} '{' '}'
+//	| {DefaultValue} 'null' // TODO
 ;
 
 Enum:
 	'enum' name=IDENTIFIER_WEBIDL '{' values+=STRING (',' values+=STRING)* optionalComma?=','? '}' ';'
 ;
 
-CallbackFunction:
-	callback?='callback' name=IDENTIFIER_WEBIDL '=' type=ReturnType '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
-;
+// Callback
 
 Typedef:
-	'typedef' type=Type name=IDENTIFIER_WEBIDL ';'
+	'typedef' type=ExtendedType name=IDENTIFIER_WEBIDL ';'
 ;
 
-ImplementsStatement:
-	ifaceA=[Interface|IDENTIFIER_WEBIDL] 'implements' ifaceB=[InterfaceOrTypedef|IDENTIFIER_WEBIDL] ';'
+IncludesStatement:
+	ifaceA=[Interface|IDENTIFIER_WEBIDL] 'includes' ifaceB=[InterfaceOrTypedef|IDENTIFIER_WEBIDL] ';'
 ;
 
 Const:
@@ -144,34 +199,38 @@ FloatLiteral returns ecore::EFloat:
 	| 'NaN'
 ;
 
-Serializer
-	: serializer?='serializer' '=' pattern=SerializationPattern ';' // TODO the semicolon is not specified!
+Constructor
+	: {Constructor} 'constructor' '(' (arguments+=Argument (',' arguments+=Argument)*)? ')' ';'
 ;
 
-SerializationPattern
-	: {SerializationPattern}'{' patternMap=SerializationPatternMap? '}' 
-	| {SerializationPattern}'[' patternList=SerializationPatternList? ']' 
-	| {SerializationPattern}identifiers+=IDENTIFIER_WEBIDL
-;
-
-SerializationPatternMap
-	: getter?='getter' 
-	| inherit?='inherit'? attribute?='attribute' // TODO getter is specified, but attribute not directly!
-	| inherit?='inherit' (',' identifiers+=IDENTIFIER_WEBIDL)*
-	| identifiers+=IDENTIFIER_WEBIDL (',' identifiers+=IDENTIFIER_WEBIDL)*
-;
-
-SerializationPatternList
-	: getter?='getter' 
-	| identifiers+=IDENTIFIER_WEBIDL (',' identifiers+=IDENTIFIER_WEBIDL)*
-;
+//Serializer
+//	: serializer?='serializer' '=' pattern=SerializationPattern ';' // TODO the semicolon is not specified!
+//;
+//
+//SerializationPattern
+//	: {SerializationPattern}'{' patternMap=SerializationPatternMap? '}' 
+//	| {SerializationPattern}'[' patternList=SerializationPatternList? ']' 
+//	| {SerializationPattern}identifiers+=IDENTIFIER_WEBIDL
+//;
+//
+//SerializationPatternMap
+//	: getter?='getter' 
+//	| inherit?='inherit'? attribute?='attribute' // TODO getter is specified, but attribute not directly!
+//	| inherit?='inherit' (',' identifiers+=IDENTIFIER_WEBIDL)*
+//	| identifiers+=IDENTIFIER_WEBIDL (',' identifiers+=IDENTIFIER_WEBIDL)*
+//;
+//
+//SerializationPatternList
+//	: getter?='getter' 
+//	| identifiers+=IDENTIFIER_WEBIDL (',' identifiers+=IDENTIFIER_WEBIDL)*
+//;
 
 Stringifier
 	: {EmptyStringifier} stringifier?='stringifier' ';'
 ;
 
 Attribute
-	: (stringifier?='stringifier'? /*|*/ static?='static'?) inherit?='inherit'? readOnly?='readonly'? 'attribute' type=Type name=AttributeName ';'
+	: (stringifier?='stringifier'? /*|*/ static?='static'?) inherit?='inherit'? readOnly?='readonly'? 'attribute' type=ExtendedType name=AttributeName ';'
 ;
 
 AttributeName:
@@ -180,7 +239,8 @@ AttributeName:
 ;
 
 AttributeNameKeyword:
-	'required'
+	'async'
+	| 'required'
 ;
 
 Operation
@@ -191,14 +251,14 @@ enum Special:
 	GETTER='getter'
 	| SETTER='setter'
 	| DELETER='deleter'
-	| LEGACYCALLER='legacycaller'
-	| STRINGIFIER='stringifier'
-	| SERIALIZER='serializer'
+//	| LEGACYCALLER='legacycaller'
+//	| STRINGIFIER='stringifier'
+//	| SERIALIZER='serializer'
 ;
 
 Argument:
 	eal=ExtendedAttributeList?
-		(optional?="optional" type=Type name=ArgumentName defaultValue=Default? 
+		(optional?="optional" type=ExtendedType name=ArgumentName defaultValue=Default? 
 		| type=Type ellipsis?='...'? name=ArgumentName)
 ;
 
@@ -208,16 +268,17 @@ ArgumentName:
 ;
 
 Iterable_
-	: 'iterable' '<' types+=Type (',' types+=Type)? '>' ';'
-	| legacy?='legacyiterable' '<' types+=Type '>' ';'
+	: 'iterable' '<' types+=ExtendedType (',' types+=ExtendedType)? '>' ';'
+//	| legacy?='legacyiterable' '<' types+=ExtendedType '>' ';'
+	| 'async' 'iterable' '<' types+=ExtendedType (',' types+=ExtendedType)? '>' ('(' (arguments+=Argument (',' arguments+=Argument)*)? ')')? ';'
 ;
 
 Maplike
-	: readOnly?='readonly'? 'maplike' '<' keyType=Type ',' valueType=Type '>' ';'
+	: readOnly?='readonly'? 'maplike' '<' keyType=ExtendedType ',' valueType=ExtendedType '>' ';'
 ;
 
 Setlike
-	: readOnly?='readonly'? 'setlike' '<' type=Type '>' ';'
+	: readOnly?='readonly'? 'setlike' '<' type=ExtendedType '>' ';'
 ;
 
 ExtendedAttributeList:
@@ -232,23 +293,28 @@ ExtendedAttribute:
 ;
 
 ArgumentNameKeyword:
-	'attribute'
+	'async'
+	| 'attribute'
 	| 'callback'
 	| 'const'
+	| 'constructor'
 	| 'deleter'
 	| 'dictionary'
 	| 'enum'
 	| 'getter'
-	| 'implements'
+	| 'includes'
 	| 'inherit'
 	| 'interface'
 	| 'iterable'
-	| 'legacycaller'
-	| 'legacyiterable'
+//	| 'legacycaller'
+//	| 'legacyiterable'
 	| 'maplike'
+	| 'mixin'
+	| 'namespace'
 	| 'partial'
+	| 'readonly'
 	| 'required'
-	| 'serializer'
+//	| 'serializer'
 	| 'setlike'
 	| 'setter'
 	| 'static'
@@ -257,37 +323,43 @@ ArgumentNameKeyword:
 	| 'unrestricted'
 ;
 
+ExtendedType:
+	eal=ExtendedAttributeList? type=Type
+;
+
 Type:
 	SingleType nullable?=Nullable?
 	| UnionType nullable?=Nullable?
 ;
 
 SingleType:
-	NonAnyType
+	DistinguishableType
 	| {AnyType} 'any' // TODO any is not nullable!
+	| {PromiseType} 'Promise' '<' type=ReturnType '>' // TODO PromiseType is not nullable!
 ;
 
 // TODO any is not allowed as union member type
 UnionType:
-	'(' unionMemberTypes+=Type ('or' unionMemberTypes+=Type)+ ')'
+	'(' unionMemberTypes+=ExtendedType ('or' unionMemberTypes+=ExtendedType)+ ')'
 ;
 
-NonAnyType:
+DistinguishableType:
 	PrimitiveType
-	| {PromiseType} 'Promise' '<' type=ReturnType '>'
-	| {ByteStringType} 'ByteString'
-	| {DOMStringType} 'DOMString'
-	| {USVStringType} 'USVString'
+	| StringType
 	| {ReferenceType} typeRef=[Definition|IDENTIFIER_WEBIDL]
-	| {SequenceType} 'sequence' '<' type=Type '>'
+	| {SequenceType} 'sequence' '<' type=ExtendedType '>'
 	| {ObjectType} 'object'
-	| {DateType} 'Date'
-	| {RegExpType} 'RegExp'
-	| {ErrorType} 'Error'
-	| {DOMExceptionType} 'DOMException'
-//	| BufferRelatedType // TODO enable - disabled on purpose to support typedarray.idl
-	| {FrozenArrayType} 'FrozenArray' '<' type=Type '>'
+	| {SymbolType} 'symbol'
+	| {DateType} 'Date' // TODO remove
+	| {RegExpType} 'RegExp' // TODO remove
+	| {ErrorType} 'Error' // TODO remove
+//	| {DOMExceptionType} 'DOMException' // TODO remove
+	| BufferRelatedType // TODO enable - disabled on purpose to support typedarray.idl
+	| {FrozenArrayType} 'FrozenArray' '<' type=ExtendedType '>'
+	| {ObservableArrayType} 'ObservableArray' '<' type=ExtendedType '>'
+	| {RecordType} 'record' '<' keyType=StringType ',' valueType=ExtendedType '>'
 ;
+
 
 BufferRelatedType
 	: {ArrayBufferType}'ArrayBuffer'
@@ -303,29 +375,35 @@ BufferRelatedType
 	| {Float64ArrayType}'Float64Array'
 ;
 
-// TODO Get rid of ConstType (replace by NonAnyType?)
-ConstType returns NonAnyType:
+// TODO Get rid of ConstType (replace by DistinguishableType?)
+ConstType returns DistinguishableType:
 	PrimitiveType nullable?=Nullable?
 	| {ReferenceType} typeRef=[Definition|IDENTIFIER_WEBIDL] nullable?=Nullable?
 ;
 
 PrimitiveType:
-	AbstractIntegerType
-	| AbstractFloatType
+	UnrestrictedIntegerType
+	| UnrestrictedFloatType
 	| {BooleanType} 'boolean'
 	| {ByteType} 'byte'
 	| {OctetType} 'octet'
 ;
 
-AbstractFloatType:
+UnrestrictedFloatType:
 	{FloatType} unrestricted?='unrestricted'? 'float'
 	| {DoubleType} unrestricted?='unrestricted'? 'double'
 ;
 
-AbstractIntegerType:
+UnrestrictedIntegerType:
 	{ShortType} unsigned?='unsigned'? 'short'
 	| {LongType} unsigned?='unsigned'? 'long'
 	| {LongLongType} unsigned?='unsigned'? 'long' 'long'
+;
+
+StringType:
+	{ByteStringType} 'ByteString'
+	| {DOMStringType} 'DOMString'
+	| {USVStringType} 'USVString'
 ;
 
 Nullable:
@@ -341,7 +419,7 @@ ReturnType:
 // Helper interface mainly for overloading
 Callable:
 	Operation
-	| CallbackFunction
+	| Callback
 	| ExtendedAttribute
 ;
 

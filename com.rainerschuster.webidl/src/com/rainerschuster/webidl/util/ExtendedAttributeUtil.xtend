@@ -32,61 +32,82 @@ class ExtendedAttributeUtil {
 //	public static val String EA_ARRAY_CLASS = "ArrayClass";
 	// TODO https://html.spec.whatwg.org/#cereactions
 	// TODO https://html.spec.whatwg.org/#concept-custom-element-reaction
+	public static val String EA_ALLOW_SHARED = "AllowShared";
 	public static val String EA_CE_REACTIONS = "CEReactions";
 	public static val String EA_CLAMP = "Clamp";
 	public static val String EA_CONSTRUCTOR = "Constructor";
+	public static val String EA_DEFAULT = "Default";
 	public static val String EA_ENFORCE_RANGE = "EnforceRange";
 	public static val String EA_EXPOSED = "Exposed";
 	public static val String EA_IMPLICIT_THIS = "ImplicitThis";
 	public static val String EA_GLOBAL = "Global";
-	public static val String EA_PRIMARY_GLOBAL = "PrimaryGlobal";
-	public static val String EA_LEGACY_ARRAY_CLASS = "LegacyArrayClass";
+//	public static val String EA_PRIMARY_GLOBAL = "PrimaryGlobal";
+//	public static val String EA_LEGACY_ARRAY_CLASS = "LegacyArrayClass";
+	public static val String EA_LEGACY_FACTORY_FUNCTION = "LegacyFactoryFunction";
+	public static val String EA_LEGACY_LENIENT_SETTER = "LegacyLenientSetter";
+	public static val String EA_LEGACY_LENIENT_THIS = "LegacyLenientThis";
+	public static val String EA_LEGACY_NAMESPACE = "LegacyNamespace";
+	public static val String EA_LEGACY_NO_INTERFACE_OBJECT = "LegacyNoInterfaceObject";
+	public static val String EA_LEGACY_NULL_TO_EMPTY_STRING = "LegacyNullToEmptyString";
+	public static val String EA_LEGACY_OVERRIDE_BUILT_INS = "LegacyOverrideBuiltIns";
+	public static val String EA_LEGACY_TREAT_NON_OBJECT_AS_NULL = "LegacyTreatNonObjectAsNull";
 	public static val String EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES = "LegacyUnenumerableNamedProperties";
-	public static val String EA_LENIENT_THIS = "LenientThis";
+	public static val String EA_LEGACY_UNFORGEABLE = "LegacyUnforgeable";
+	public static val String EA_LEGACY_WINDOW_ALIAS = "LegacyWindowAlias";
 	public static val String EA_NAMED_CONSTRUCTOR = "NamedConstructor";
 	public static val String EA_NEW_OBJECT = "NewObject";
-	public static val String EA_NO_INTERFACE_OBJECT = "NoInterfaceObject";
-	public static val String EA_OVERRIDE_BUILTINS = "OverrideBuiltins";
 	public static val String EA_PUT_FORWARDS = "PutForwards";
 //	public static val String EA_REPLACEABLE_NAMED_PROPERTIES = "ReplaceableNamedProperties";
 	public static val String EA_REPLACEABLE = "Replaceable";
 	public static val String EA_SAME_OBJECT = "SameObject";
 	public static val String EA_SECURE_CONTEXT = "SecureContext";
 	public static val String EA_TREAT_NON_CALLABLE_AS_NULL = "TreatNonCallableAsNull";
-	public static val String EA_TREAT_NON_OBJECT_AS_NULL = "TreatNonObjectAsNull";
+//	public static val String EA_TREAT_NON_OBJECT_AS_NULL = "TreatNonObjectAsNull";
 	public static val String EA_TREAT_NULL_AS = "TreatNullAs";
-	public static val String EA_UNFORGEABLE = "Unforgeable";
 	public static val String EA_UNSCOPABLE = "Unscopable";
 	public static val String EA_WEB_GL_HANDLES_CONTEXT_LOSS= "WebGLHandlesContextLoss";
+	
+	// HTML Specification
+	public static val String EA_HTML_CONSTRUCTOR = "HTMLConstructor";
 
 	public static val KNOWN_EXTENDED_ATTRIBUTES = #[
 //		EA_ARRAY_CLASS,
+		EA_ALLOW_SHARED,
 		EA_CE_REACTIONS,
 		EA_CLAMP,
 		EA_CONSTRUCTOR,
+		EA_DEFAULT,
 		EA_ENFORCE_RANGE,
 		EA_EXPOSED,
 		EA_IMPLICIT_THIS,
 		EA_GLOBAL,
-		EA_PRIMARY_GLOBAL,
-		EA_LEGACY_ARRAY_CLASS,
+//		EA_PRIMARY_GLOBAL,
+//		EA_LEGACY_ARRAY_CLASS,
+		EA_LEGACY_FACTORY_FUNCTION,
+		EA_LEGACY_LENIENT_SETTER,
+		EA_LEGACY_LENIENT_THIS,
+		EA_LEGACY_NAMESPACE,
+		EA_LEGACY_NO_INTERFACE_OBJECT,
+		EA_LEGACY_NULL_TO_EMPTY_STRING,
+		EA_LEGACY_OVERRIDE_BUILT_INS,
+		EA_LEGACY_TREAT_NON_OBJECT_AS_NULL,
 		EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES,
-		EA_LENIENT_THIS,
+		EA_LEGACY_UNFORGEABLE,
+		EA_LEGACY_WINDOW_ALIAS,
 		EA_NAMED_CONSTRUCTOR,
 		EA_NEW_OBJECT,
-		EA_NO_INTERFACE_OBJECT,
-		EA_OVERRIDE_BUILTINS,
 		EA_PUT_FORWARDS,
 //		EA_REPLACEABLE_NAMED_PROPERTIES,
 		EA_REPLACEABLE,
 		EA_SAME_OBJECT,
 		EA_SECURE_CONTEXT,
 		EA_TREAT_NON_CALLABLE_AS_NULL,
-		EA_TREAT_NON_OBJECT_AS_NULL,
 		EA_TREAT_NULL_AS,
-		EA_UNFORGEABLE,
+		EA_LEGACY_UNFORGEABLE,
 		EA_UNSCOPABLE,
-		EA_WEB_GL_HANDLES_CONTEXT_LOSS
+		EA_WEB_GL_HANDLES_CONTEXT_LOSS,
+
+		EA_HTML_CONSTRUCTOR
 	];
 
 	def static boolean containsExtendedAttribute(Iterable<ExtendedAttribute> input, String name) {
@@ -116,6 +137,10 @@ class ExtendedAttributeUtil {
 		input.filter[it.nameRef == name]
 	}
 
+	def static boolean containsAllowShared(Iterable<ExtendedAttribute> input) {
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_ALLOW_SHARED)
+	}
+
 	def static boolean containsClamp(Iterable<ExtendedAttribute> input) {
 		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_CLAMP)
 	}
@@ -140,16 +165,16 @@ class ExtendedAttributeUtil {
 		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_GLOBAL)
 	}
 
-	def static boolean containsPrimaryGlobal(Iterable<ExtendedAttribute> input) {
-		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_PRIMARY_GLOBAL)
-	}
+//	def static boolean containsPrimaryGlobal(Iterable<ExtendedAttribute> input) {
+//		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_PRIMARY_GLOBAL)
+//	}
 
-	def static boolean containsLegacyArrayClass(Iterable<ExtendedAttribute> input) {
-		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LEGACY_ARRAY_CLASS)
-	}
+//	def static boolean containsLegacyArrayClass(Iterable<ExtendedAttribute> input) {
+//		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LEGACY_ARRAY_CLASS)
+//	}
 
-	def static boolean containsLenientThis(Iterable<ExtendedAttribute> input) {
-		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LENIENT_THIS)
+	def static boolean containsLegacyLenientThis(Iterable<ExtendedAttribute> input) {
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LEGACY_LENIENT_THIS)
 	}
 
 	def static boolean containsNamedConstructor(Iterable<ExtendedAttribute> input) {
@@ -160,12 +185,12 @@ class ExtendedAttributeUtil {
 		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_NEW_OBJECT)
 	}
 
-	def static boolean containsNoInterfaceObject(Iterable<ExtendedAttribute> input) {
-		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_NO_INTERFACE_OBJECT)
+	def static boolean containsLegacyNoInterfaceObject(Iterable<ExtendedAttribute> input) {
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LEGACY_NO_INTERFACE_OBJECT)
 	}
 
-	def static boolean containsOverrideBuiltins(Iterable<ExtendedAttribute> input) {
-		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_OVERRIDE_BUILTINS)
+	def static boolean containsOverrideBuiltIns(Iterable<ExtendedAttribute> input) {
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LEGACY_OVERRIDE_BUILT_INS)
 	}
 
 	def static boolean containsPutForwards(Iterable<ExtendedAttribute> input) {
@@ -184,16 +209,16 @@ class ExtendedAttributeUtil {
 		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_TREAT_NON_CALLABLE_AS_NULL)
 	}
 
-	def static boolean containsTreatNonObjectAsNull(Iterable<ExtendedAttribute> input) {
-		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_TREAT_NON_OBJECT_AS_NULL)
+	def static boolean containsLegacyTreatNonObjectAsNull(Iterable<ExtendedAttribute> input) {
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LEGACY_TREAT_NON_OBJECT_AS_NULL)
 	}
 
 	def static boolean containsTreatNullAs(Iterable<ExtendedAttribute> input) {
 		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_TREAT_NULL_AS)
 	}
 
-	def static boolean containsUnforgeable(Iterable<ExtendedAttribute> input) {
-		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_UNFORGEABLE)
+	def static boolean containsLegacyUnforgeable(Iterable<ExtendedAttribute> input) {
+		com.rainerschuster.webidl.util.ExtendedAttributeUtil.containsExtendedAttribute(input, EA_LEGACY_UNFORGEABLE)
 	}
 
 	def static boolean containsUnscopable(Iterable<ExtendedAttribute> input) {

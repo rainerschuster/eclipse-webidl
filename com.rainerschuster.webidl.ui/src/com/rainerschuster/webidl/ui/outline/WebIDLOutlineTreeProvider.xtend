@@ -19,12 +19,12 @@
 package com.rainerschuster.webidl.ui.outline
 
 import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.CallbackFunction
+import com.rainerschuster.webidl.webIDL.Callback
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.Definitions
 import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.DictionaryMember
-import com.rainerschuster.webidl.webIDL.ImplementsStatement
+import com.rainerschuster.webidl.webIDL.IncludesStatement
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.Iterable_
 import com.rainerschuster.webidl.webIDL.Maplike
@@ -38,6 +38,7 @@ import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider
 import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode
 
 import static extension com.rainerschuster.webidl.util.NameUtil.*
+import com.rainerschuster.webidl.util.TypeUtil
 
 /**
  * Customization of the default outline structure.
@@ -113,7 +114,7 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		true
 	}
 
-	def _isLeaf(CallbackFunction callbackFunction) {
+	def _isLeaf(Callback callbackFunction) {
 		true
 	}
 
@@ -128,11 +129,11 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	// TODO Argument ?
 
 	def _text(Typedef typedef) {
-		typedef.name + ' : ' + typeName(typedef.type)
+		typedef.name + ' : ' + typeName(typedef.type.type)
 	}
 
-	def _text(ImplementsStatement implementsStatement) {
-		implementsStatement.ifaceA?.name + ' implements ' + /*implementsStatement.ifaceB?.name*/ {
+	def _text(IncludesStatement implementsStatement) {
+		implementsStatement.ifaceA?.name + ' includes ' + /*implementsStatement.ifaceB?.name*/ {
 			val ifaceB = implementsStatement.ifaceB;
 			switch (ifaceB) {
 				Interface: ifaceB.name
@@ -141,7 +142,7 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		}
 	}
 
-	def _text(CallbackFunction callbackFunction) {
+	def _text(Callback callbackFunction) {
 		callbackFunction.name + ' : ' + (typeName(callbackFunction.type)?:callbackFunction.type)
 	}
 
@@ -156,11 +157,11 @@ class WebIDLOutlineTreeProvider extends DefaultOutlineTreeProvider {
 
 	// TODO required, default etc.
 	def _text(DictionaryMember dictionaryMember) {
-		dictionaryMember.name + ' : ' + (typeName(dictionaryMember.type)?:dictionaryMember.type)
+		dictionaryMember.name + ' : ' + (typeName(TypeUtil.type(dictionaryMember))?:TypeUtil.type(dictionaryMember))
 	}
 
 	// TODO inherit, readonly etc.
 	def _text(Attribute attribute) {
-		attribute.name + ' : ' + (typeName(attribute.type)?:attribute.type)
+		attribute.name + ' : ' + (typeName(attribute.type.type)?:attribute.type)
 	}
 }

@@ -17,7 +17,7 @@ package com.rainerschuster.webidl.util
 
 import java.util.ArrayList
 import java.util.List
-import com.rainerschuster.webidl.webIDL.CallbackFunction
+import com.rainerschuster.webidl.webIDL.Callback
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.Callable
@@ -32,7 +32,7 @@ class EffectiveOverloadingSetUtil {
 		val f = iface.interfaceMembers.map[it.interfaceMember].
 			filter(typeof(Operation)).
 			filter[TypeUtil.regularOperation(it)].
-			filter[(it == null && identifier == null) || (identifier != null && identifier == it.name)];
+			filter[(it === null && identifier === null) || (identifier !== null && identifier == it.name)];
 
 		return compute(f, argumentCount);
 	}
@@ -41,7 +41,7 @@ class EffectiveOverloadingSetUtil {
 		val f = iface.interfaceMembers.map[it.interfaceMember].
 			filter(typeof(Operation)).
 			filter[TypeUtil.staticOperation(it)].
-			filter[(it == null && identifier == null) || (identifier != null && identifier == it.name)];
+			filter[(it === null && identifier === null) || (identifier !== null && identifier == it.name)];
 
 		return compute(f, argumentCount);
 	}
@@ -60,8 +60,8 @@ class EffectiveOverloadingSetUtil {
 		return compute(f, argumentCount);
 	}
 
-	def static List<EffectiveOverloadingSetEntry<CallbackFunction>> computeForCallbackFunction(CallbackFunction callbackFunction, long argumentCount) {
-		val List<CallbackFunction> f = #[callbackFunction];
+	def static List<EffectiveOverloadingSetEntry<Callback>> computeForCallback(Callback callbackFunction, long argumentCount) {
+		val List<Callback> f = #[callbackFunction];
 		return compute(f, argumentCount);
 	}
 
@@ -98,7 +98,7 @@ class EffectiveOverloadingSetUtil {
 			// TODO Implement Interface HasArguments?
 			val int maxargCandidate = switch ff {
 				Operation: ff.arguments.size
-				CallbackFunction: ff.arguments.size
+				Callback: ff.arguments.size
 				Constructor: ff.arguments.size
 				default: 0
 			};
@@ -112,7 +112,7 @@ class EffectiveOverloadingSetUtil {
 		for (x : f) {
 			val argumentsOfX = switch x {
 				Operation: x.arguments
-				CallbackFunction: x.arguments
+				Callback: x.arguments
 				Constructor: x.arguments
 			};
 
@@ -121,7 +121,7 @@ class EffectiveOverloadingSetUtil {
 
 			// 5.2. Let t0..n−1 be a list of types, where ti is the type of X's argument at index i.
 			// FIXME Check if EcoreUtil2.cloneWithProxies(it.type) is necessary here!
-			val t = argumentsOfX.map[it.type].toList();
+			val t = argumentsOfX.map[TypeUtil.type(it)].toList();
 
 			// 5.3. Let o0..n−1 be a list of optionality values, where oi is "variadic" if X's argument at index i is a final, variadic argument, "optional" if the argument is optional, and "required" otherwise.
 			val o = argumentsOfX.map[
@@ -144,7 +144,7 @@ class EffectiveOverloadingSetUtil {
 			// TODO TypeUtil.variadic should support polymorphic dispatch or Callable
 			val variadic = switch x {
 				Operation: TypeUtil.variadic(x)
-				CallbackFunction: TypeUtil.variadic(x)
+				Callback: TypeUtil.variadic(x)
 				Constructor: TypeUtil.variadic(x)
 			};
 			if (/*n > 0 && */variadic) {

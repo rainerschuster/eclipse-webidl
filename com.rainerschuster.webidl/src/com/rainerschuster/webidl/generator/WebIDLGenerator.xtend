@@ -23,12 +23,12 @@ import com.google.common.collect.ListMultimap
 import com.google.inject.Inject
 import com.rainerschuster.webidl.webIDL.Argument
 import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.CallbackFunction
+import com.rainerschuster.webidl.webIDL.Callback
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeList
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
-import com.rainerschuster.webidl.webIDL.ImplementsStatement
+import com.rainerschuster.webidl.webIDL.IncludesStatement
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.InterfaceMember
 import com.rainerschuster.webidl.webIDL.Operation
@@ -54,6 +54,7 @@ import com.rainerschuster.webidl.webIDL.impl.OperationImpl
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.EcoreUtil2
 import java.util.Set
+import com.rainerschuster.webidl.util.TypeUtil
 
 /**
  * Generates code from your model files on save.
@@ -74,7 +75,7 @@ class WebIDLGenerator implements IGenerator {
 		var ListMultimap<Interface, Interface> implementsMap = ArrayListMultimap.create();
 		var ListMultimap<Interface, PartialInterface> partialInterfaceMap = ArrayListMultimap.create();
 		var ListMultimap<Dictionary, PartialDictionary> partialDictionaryMap = ArrayListMultimap.create();
-		for (e : resource.allContents.toIterable.filter(typeof(ImplementsStatement))) {
+		for (e : resource.allContents.toIterable.filter(typeof(IncludesStatement))) {
 			val ifaceB = e.ifaceB.resolveDefinition as Interface;
 			implementsMap.put(e.ifaceA, ifaceB);
 		}
@@ -170,7 +171,7 @@ class WebIDLGenerator implements IGenerator {
 		}
 	'''
 
-	def binding(CallbackFunction callback, List<EffectiveOverloadingSetEntry<CallbackFunction>> effectiveOverloadingSet) '''
+	def binding(Callback callback, List<EffectiveOverloadingSetEntry<Callback>> effectiveOverloadingSet) '''
 		interface «callback.name» {
 		«FOR entry : effectiveOverloadingSet SEPARATOR '\n'»
 			«entry.callable.type.toTypeScriptType» call(«FOR i : entry.mapArguments(callback.arguments) SEPARATOR ', '»«binding(i.key, i.value)»«ENDFOR»);
@@ -204,17 +205,17 @@ class WebIDLGenerator implements IGenerator {
 
 	// TODO is... for boolean! (non-nullable?!)
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, Attribute attribute) '''
-		«attribute.name»: «attribute.type.toTypeScriptType»;
+		«attribute.name»: «attribute.type.type.toTypeScriptType»;
 	'''
 
 	// FIXME What if more than one specials occur, e.g.: setter creator void (unsigned long index, HTMLOptionElement? option);
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, Operation operation) '''
-		«IF operation.name.nullOrEmpty»«IF operation.specials.contains(Special.GETTER)»_get«ELSEIF operation.specials.contains(Special.SETTER)»_set«ELSEIF operation.specials.contains(Special.DELETER)»_delete«ELSEIF operation.specials.contains(Special.LEGACYCALLER)»_call«ENDIF»«ELSE»«operation.name.getEscapedJavaName»«ENDIF»(«FOR i : operation.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»): «operation.type.toTypeScriptType»;
+		«IF operation.name.nullOrEmpty»«IF operation.specials.contains(Special.GETTER)»_get«ELSEIF operation.specials.contains(Special.SETTER)»_set«ELSEIF operation.specials.contains(Special.DELETER)»_delete«ENDIF»«ELSE»«operation.name.getEscapedJavaName»«ENDIF»(«FOR i : operation.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»): «operation.type.toTypeScriptType»;
 	'''
 
 	def binding(Argument parameter) '''
-		«IF parameter.ellipsis»...«ENDIF»«parameter.name.getEscapedJavaName»«IF parameter.optional»?«ENDIF»: «parameter.type.toTypeScriptType»'''
+		«IF parameter.ellipsis»...«ENDIF»«parameter.name.getEscapedJavaName»«IF parameter.optional»?«ENDIF»: «TypeUtil.type(parameter).toTypeScriptType»'''
 	def binding(Argument parameter, Pair<Type, OptionalityValue> o) '''
-		«IF o.value == OptionalityValue.VARIADIC»...«ENDIF»«parameter.name.getEscapedJavaName»«IF o.value == OptionalityValue.OPTIONAL»?«ENDIF»: «parameter.type.toTypeScriptType»'''
+		«IF o.value == OptionalityValue.VARIADIC»...«ENDIF»«parameter.name.getEscapedJavaName»«IF o.value == OptionalityValue.OPTIONAL»?«ENDIF»: «TypeUtil.type(parameter).toTypeScriptType»'''
 
 }

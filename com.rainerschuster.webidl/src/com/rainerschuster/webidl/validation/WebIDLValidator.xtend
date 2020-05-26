@@ -20,7 +20,7 @@ package com.rainerschuster.webidl.validation
 
 import com.rainerschuster.webidl.webIDL.Argument
 import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.CallbackFunction
+import com.rainerschuster.webidl.webIDL.Callback
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.Definition
 import com.rainerschuster.webidl.webIDL.Definitions
@@ -29,13 +29,12 @@ import com.rainerschuster.webidl.webIDL.Enum
 import com.rainerschuster.webidl.webIDL.ExtendedAttribute
 import com.rainerschuster.webidl.webIDL.ExtendedDefinition
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
-import com.rainerschuster.webidl.webIDL.ImplementsStatement
+import com.rainerschuster.webidl.webIDL.IncludesStatement
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.Iterable_
 import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.PartialInterface
 import com.rainerschuster.webidl.webIDL.PrimitiveType
-import com.rainerschuster.webidl.webIDL.PromiseType
 import com.rainerschuster.webidl.webIDL.ReferenceType
 import com.rainerschuster.webidl.webIDL.SequenceType
 import com.rainerschuster.webidl.webIDL.Special
@@ -88,7 +87,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		for (definition : definitions.definitions.map[it.def]) {
 			// TODO Only interface, dictionary, enumeration, callback function and typedef should be checked!
 			val definitionName = definition.definitionToName();
-			if (definitionName != null) {
+			if (definitionName !== null) {
 				checkUniqueNames(definitions, definition);
 			}
 		}
@@ -110,7 +109,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkInheritedInterfaceCycle(Interface iface) {
 		val inheritedInterfaces = iface.inheritedInterfaces();
-		if (inheritedInterfaces == null) {
+		if (inheritedInterfaces === null) {
 			error('An interface must not be declared such that its inheritance hierarchy has a cycle', 
 					iface,
 					WebIDLPackage.Literals.INTERFACE__INHERITS)
@@ -142,25 +141,28 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnInterface(Interface iface) {
-		val allowedExtendedAttributes = #[EA_CONSTRUCTOR, EA_EXPOSED, EA_GLOBAL, EA_IMPLICIT_THIS, EA_LEGACY_ARRAY_CLASS, EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT, EA_OVERRIDE_BUILTINS, EA_PRIMARY_GLOBAL, EA_SECURE_CONTEXT, EA_UNFORGEABLE];
+		val allowedExtendedAttributes = #[EA_EXPOSED, EA_GLOBAL, EA_LEGACY_WINDOW_ALIAS, EA_LEGACY_FACTORY_FUNCTION, EA_LEGACY_NO_INTERFACE_OBJECT, EA_LEGACY_OVERRIDE_BUILT_INS, EA_SECURE_CONTEXT, EA_CONSTRUCTOR];
 		val containerDefinition = iface.eContainer as ExtendedDefinition;
 		checkAllowedExtendedAttributes(containerDefinition.eal, allowedExtendedAttributes, 'interface definitions');
 	}
 
 	@Check
 	def checkExtendedAttributeOnPartialInterface(PartialInterface partialInterface) {
-		val forbiddenExtendedAttributes = #[EA_CONSTRUCTOR, EA_IMPLICIT_THIS, EA_LEGACY_ARRAY_CLASS, EA_NAMED_CONSTRUCTOR, EA_NO_INTERFACE_OBJECT];
+		val allowedExtendedAttributes = #[EA_EXPOSED, EA_LEGACY_OVERRIDE_BUILT_INS, EA_SECURE_CONTEXT];
 		val containerDefinition = partialInterface.eContainer as ExtendedDefinition;
-		val extendedAttributes = containerDefinition.eal.extendedAttributes;
-		for (String extendedAttribute : forbiddenExtendedAttributes) {
-			if (extendedAttributes.containsExtendedAttribute(extendedAttribute)) {
-				extendedAttributes.getAllExtendedAttributes(extendedAttribute).forEach[
-					error('The extended attribute "' + it.nameRef + '" must not be specified on partial interface definitions', 
-							it,
-							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-				];
-			}
-		}
+		checkAllowedExtendedAttributes(containerDefinition.eal, allowedExtendedAttributes, 'partial interface definitions');
+//		val forbiddenExtendedAttributes = #[EA_EXPOSED, EA_LEGACY_OVERRIDE_BUILT_INS, EA_SECURE_CONTEXT];
+//		val containerDefinition = partialInterface.eContainer as ExtendedDefinition;
+//		val extendedAttributes = containerDefinition.eal.extendedAttributes;
+//		for (String extendedAttribute : forbiddenExtendedAttributes) {
+//			if (extendedAttributes.containsExtendedAttribute(extendedAttribute)) {
+//				extendedAttributes.getAllExtendedAttributes(extendedAttribute).forEach[
+//					error('The extended attribute "' + it.nameRef + '" must not be specified on partial interface definitions', 
+//							it,
+//							WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//				];
+//			}
+//		}
 	}
 
 	// See 3.2.1. Constants
@@ -206,7 +208,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkAttributeType(Attribute attribute) {
 		// TODO this check is not exact enough (see specification, esp. resolved typedefs)!
-		val attributeType = attribute.type;
+		val attributeType = attribute.type.type;
 		if (attributeType instanceof ReferenceType) {
 			val Definition ref = attributeType.typeRef;
 			if (ref instanceof SequenceType) {
@@ -244,7 +246,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		if (attribute.inheritsGetter) {
 			val inheritedGetter = attribute.inheritedGetter;
 			// TODO resolve? implement equals?
-			if (attribute.type.typeName != inheritedGetter.type.typeName)
+			if (attribute.type.type.typeName != inheritedGetter.type.type.typeName)
 				error('The attribute whose getter is being inherited must be of the same type as the inheriting attribute', 
 						attribute,
 						WebIDLPackage.Literals.ATTRIBUTE__INHERIT)
@@ -254,7 +256,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	@Check
 	def checkExtendedAttributeOnAttribute(Attribute attribute) {
 		val allowedExtendedAttributesStatic = #[EA_CE_REACTIONS, EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_SECURE_CONTEXT, EA_TREAT_NULL_AS];
-		val allowedExtendedAttributesRegular = #[EA_CE_REACTIONS, EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_SECURE_CONTEXT, EA_TREAT_NULL_AS, EA_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_UNFORGEABLE, EA_UNSCOPABLE];
+		val allowedExtendedAttributesRegular = #[EA_CE_REACTIONS, EA_CLAMP, EA_ENFORCE_RANGE, EA_EXPOSED, EA_SAME_OBJECT, EA_SECURE_CONTEXT, EA_TREAT_NULL_AS, EA_LEGACY_LENIENT_THIS, EA_PUT_FORWARDS, EA_REPLACEABLE, EA_LEGACY_UNFORGEABLE, EA_UNSCOPABLE];
 		val containerDefinition = attribute.eContainer;
 		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
@@ -326,7 +328,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkFinalArgumentOfVariadicOperationNoDefault(Operation operation) {
-		if (operation.variadic && operation.arguments.last.defaultValue != null) {
+		if (operation.variadic && operation.arguments.last.defaultValue !== null) {
 			error('The implicitly optional final argument of a variadic operation must not have a default value specified', 
 					operation,
 					WebIDLPackage.Literals.OPERATION__ARGUMENTS)
@@ -335,7 +337,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeOnOperation(Operation operation) {
-		val allowedExtendedAttributes = #[EA_CE_REACTIONS, EA_EXPOSED, EA_NEW_OBJECT, EA_TREAT_NULL_AS, EA_UNFORGEABLE, EA_UNSCOPABLE, EA_WEB_GL_HANDLES_CONTEXT_LOSS];
+		val allowedExtendedAttributes = #[EA_DEFAULT, EA_EXPOSED, EA_NEW_OBJECT, EA_SECURE_CONTEXT, EA_LEGACY_UNFORGEABLE, EA_CE_REACTIONS, EA_WEB_GL_HANDLES_CONTEXT_LOSS];
 		val containerDefinition = operation.eContainer;
 		if (containerDefinition instanceof ExtendedInterfaceMember) {
 			checkAllowedExtendedAttributes(containerDefinition.eal, allowedExtendedAttributes, 'operations');
@@ -372,7 +374,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	def checkSpecialOperationsNotVariadicNorOptionalArguments(Operation operation) {
 		// FIXME is this also true for legacy callers?
 		// => Added this exception since HTML specification uses "legacycaller any (any... arguments);"
-		if (operation.specialOperation && operation.specials.exists[it != Special.LEGACYCALLER]) {
+		if (operation.specialOperation && operation.specials.exists[/*it != Special.LEGACYCALLER*/]) {
 			if (operation.variadic) {
 				error('Special operations declared using operations must not be variadic nor have any optional arguments', 
 						operation,
@@ -403,35 +405,39 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	// See 3.2.4.1. Legacy callers
 
-	@Check
-	def checkLegacyCallersDoNotReturnPromiseType(Operation operation) {
-		val operationType = operation.type;
-		if (operation.specials.contains(Special.LEGACYCALLER) && operationType instanceof PromiseType) {
-			error('Legacy callers must not be defined to return a promise type', 
-					operation,
-					WebIDLPackage.Literals.OPERATION__TYPE)
-		}
-	}
+//	@Check
+//	def checkLegacyCallersDoNotReturnPromiseType(Operation operation) {
+//		val operationType = operation.type;
+//		if (operation.specials.contains(Special.LEGACYCALLER) && operationType instanceof PromiseType) {
+//			error('Legacy callers must not be defined to return a promise type', 
+//					operation,
+//					WebIDLPackage.Literals.OPERATION__TYPE)
+//		}
+//	}
 
 	// See 3.2.4.2. Stringifiers
 
-	@Check
-	def checkStringifierOnOperation(Operation operation) {
-		// Note: The shorthand notation is represented by EmptyStringifier
-		val operationType = operation.type;
-		if (operation.specials.contains(Special.STRINGIFIER)) {
-			if (!(operation.arguments.nullOrEmpty && operationType instanceof DOMStringType))
-			error('Stringifiers declared with operations must be declared to take zero arguments and return a DOMString', 
-					operation,
-					WebIDLPackage.Literals.OPERATION__TYPE)
-		}
-	}
+//	@Check
+//	def checkStringifierOnOperation(Operation operation) {
+//		// Note: The shorthand notation is represented by EmptyStringifier
+//		val operationType = operation.type;
+//		if (operation.specials.contains(Special.STRINGIFIER)) {
+//			if (!(operation.arguments.nullOrEmpty && operationType instanceof DOMStringType))
+//			error('Stringifiers declared with operations must be declared to take zero arguments and return a DOMString', 
+//					operation,
+//					WebIDLPackage.Literals.OPERATION__TYPE)
+//		}
+//	}
 
 
 	@Check
 	def checkStringifierAttributeNotString(Attribute attribute) {
-		val attributeType = attribute.type;
-		if (attribute.stringifier && !(attributeType instanceof DOMStringType || attributeType instanceof USVStringType)) {
+		var type = attribute.type.type;
+		// TODO resolve type if typedef is used
+		if (type instanceof Typedef) {
+			type = type.type.type;
+		}
+		if (attribute.stringifier && !(type instanceof DOMStringType || type instanceof USVStringType)) {
 			error('The stringifier keyword must not be placed on an attribute unless it is declared to be of type DOMString or USVString', 
 					attribute,
 					WebIDLPackage.Literals.ATTRIBUTE__TYPE)
@@ -549,10 +555,10 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	 * Callback functions must not be used as the type of a constant.
 	 */
 	@Check
-	def checkConstTypeNotCallbackFunction(Const constant) {
+	def checkConstTypeNotCallback(Const constant) {
 		val constantType = constant.type;
 		if (constantType instanceof ReferenceType) {
-			if (constantType.typeRef instanceof CallbackFunction) {
+			if (constantType.typeRef instanceof Callback) {
 				error('Callback functions must not be used as the type of a constant', 
 						constant,
 						WebIDLPackage.Literals.CONST__TYPE)
@@ -561,8 +567,8 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	}
 
 	@Check
-	def checkExtendedAttributeOnCallbackFunction(CallbackFunction callbackFunction) {
-		val allowedExtendedAttributes = #[EA_TREAT_NON_OBJECT_AS_NULL];
+	def checkExtendedAttributeOnCallback(Callback callbackFunction) {
+		val allowedExtendedAttributes = #[EA_LEGACY_TREAT_NON_OBJECT_AS_NULL];
 		val containerDefinition = callbackFunction.eContainer as ExtendedDefinition;
 		checkAllowedExtendedAttributes(containerDefinition.eal, allowedExtendedAttributes, 'callback functions');
 	}
@@ -581,10 +587,10 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 	 * The two identifiers must identify two different interfaces.
 	 */
 	@Check
-	def checkImplementsStatementIdentifiers(ImplementsStatement implementsStatement) {
-		if (implementsStatement.ifaceA == implementsStatement.ifaceB) {
-			error('The two identifiers in an implements statement must identify two different interfaces.', 
-					implementsStatement,
+	def checkIncludesStatementIdentifiers(IncludesStatement includesStatement) {
+		if (includesStatement.ifaceA == includesStatement.ifaceB) {
+			error('The two identifiers in an includes statement must identify two different interfaces.', 
+					includesStatement,
 					WebIDLPackage.Literals.CONST__TYPE)
 		}
 	}
@@ -613,35 +619,35 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 //	}
 
 	/**
-	 * The interface identified on the left-hand side of an implements statement must not inherit from the interface identifier on the right-hand side, and vice versa.
+	 * The interface identified on the left-hand side of an includes statement must not inherit from the interface identifier on the right-hand side, and vice versa.
 	 */
 	@Check
-	def checkImplementsStatementInherits(ImplementsStatement implementsStatement) {
+	def checkIncludesStatementInherits(IncludesStatement includesStatement) {
 		// FIXME use inherited interfaces instead?!
 		// TODO Check typedefs!
-		val ifaceA = implementsStatement.ifaceA;
-		val ifaceB = implementsStatement.ifaceB;
-		if (ifaceA != null && ifaceB != null) {
+		val ifaceA = includesStatement.ifaceA;
+		val ifaceB = includesStatement.ifaceB;
+		if (ifaceA !== null && ifaceB !== null) {
 			if (ifaceA.inherits == ifaceB) {
-				error('The interface identified on the left-hand side of an implements statement must not inherit from the interface identifier on the right-hand side', 
-							implementsStatement,
-							WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_A)
+				error('The interface identified on the left-hand side of an includes statement must not inherit from the interface identifier on the right-hand side', 
+							includesStatement,
+							WebIDLPackage.Literals.INCLUDES_STATEMENT__IFACE_A)
 			}
 			if (ifaceB instanceof Interface) {
 				if (ifaceB.inherits == ifaceA) {
-					error('The interface identified on the right-hand side of an implements statement must not inherit from the interface identifier on the left-hand side', 
-						implementsStatement,
-						WebIDLPackage.Literals.IMPLEMENTS_STATEMENT__IFACE_B)
+					error('The interface identified on the right-hand side of an includes statement must not inherit from the interface identifier on the left-hand side', 
+						includesStatement,
+						WebIDLPackage.Literals.INCLUDES_STATEMENT__IFACE_B)
 				}
 			}
 		}
 	}
 
 	@Check
-	def checkExtendedAttributeOnImplementsStatement(ImplementsStatement implementsStatement) {
+	def checkExtendedAttributeOnIncludesStatement(IncludesStatement includesStatement) {
 		val allowedExtendedAttributes = #[];
-		val containerDefinition = implementsStatement.eContainer as ExtendedDefinition;
-		checkAllowedExtendedAttributes(containerDefinition.eal, allowedExtendedAttributes, 'implements statements');
+		val containerDefinition = includesStatement.eContainer as ExtendedDefinition;
+		checkAllowedExtendedAttributes(containerDefinition.eal, allowedExtendedAttributes, 'includes statements');
 	}
 
 	// See 3.10. Types
@@ -671,7 +677,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 3.11. Extended attributes
+	// See 3.3. Extended attributes
 
 	@Check
 	def checkDeprecatedExtendedAttribute(ExtendedAttribute extendedAttribute) {
@@ -691,7 +697,20 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.1. [Clamp]
+	// See 3.3.1. [AllowShared]
+
+	@Check
+	def checkExtendedAttributeAllowSharedTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_ALLOW_SHARED) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.3.2. [Clamp]
 
 	@Check
 	def checkExtendedAttributeClampTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -704,50 +723,64 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.2. [Constructor]
+// TODO Is this now HTMLConstructor?
+//	// See 3.3.2. [Constructor]
+//
+//	@Check
+//	def checkExtendedAttributeConstructorTakesNoArgumentsOrTakesAnArgumentList(ExtendedAttribute extendedAttribute) {
+//		if (extendedAttribute.nameRef == EA_CONSTRUCTOR) {
+//			if (!(extendedAttribute.takesNoArguments() || extendedAttribute.takesAnArgumentList())) {
+//				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take no arguments or take an argument list', 
+//					extendedAttribute,
+//					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//			}
+//		}
+//	}
+//
+//	@Check
+//	def checkExtendedAttributeConstructorNotNoInterfaceObject(Interface iface) {
+//		if (iface.callback) {
+//			val containerDefinition = iface.eContainer as ExtendedDefinition;
+//			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+//			if (extendedAttributes.containsExtendedAttribute(EA_CONSTRUCTOR) && extendedAttributes.containsExtendedAttribute(EA_NO_INTERFACE_OBJECT)) {
+//				extendedAttributes.getAllExtendedAttributes(EA_NO_INTERFACE_OBJECT).forEach[
+//					error('If the "Constructor" extended attribute is specified on an interface, then the "NoInterfaceObject" extended attribute must not also be specified on that interface', 
+//						it,
+//						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//				];
+//			}
+//		}
+//	}
+//
+//	@Check
+//	def checkExtendedAttributeConstructorNotOnCallbackInterface(Interface iface) {
+//		if (iface.callback) {
+//			val containerDefinition = iface.eContainer as ExtendedDefinition;
+//			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+//			if (extendedAttributes.containsExtendedAttribute(EA_CONSTRUCTOR)) {
+//				extendedAttributes.getAllExtendedAttributes(EA_CONSTRUCTOR).forEach[
+//					error('The extended attribute "' + it.nameRef + '" must not be used on a callback interface', 
+//						it,
+//						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//				]
+//			}
+//		}
+//	}
+
+	// See 3.3.3. [Default]
 
 	@Check
-	def checkExtendedAttributeConstructorTakesNoArgumentsOrTakesAnArgumentList(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_CONSTRUCTOR) {
-			if (!(extendedAttribute.takesNoArguments() || extendedAttribute.takesAnArgumentList())) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take no arguments or take an argument list', 
+	def checkExtendedAttributeDefaultTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_DEFAULT) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
 					extendedAttribute,
 					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 			}
 		}
 	}
 
-	@Check
-	def checkExtendedAttributeConstructorNotNoInterfaceObject(Interface iface) {
-		if (iface.callback) {
-			val containerDefinition = iface.eContainer as ExtendedDefinition;
-			val extendedAttributes = containerDefinition.eal.extendedAttributes;
-			if (extendedAttributes.containsExtendedAttribute(EA_CONSTRUCTOR) && extendedAttributes.containsExtendedAttribute(EA_NO_INTERFACE_OBJECT)) {
-				extendedAttributes.getAllExtendedAttributes(EA_NO_INTERFACE_OBJECT).forEach[
-					error('If the "Constructor" extended attribute is specified on an interface, then the "NoInterfaceObject" extended attribute must not also be specified on that interface', 
-						it,
-						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-				];
-			}
-		}
-	}
-
-	@Check
-	def checkExtendedAttributeConstructorNotOnCallbackInterface(Interface iface) {
-		if (iface.callback) {
-			val containerDefinition = iface.eContainer as ExtendedDefinition;
-			val extendedAttributes = containerDefinition.eal.extendedAttributes;
-			if (extendedAttributes.containsExtendedAttribute(EA_CONSTRUCTOR)) {
-				extendedAttributes.getAllExtendedAttributes(EA_CONSTRUCTOR).forEach[
-					error('The extended attribute "' + it.nameRef + '" must not be used on a callback interface', 
-						it,
-						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-				]
-			}
-		}
-	}
-
-	// See 4.3.3. [EnforceRange]
+	// See 3.3.4. [EnforceRange]
 
 	@Check
 	def checkExtendedAttributeEnforceRangeTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -760,7 +793,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.4. [Exposed]
+	// See 3.3.5. [Exposed]
 
 	@Check
 	def checkExtendedAttributeExposedTakesAnIdentifierOrTakesAnIdentifierList(ExtendedAttribute extendedAttribute) {
@@ -786,20 +819,20 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.5. [ImplicitThis]
+//	// See 3.3.5. [ImplicitThis]
+//
+//	@Check
+//	def checkExtendedAttributeImplicitThisTakesNoArguments(ExtendedAttribute extendedAttribute) {
+//		if (extendedAttribute.nameRef == EA_IMPLICIT_THIS) {
+//			if (!extendedAttribute.takesNoArguments()) {
+//				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+//					extendedAttribute,
+//					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//			}
+//		}
+//	}
 
-	@Check
-	def checkExtendedAttributeImplicitThisTakesNoArguments(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_IMPLICIT_THIS) {
-			if (!extendedAttribute.takesNoArguments()) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	// See 4.3.6. [Global] and [PrimaryGlobal]
+	// See 3.3.6. [Global] and [PrimaryGlobal]
 
 	@Check
 	def checkExtendedAttributeGlobalTakesNoArgumentsOrTakesAnIdentifierList(ExtendedAttribute extendedAttribute) {
@@ -812,100 +845,18 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	@Check
-	def checkExtendedAttributePrimaryGlobalTakesNoArgumentsOrTakesAnIdentifierList(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_PRIMARY_GLOBAL) {
-			if (!(extendedAttribute.takesNoArguments() || extendedAttribute.takesAnIdentifierList())) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take no arguments or take an identifier list', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
+//	@Check
+//	def checkExtendedAttributePrimaryGlobalTakesNoArgumentsOrTakesAnIdentifierList(ExtendedAttribute extendedAttribute) {
+//		if (extendedAttribute.nameRef == EA_PRIMARY_GLOBAL) {
+//			if (!(extendedAttribute.takesNoArguments() || extendedAttribute.takesAnIdentifierList())) {
+//				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take no arguments or take an identifier list', 
+//					extendedAttribute,
+//					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//			}
+//		}
+//	}
 
-	// See 4.3.7. [LegacyArrayClass]
-
-	@Check
-	def checkExtendedAttributeLegacyArrayClassTakesNoArguments(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_LEGACY_ARRAY_CLASS) {
-			if (!extendedAttribute.takesNoArguments()) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	@Check
-	def checkExtendedAttributeLegacyArrayClassNotOnInterfaceThatInherits(Interface iface) {
-		if (!iface.inheritedInterfaces.isEmpty()) {
-			val containerDefinition = iface.eContainer as ExtendedDefinition;
-			val extendedAttributes = containerDefinition.eal.extendedAttributes;
-			if (extendedAttributes.containsExtendedAttribute(EA_LEGACY_ARRAY_CLASS)) {
-				extendedAttributes.getAllExtendedAttributes(EA_LEGACY_ARRAY_CLASS).forEach[
-					error('The extended attribute "' + it.nameRef + '" must not be used on an interface that has any inherited interfaces', 
-						it,
-						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-				]
-			}
-		}
-	}
-
-	// See 4.3.8. [LegacyUnenumerableNamedProperties]
-
-	@Check
-	def checkExtendedAttributeLegacyUnenumerableNamedPropertiesTakesNoArguments(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES) {
-			if (!extendedAttribute.takesNoArguments()) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	// See 4.3.9. [LenientThis]
-
-	@Check
-	def checkExtendedAttributeLenientThisThisTakesNoArguments(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_LENIENT_THIS) {
-			if (!extendedAttribute.takesNoArguments()) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	// See 4.3.10. [NamedConstructor]
-
-	@Check
-	def checkExtendedAttributeNamedConstructorTakesAnIdentifierOrTakesANamedArgumentList(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_NAMED_CONSTRUCTOR) {
-			if (!(extendedAttribute.takesAnIdentifier() || extendedAttribute.takesANamedArgumentList())) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take an identifier or take a named argument list', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	@Check
-	def checkExtendedAttributeNamedConstructorNotOnCallbackInterface(Interface iface) {
-		if (iface.callback) {
-			val containerDefinition = iface.eContainer as ExtendedDefinition;
-			val extendedAttributes = containerDefinition.eal.extendedAttributes;
-			if (extendedAttributes.containsExtendedAttribute(EA_NAMED_CONSTRUCTOR)) {
-				extendedAttributes.getAllExtendedAttributes(EA_NAMED_CONSTRUCTOR).forEach[
-					error('The extended attribute "' + it.nameRef + '" must not be used on a callback interface', 
-						it,
-						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-				]
-			}
-		}
-	}
-
-	// See 4.3.11. [NewObject]
+	// See 3.3.7. [NewObject]
 
 	@Check
 	def checkExtendedAttributeNewObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -918,33 +869,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.12. [NoInterfaceObject]
-
-	@Check
-	def checkExtendedAttributeNoInterfaceObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_NO_INTERFACE_OBJECT) {
-			if (!extendedAttribute.takesNoArguments()) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	// See 4.3.13. [OverrideBuiltins]
-
-	@Check
-	def checkExtendedAttributeOverrideBuiltinsTakesNoArguments(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_OVERRIDE_BUILTINS) {
-			if (!extendedAttribute.takesNoArguments()) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	// See 4.3.14. [PutForwards]
+	// See 3.3.8. [PutForwards]
 
 	@Check
 	def checkExtendedAttributePutForwardsTakesAnIdentifier(ExtendedAttribute extendedAttribute) {
@@ -957,7 +882,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.15. [Replaceable]
+	// See 3.3.9. [Replaceable]
 
 	@Check
 	def checkExtendedAttributeReplaceableTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -970,7 +895,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.16. [SameObject]
+	// See 3.3.10. [SameObject]
 
 	@Check
 	def checkExtendedAttributeSameObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -985,7 +910,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 
 	@Check
 	def checkExtendedAttributeSameObjectArgumentReadonlyType(Attribute attribute) {
-		if (!attribute.readOnly || !(attribute.type instanceof ObjectType || attribute.type instanceof ReferenceType)) {
+		if (!attribute.readOnly || !(attribute.type.type instanceof ObjectType || attribute.type.type instanceof ReferenceType)) {
 			val containerDefinition = attribute.eContainer as ExtendedInterfaceMember;
 			val extendedAttributes = containerDefinition.eal.extendedAttributes;
 			extendedAttributes
@@ -998,7 +923,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.17. [SecureContext]
+	// See 3.3.11. [SecureContext]
 
 	@Check
 	def checkExtendedAttributeSecureContextTakesNoArguments(ExtendedAttribute extendedAttribute) {
@@ -1011,41 +936,161 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		}
 	}
 
-	// See 4.3.18. [TreatNonObjectAsNull]
-
-	// See 4.3.19. [TreatNullAs]
-
-	@Check
-	def checkExtendedAttributeTreatNullAsTakesAnIdentifier(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_TREAT_NULL_AS) {
-			if (!extendedAttribute.takesAnIdentifier() || (extendedAttribute as ExtendedAttributeIdent).nameRefB != "EmptyString") {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must take the identifier EmptyString', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	// See 4.3.20. [Unforgeable]
-
-	@Check
-	def checkExtendedAttributeUnforgeableTakesNoArguments(ExtendedAttribute extendedAttribute) {
-		if (extendedAttribute.nameRef == EA_UNFORGEABLE) {
-			if (!extendedAttribute.takesNoArguments()) {
-				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
-					extendedAttribute,
-					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
-			}
-		}
-	}
-
-	// See 4.3.21. [Unscopable]
+	// See 3.3.12. [Unscopable]
 
 	@Check
 	def checkExtendedAttributeUnscopableTakesNoArguments(ExtendedAttribute extendedAttribute) {
 		if (extendedAttribute.nameRef == EA_UNSCOPABLE) {
 			if (!extendedAttribute.takesNoArguments()) {
 				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.4.1. [LegacyFactoryFunction]
+
+	// See 3.4.2. [LegacyLenientSetter]
+
+	// See 3.4.3. [LegacyLenientThis]
+
+	@Check
+	def checkExtendedAttributeLenientThisThisTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_LEGACY_LENIENT_THIS) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.4.4. [LegacyNamespace]
+
+	// See 3.4.5. [LegacyNoInterfaceObject]
+
+	@Check
+	def checkExtendedAttributeNoInterfaceObjectTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_LEGACY_NO_INTERFACE_OBJECT) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.4.6. [LegacyNullToEmptyString]
+
+	// See 3.4.7. [LegacyOverrideBuiltins]
+
+	@Check
+	def checkExtendedAttributeOverrideBuiltinsTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_LEGACY_OVERRIDE_BUILT_INS) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.4.8. [LegacyTreatNonObjectAsNull]
+
+	// See 3.4.9. [LegacyUnenumerableNamedProperties]
+
+	@Check
+	def checkExtendedAttributeLegacyUnenumerableNamedPropertiesTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_LEGACY_UNENUMERABLE_NAMED_PROPERTIES) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.4.10. [LegacyUnforgeable]
+
+	@Check
+	def checkExtendedAttributeUnforgeableTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_LEGACY_UNFORGEABLE) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
+		}
+	}
+
+	// See 3.4.11. [LegacyWindowAlias]
+
+//	// See 3.3.7. [LegacyArrayClass]
+//
+//	@Check
+//	def checkExtendedAttributeLegacyArrayClassTakesNoArguments(ExtendedAttribute extendedAttribute) {
+//		if (extendedAttribute.nameRef == EA_LEGACY_ARRAY_CLASS) {
+//			if (!extendedAttribute.takesNoArguments()) {
+//				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+//					extendedAttribute,
+//					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//			}
+//		}
+//	}
+//
+//	@Check
+//	def checkExtendedAttributeLegacyArrayClassNotOnInterfaceThatInherits(Interface iface) {
+//		if (!iface.inheritedInterfaces.isEmpty()) {
+//			val containerDefinition = iface.eContainer as ExtendedDefinition;
+//			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+//			if (extendedAttributes.containsExtendedAttribute(EA_LEGACY_ARRAY_CLASS)) {
+//				extendedAttributes.getAllExtendedAttributes(EA_LEGACY_ARRAY_CLASS).forEach[
+//					error('The extended attribute "' + it.nameRef + '" must not be used on an interface that has any inherited interfaces', 
+//						it,
+//						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//				]
+//			}
+//		}
+//	}
+//
+//	// See 3.3.10. [NamedConstructor]
+//
+//	@Check
+//	def checkExtendedAttributeNamedConstructorTakesAnIdentifierOrTakesANamedArgumentList(ExtendedAttribute extendedAttribute) {
+//		if (extendedAttribute.nameRef == EA_NAMED_CONSTRUCTOR) {
+//			if (!(extendedAttribute.takesAnIdentifier() || extendedAttribute.takesANamedArgumentList())) {
+//				error('The extended attribute "' + extendedAttribute.nameRef + '" must either take an identifier or take a named argument list', 
+//					extendedAttribute,
+//					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//			}
+//		}
+//	}
+//
+//	@Check
+//	def checkExtendedAttributeNamedConstructorNotOnCallbackInterface(Interface iface) {
+//		if (iface.callback) {
+//			val containerDefinition = iface.eContainer as ExtendedDefinition;
+//			val extendedAttributes = containerDefinition.eal.extendedAttributes;
+//			if (extendedAttributes.containsExtendedAttribute(EA_NAMED_CONSTRUCTOR)) {
+//				extendedAttributes.getAllExtendedAttributes(EA_NAMED_CONSTRUCTOR).forEach[
+//					error('The extended attribute "' + it.nameRef + '" must not be used on a callback interface', 
+//						it,
+//						WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+//				]
+//			}
+//		}
+//	}
+//
+//	// See 3.3.18. [TreatNonObjectAsNull]
+//
+//	// See 3.3.19. [TreatNullAs]
+
+	@Check
+	def checkExtendedAttributeTreatNullAsTakesAnIdentifier(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_TREAT_NULL_AS) {
+			if (!extendedAttribute.takesAnIdentifier() || (extendedAttribute as ExtendedAttributeIdent).nameRefB != "EmptyString") {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take the identifier EmptyString', 
 					extendedAttribute,
 					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
 			}
@@ -1067,7 +1112,7 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 		switch (containerDefinition) {
 			Argument: WebIDLPackage.Literals.ARGUMENT__TYPE
 			Attribute: WebIDLPackage.Literals.ATTRIBUTE__TYPE
-			CallbackFunction: WebIDLPackage.Literals.CALLBACK_FUNCTION__TYPE
+			Callback: WebIDLPackage.Literals.CALLBACK__TYPE
 			DictionaryMember: WebIDLPackage.Literals.DICTIONARY_MEMBER__TYPE
 			Iterable_: WebIDLPackage.Literals.ITERABLE___TYPES
 			Maplike: if(containerDefinition.keyType == type) {
@@ -1088,8 +1133,23 @@ class WebIDLValidator extends AbstractWebIDLValidator {
 			Interface: WebIDLPackage.Literals.INTERFACE__NAME
 			Dictionary: WebIDLPackage.Literals.DICTIONARY__NAME
 			Enum: WebIDLPackage.Literals.ENUM__NAME
-			CallbackFunction: WebIDLPackage.Literals.CALLBACK_FUNCTION__NAME
+			Callback: WebIDLPackage.Literals.CALLBACK__NAME
 			Typedef: WebIDLPackage.Literals.TYPEDEF__NAME
+		}
+	}
+
+	// HTML Specification // TODO extract to own HtmlValidator
+
+	// 3.2.3 HTML element constructors
+
+	@Check
+	def checkExtendedAttributeHTMLConstructorTakesNoArguments(ExtendedAttribute extendedAttribute) {
+		if (extendedAttribute.nameRef == EA_HTML_CONSTRUCTOR) {
+			if (!extendedAttribute.takesNoArguments()) {
+				error('The extended attribute "' + extendedAttribute.nameRef + '" must take no arguments', 
+					extendedAttribute,
+					WebIDLPackage.Literals.EXTENDED_ATTRIBUTE__NAME_REF)
+			}
 		}
 	}
 }

@@ -20,19 +20,19 @@ package com.rainerschuster.webidl.ui.labeling
 
 import com.google.inject.Inject
 import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.CallbackFunction
+import com.rainerschuster.webidl.webIDL.Callback
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.DictionaryMember
 import com.rainerschuster.webidl.webIDL.Enum
-import com.rainerschuster.webidl.webIDL.ImplementsStatement
+import com.rainerschuster.webidl.webIDL.IncludesStatement
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.Iterable_
 import com.rainerschuster.webidl.webIDL.Maplike
 import com.rainerschuster.webidl.webIDL.Operation
 import com.rainerschuster.webidl.webIDL.PartialDictionary
 import com.rainerschuster.webidl.webIDL.PartialInterface
-import com.rainerschuster.webidl.webIDL.Serializer
+//import com.rainerschuster.webidl.webIDL.Serializer
 import com.rainerschuster.webidl.webIDL.Setlike
 import com.rainerschuster.webidl.webIDL.Stringifier
 import com.rainerschuster.webidl.webIDL.Typedef
@@ -99,7 +99,7 @@ class WebIDLLabelProvider extends DefaultEObjectLabelProvider {
 		'typedef.png'
 	}
 
-	def image(ImplementsStatement ele) {
+	def image(IncludesStatement ele) {
 		'implementsStatement.png'
 	}
 
@@ -116,9 +116,9 @@ class WebIDLLabelProvider extends DefaultEObjectLabelProvider {
 		'operation.png'
 	}
 
-	def image(Serializer ele) {
-		'operation.png'
-	}
+//	def image(Serializer ele) {
+//		'operation.png'
+//	}
 
 	def image(Stringifier ele) {
 		'operation.png'
@@ -140,7 +140,7 @@ class WebIDLLabelProvider extends DefaultEObjectLabelProvider {
 		'setlike.png'
 	}
 
-	def image(CallbackFunction ele) {
+	def image(Callback ele) {
 		'callbackFunction.png'
 	}
 

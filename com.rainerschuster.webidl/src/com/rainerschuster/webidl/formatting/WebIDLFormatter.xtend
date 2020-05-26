@@ -63,14 +63,14 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 //		c.setLinewrap().before(definitionRule);
 
 		// Callback function
-		c.setLinewrap().after(callbackFunctionAccess.semicolonKeyword_7);
+		c.setLinewrap().after(callbackAccess.semicolonKeyword_7);
 
 		// Interface
 		c.setLinewrap().before(interfaceAccess.interfaceKeyword_1);
-		c.setIndentation(interfaceAccess.leftCurlyBracketKeyword_4, interfaceAccess.rightCurlyBracketKeyword_6);
-		c.setLinewrap().after(interfaceAccess.leftCurlyBracketKeyword_4);
-		c.setNoSpace.between(interfaceAccess.rightCurlyBracketKeyword_6, interfaceAccess.semicolonKeyword_7);
-		c.setLinewrap().after(interfaceAccess.semicolonKeyword_7);
+		c.setIndentation(interfaceAccess.leftCurlyBracketKeyword_5, interfaceAccess.rightCurlyBracketKeyword_7);
+		c.setLinewrap().after(interfaceAccess.leftCurlyBracketKeyword_5);
+		c.setNoSpace.between(interfaceAccess.rightCurlyBracketKeyword_7, interfaceAccess.semicolonKeyword_8);
+		c.setLinewrap().after(interfaceAccess.semicolonKeyword_8);
 
 		// Dictionary
 		c.setLinewrap().before(dictionaryAccess.dictionaryKeyword_0);
@@ -85,10 +85,10 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap().before(partialAccess.partialKeyword_0);
 
 		// Partial Interface
-		c.setIndentation(partialInterfaceAccess.leftCurlyBracketKeyword_2, partialInterfaceAccess.rightCurlyBracketKeyword_4);
-		c.setLinewrap().after(partialInterfaceAccess.leftCurlyBracketKeyword_2);
-		c.setNoSpace.between(partialInterfaceAccess.rightCurlyBracketKeyword_4, partialInterfaceAccess.semicolonKeyword_5);
-		c.setLinewrap().after(partialInterfaceAccess.semicolonKeyword_5);
+		c.setIndentation(partialInterfaceAccess.leftCurlyBracketKeyword_3, partialInterfaceAccess.rightCurlyBracketKeyword_5);
+		c.setLinewrap().after(partialInterfaceAccess.leftCurlyBracketKeyword_3);
+		c.setNoSpace.between(partialInterfaceAccess.rightCurlyBracketKeyword_5, partialInterfaceAccess.semicolonKeyword_6);
+		c.setLinewrap().after(partialInterfaceAccess.semicolonKeyword_6);
 
 		// Partial Dictionary
 		c.setIndentation(partialDictionaryAccess.leftCurlyBracketKeyword_2, partialDictionaryAccess.rightCurlyBracketKeyword_4);
@@ -107,9 +107,9 @@ class WebIDLFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap(2).after(typedefAccess.semicolonKeyword_3);
 		c.setNoSpace().before(typedefAccess.semicolonKeyword_3);
 
-		// ImplementsStatement
-		c.setLinewrap(2).after(implementsStatementAccess.semicolonKeyword_3);
-		c.setNoSpace().before(implementsStatementAccess.semicolonKeyword_3);
+		// IncludesStatement
+		c.setLinewrap(2).after(includesStatementAccess.semicolonKeyword_3);
+		c.setNoSpace().before(includesStatementAccess.semicolonKeyword_3);
 
 		// Interface member
 		c.setLinewrap().after(interfaceMemberRule);

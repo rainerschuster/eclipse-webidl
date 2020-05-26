@@ -22,9 +22,8 @@ import com.rainerschuster.webidl.webIDL.Attribute
 import com.rainerschuster.webidl.webIDL.BooleanType
 import com.rainerschuster.webidl.webIDL.ByteStringType
 import com.rainerschuster.webidl.webIDL.ByteType
-import com.rainerschuster.webidl.webIDL.CallbackFunction
+import com.rainerschuster.webidl.webIDL.Callback
 import com.rainerschuster.webidl.webIDL.Const
-import com.rainerschuster.webidl.webIDL.DOMExceptionType
 import com.rainerschuster.webidl.webIDL.DOMStringType
 import com.rainerschuster.webidl.webIDL.DataViewType
 import com.rainerschuster.webidl.webIDL.DateType
@@ -152,7 +151,7 @@ class NameUtil {
 			Interface: definition.name
 			Dictionary: definition.name
 			com.rainerschuster.webidl.webIDL.Enum: definition.name
-			CallbackFunction: definition.name
+			Callback: definition.name
 			Typedef: definition.name
 		}
 	}
@@ -185,7 +184,7 @@ class NameUtil {
 			 Interface: type.name
 			 Dictionary: type.name
 			 Enum: type.name
-			 CallbackFunction: type.name
+			 Callback: type.name
 			 Typedef: type.name // TODO This may not be specified!
 			 default: null
 		}
@@ -236,10 +235,10 @@ class NameUtil {
 			ObjectType: 'Object'
 			SequenceType: typeName(type.type as Type) + 'Sequence'
 			PromiseType: typeName(type.type as /*Return*/Type) + 'Promise'
-			UnionType: type.unionMemberTypes.map[typeName(it)].join('Or')
+			UnionType: type.unionMemberTypes.map[typeName(it.type)].join('Or')
 			DateType: 'Date'
 			RegExpType: 'RegExp'
-			DOMExceptionType: 'DOMException'
+//			DOMExceptionType: 'DOMException'
 			ArrayBufferType : 'ArrayBuffer'
 			DataViewType : 'DataView'
 			Int8ArrayType : 'Int8Array'

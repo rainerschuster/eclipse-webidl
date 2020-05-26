@@ -23,12 +23,12 @@ import com.google.common.collect.ListMultimap
 import com.google.inject.Inject
 import com.rainerschuster.webidl.webIDL.Argument
 import com.rainerschuster.webidl.webIDL.Attribute
-import com.rainerschuster.webidl.webIDL.CallbackFunction
+import com.rainerschuster.webidl.webIDL.Callback
 import com.rainerschuster.webidl.webIDL.Const
 import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.ExtendedAttributeList
 import com.rainerschuster.webidl.webIDL.ExtendedInterfaceMember
-import com.rainerschuster.webidl.webIDL.ImplementsStatement
+import com.rainerschuster.webidl.webIDL.IncludesStatement
 import com.rainerschuster.webidl.webIDL.Interface
 import com.rainerschuster.webidl.webIDL.InterfaceMember
 import com.rainerschuster.webidl.webIDL.Operation
@@ -54,6 +54,7 @@ import com.rainerschuster.webidl.webIDL.impl.OperationImpl
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.EcoreUtil2
 import java.util.Set
+import com.rainerschuster.webidl.util.TypeUtil
 
 /**
  * Generates code from your model files on save.
@@ -195,7 +196,7 @@ class WebIDLGeneratorJava implements IGenerator {
 		}
 	'''
 
-	def binding(CallbackFunction callback, List<EffectiveOverloadingSetEntry<CallbackFunction>> effectiveOverloadingSet) '''
+	def binding(Callback callback, List<EffectiveOverloadingSetEntry<Callback>> effectiveOverloadingSet) '''
 		«IF callback.eContainer.fullyQualifiedName != null»
 			package «callback.eContainer.fullyQualifiedName»;
 
@@ -235,22 +236,22 @@ class WebIDLGeneratorJava implements IGenerator {
 	// TODO is... for boolean! (non-nullable?!)
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, Attribute attribute) '''
 		«IF !attribute.inherit»
-			«attribute.type.toJavaType» get«attribute.name.toFirstUpper»();
+			«attribute.type.type.toJavaType» get«attribute.name.toFirstUpper»();
 		«ENDIF»
 		«IF !attribute.readOnly»
-			void set«attribute.name.toFirstUpper»(«attribute.type.toJavaType» «attribute.name.getEscapedJavaName»);
+			void set«attribute.name.toFirstUpper»(«attribute.type.type.toJavaType» «attribute.name.getEscapedJavaName»);
 		«ENDIF»
 
 	'''
 
 	// FIXME What if more than one specials occur, e.g.: setter creator void (unsigned long index, HTMLOptionElement? option);
 	def dispatch bindingInterfaceMember(ExtendedAttributeList eal, Operation operation) '''
-		«operation.type.toJavaType» «IF operation.name.nullOrEmpty»«IF operation.specials.contains(Special.GETTER)»_get«ELSEIF operation.specials.contains(Special.SETTER)»_set«ELSEIF operation.specials.contains(Special.DELETER)»_delete«ELSEIF operation.specials.contains(Special.LEGACYCALLER)»_call«ENDIF»«ELSE»«operation.name.getEscapedJavaName»«ENDIF»(«FOR i : operation.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»);
+		«operation.type.toJavaType» «IF operation.name.nullOrEmpty»«IF operation.specials.contains(Special.GETTER)»_get«ELSEIF operation.specials.contains(Special.SETTER)»_set«ELSEIF operation.specials.contains(Special.DELETER)»_delete«ENDIF»«ELSE»«operation.name.getEscapedJavaName»«ENDIF»(«FOR i : operation.arguments SEPARATOR ', '»«binding(i)»«ENDFOR»);
 	'''
 
 	def binding(Argument parameter) '''
-		«parameter.type.toJavaType»«IF parameter.ellipsis»...«ENDIF» «parameter.name.getEscapedJavaName»'''
+		«TypeUtil.type(parameter).toJavaType»«IF parameter.ellipsis»...«ENDIF» «parameter.name.getEscapedJavaName»'''
 	def binding(Argument parameter, Pair<Type, OptionalityValue> o) '''
-		«parameter.type.toJavaType»«IF o.value == OptionalityValue.VARIADIC»...«ENDIF» «parameter.name.getEscapedJavaName»'''
+		«TypeUtil.type(parameter).toJavaType»«IF o.value == OptionalityValue.VARIADIC»...«ENDIF» «parameter.name.getEscapedJavaName»'''
 
 }

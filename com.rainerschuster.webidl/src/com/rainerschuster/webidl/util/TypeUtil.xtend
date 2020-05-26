@@ -20,8 +20,7 @@ import com.rainerschuster.webidl.webIDL.ArrayBufferType
 import com.rainerschuster.webidl.webIDL.BooleanType
 import com.rainerschuster.webidl.webIDL.ByteStringType
 import com.rainerschuster.webidl.webIDL.ByteType
-import com.rainerschuster.webidl.webIDL.CallbackFunction
-import com.rainerschuster.webidl.webIDL.DOMExceptionType
+import com.rainerschuster.webidl.webIDL.Callback
 import com.rainerschuster.webidl.webIDL.DOMStringType
 import com.rainerschuster.webidl.webIDL.DataViewType
 import com.rainerschuster.webidl.webIDL.DateType
@@ -29,10 +28,11 @@ import com.rainerschuster.webidl.webIDL.Definition
 import com.rainerschuster.webidl.webIDL.Dictionary
 import com.rainerschuster.webidl.webIDL.DoubleType
 import com.rainerschuster.webidl.webIDL.Enum
+import com.rainerschuster.webidl.webIDL.ExtendedType
 import com.rainerschuster.webidl.webIDL.Float32ArrayType
 import com.rainerschuster.webidl.webIDL.Float64ArrayType
 import com.rainerschuster.webidl.webIDL.FloatType
-import com.rainerschuster.webidl.webIDL.ImplementsStatement
+import com.rainerschuster.webidl.webIDL.IncludesStatement
 import com.rainerschuster.webidl.webIDL.Int16ArrayType
 import com.rainerschuster.webidl.webIDL.Int32ArrayType
 import com.rainerschuster.webidl.webIDL.Int8ArrayType
@@ -69,8 +69,25 @@ import com.rainerschuster.webidl.webIDL.InterfaceOrTypedef
 import com.rainerschuster.webidl.webIDL.DictionaryOrTypedef
 import com.rainerschuster.webidl.webIDL.FrozenArrayType
 import static extension com.rainerschuster.webidl.util.NameUtil.*
+import com.rainerschuster.webidl.webIDL.DictionaryMember
 
 class TypeUtil {
+
+	def static Type type(Argument argument) {
+		val argumentType = argument.type;
+		switch argumentType {
+			ExtendedType: argumentType.type
+			Type: argumentType
+		}
+	}
+
+	def static Type type(DictionaryMember dictionaryMember) {
+		val dictionaryMemberType = dictionaryMember.type;
+		switch dictionaryMemberType {
+			ExtendedType: dictionaryMemberType.type
+			Type: dictionaryMemberType
+		}
+	}
 
 	// See 3.2. Interfaces
 	/**
@@ -80,7 +97,7 @@ class TypeUtil {
 		val result = newArrayList();
 		var currentInterface = iface;
 		var currentInherit = currentInterface.inherits;
-		while (currentInherit != null) {
+		while (currentInherit !== null) {
 			if (currentInherit instanceof Typedef) {
 				currentInterface = resolveDefinition(currentInherit) as Interface;
 			} else if (currentInherit instanceof Interface) {
@@ -104,7 +121,7 @@ class TypeUtil {
 	}
 
 	static def Definition resolveDefinition(Typedef typedef) {
-		val Type type = typedef.type;
+		val Type type = typedef.type.type;
 		if (type instanceof ReferenceType) {
 			resolveDefinition(type)
 		} else {
@@ -123,7 +140,7 @@ class TypeUtil {
 	}
 
 	static def Type resolveType(Typedef typedef) {
-		val Type type = typedef.type;
+		val Type type = typedef.type.type;
 		if (type instanceof ReferenceType) {
 			resolveType(type)
 		} else {
@@ -260,7 +277,7 @@ class TypeUtil {
 	/**
 	 * {@link http://heycam.github.io/webidl/#dfn-variadic}
 	 */
-	static def boolean variadic(CallbackFunction callback) {
+	static def boolean variadic(Callback callback) {
 		if (callback.arguments.nullOrEmpty) {
 			return false;
 		}
@@ -369,7 +386,7 @@ class TypeUtil {
 		// each interface B where the IDL states A implements B
 		// FIXME eCrossReferences does not work!
 		val references = iface.eCrossReferences;
-		val bs = references.filter(typeof(ImplementsStatement)).filter[it.ifaceA == iface].map[it.ifaceB].filter(typeof(Interface)).filter[!result.contains(it)];
+		val bs = references.filter(typeof(IncludesStatement)).filter[it.ifaceA == iface].map[it.ifaceB].filter(typeof(Interface)).filter[!result.contains(it)];
 		result += bs;
 		newInterfaces += bs;
 		// each interface that a consequential interface of A inherits from
@@ -407,10 +424,11 @@ class TypeUtil {
 	static def Set<Type> flattenedMemberTypes(UnionType unionType) {
 		val Set<Type> s = newLinkedHashSet();
 		for (u : unionType.unionMemberTypes) {
-			if (u instanceof UnionType) {
-				s += flattenedMemberTypes(u);
+			val uType = u.type;
+			if (uType instanceof UnionType) {
+				s += flattenedMemberTypes(uType);
 			} else {
-				s += u;
+				s += uType;
 			}
 		}
 		return s;
@@ -422,13 +440,14 @@ class TypeUtil {
 	static def int numberOfNullableMemberTypes(UnionType unionType) {
 		var n = 0;
 		for (u : unionType.unionMemberTypes) {
-			if (nullableType(u)) {
+			val uType = u.type;
+			if (nullableType(uType)) {
 				n = n + 1;
 			}
 			// TODO http://heycam.github.io/webidl/#dfn-union-type
-			if (u instanceof UnionType) {
+			if (uType instanceof UnionType) {
 				// Let m be the number of nullable member types of U.
-				val m = numberOfNullableMemberTypes(u);
+				val m = numberOfNullableMemberTypes(uType);
 				n = n + m;
 			}
 		}
@@ -457,14 +476,14 @@ class TypeUtil {
 		val intermediate = switch type {
 			ReferenceType : {
 				var Definition resolved = type.typeRef;
-				if (resolved != null) {
+				if (resolved !== null) {
 					switch resolved {
 						Interface : resolved.name
 						Dictionary : "java.util.HashMap<java.lang.String,java.lang.Object>"
 						Enum : "java.lang.String"
-						// TODO implement CallbackFunctionType!
-						CallbackFunction : resolved.name
-						Typedef : resolved.type.toJavaType
+						// TODO implement CallbackType!
+						Callback : resolved.name
+						Typedef : resolved.type.type.toJavaType
 					}
 				} else {
 					null
@@ -492,12 +511,12 @@ class TypeUtil {
 //			InterfaceSymbol : type.name
 //			DictionarySymbol : "java.util.HashMap<java.lang.String,java.lang.Object>"
 //			EnumerationSymbol : "java.lang.String"
-//			// TODO implement CallbackFunctionType!
-//			CallbackFunctionSymbol : type.name
+//			// TODO implement CallbackType!
+//			CallbackSymbol : type.name
 			SequenceType : {
-				val Type subType = type.type;
+				val Type subType = type.type.type;
 				val String subTypeString = subType.toJavaType;
-				if (subTypeString != null) {
+				if (subTypeString !== null) {
 					subTypeString + "[]";
 				}
 			}
@@ -507,7 +526,6 @@ class TypeUtil {
 				"java.lang.Object"
 			}
 			UnionType : "java.lang.Object"
-			DOMExceptionType : "java.lang.Object"
 			DateType : "java.util.Date"
 			ByteStringType : "String"
 			USVStringType : "String"
@@ -534,9 +552,9 @@ class TypeUtil {
 //			Float32ArrayType : "java.lang.Object"
 //			Float64ArrayType : "java.lang.Object"
 			FrozenArrayType : {
-				val Type subType = type.type;
+				val Type subType = type.type.type;
 				val String subTypeString = subType.toJavaType;
-				if (subTypeString != null) {
+				if (subTypeString !== null) {
 					subTypeString + "Array";
 				}
 			}
@@ -558,22 +576,22 @@ class TypeUtil {
 
 	// FIXME This is copied from WebIDLGenerator!
 	def static binding(Argument parameter) '''
-		«IF parameter.ellipsis»...«ENDIF»«parameter.name.getEscapedJavaName»«IF parameter.optional»?«ENDIF»: «parameter.type.toTypeScriptType»'''
+		«IF parameter.ellipsis»...«ENDIF»«parameter.name.getEscapedJavaName»«IF parameter.optional»?«ENDIF»: «type(parameter).toTypeScriptType»'''
 	def static binding(Argument parameter, Pair<Type, OptionalityValue> o) '''
-		«IF o.value == OptionalityValue.VARIADIC»...«ENDIF»«parameter.name.getEscapedJavaName»«IF o.value == OptionalityValue.OPTIONAL»?«ENDIF»: «parameter.type.toTypeScriptType»'''
+		«IF o.value == OptionalityValue.VARIADIC»...«ENDIF»«parameter.name.getEscapedJavaName»«IF o.value == OptionalityValue.OPTIONAL»?«ENDIF»: «type(parameter)»'''
 
 	def static String toTypeScriptType(Type type) {
 		switch type {
 			ReferenceType : {
 				var Definition resolved = type.typeRef;
-				if (resolved != null) {
+				if (resolved !== null) {
 					switch resolved {
 						Interface : resolved.name
 						Dictionary : "any" // TODO Dictionary
 						Enum : "string" // TODO is this correct?
-						// TODO implement CallbackFunctionType!
-						CallbackFunction : "(" + resolved.arguments.map[binding(it)].join(", ") + ")" + " => " + toTypeScriptType(resolved.type) // "any"  // TODO CallbackFunction // resolved.name
-						Typedef : resolved.type.toTypeScriptType
+						// TODO implement CallbackType!
+						Callback : "(" + resolved.arguments.map[binding(it)].join(", ") + ")" + " => " + toTypeScriptType(resolved.type) // "any"  // TODO Callback // resolved.name
+						Typedef : resolved.type.type.toTypeScriptType
 					}
 				} else {
 					null
@@ -601,12 +619,12 @@ class TypeUtil {
 //			InterfaceSymbol : type.name
 //			DictionarySymbol : "java.util.HashMap<java.lang.String,java.lang.Object>"
 //			EnumerationSymbol : "java.lang.String"
-//			// TODO implement CallbackFunctionType!
-//			CallbackFunctionSymbol : type.name
+//			// TODO implement CallbackType!
+//			CallbackSymbol : type.name
 			SequenceType : {
-				val Type subType = type.type;
+				val Type subType = type.type.type;
 				val String subTypeString = subType.toTypeScriptType;
-				if (subTypeString != null) {
+				if (subTypeString !== null) {
 					"Array<" + subTypeString + ">";
 //					subTypeString + "[]";
 				}
@@ -621,7 +639,6 @@ class TypeUtil {
 //				}
 			}
 			UnionType : "any" // TODO union
-			DOMExceptionType : "any"
 			DateType : "Date"
 			ByteStringType : "string"
 			USVStringType : "string"
@@ -637,9 +654,9 @@ class TypeUtil {
 			Float32ArrayType : "Float32Array"
 			Float64ArrayType : "Float64Array"
 			FrozenArrayType : { // TODO What?
-				val Type subType = type.type;
+				val Type subType = type.type.type;
 				val String subTypeString = subType.toTypeScriptType;
-				if (subTypeString != null) {
+				if (subTypeString !== null) {
 					"Array<" + subTypeString + ">";
 //					subTypeString + "[]";
 				}
